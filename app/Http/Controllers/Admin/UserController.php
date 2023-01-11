@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
 use Paginator;
+use App\Model\Menu;
+
 
 class UserController extends Controller
 {
@@ -41,9 +43,15 @@ class UserController extends Controller
     public function show($id)
     {
         $query = User::find($id);
-        $query->role;
+        $access_menu = $query->role->roleMenu;
         $query->admin;
 
+        $access_menu = $access_menu->map(function ($q) {
+            $q['menu'] = Menu::select(['id','code','name'])->where('id', $q->menu_id)->first();
+
+            return $q;
+        });
+        
         return response()->json([
             'status' =>'success',
             'data' => $query

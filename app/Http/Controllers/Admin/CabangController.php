@@ -5,79 +5,79 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Model\Cabang;
+
 class CabangController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $cabang = Cabang::paginate(15);
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $cabang
+        ], 200); 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+
+        $cabang = Cabang::create([
+            "is_active"=> $request->is_active,
+            "old_id"=> $request->old_id,
+            "name"=> $request->name,
+            "alamat"=> $request->alamat,
+            "cash_in_hand_berjalan"=> $request->cash_in_hand_berjalan,
+            "counter_anggota"=> $request->counter_anggota,
+            "counter_faktur"=> $request->counter_faktur,
+            "hp"=> $request->hp,
+            "kode"=> $request->kode,
+            "skema_hitung"=> $request->skema_hitung,
+            "telepon"=> $request->telepon,
+            "created_by_id"=> $request->created_by_id,
+            "updated_by_id"=> $request->updated_by_id,
+            "kabupaten_kota_id"=> $request->kabupaten_kota_id,
+            "kepala_cabang_id"=> $request->kepala_cabang_id,
+            "kepala_cabang_senior_id"=> $request->kepala_cabang_senior_id,
+            "kepala_unit_id"=> $request->kepala_unit_id,
+            "kas_awal"=> $request->kas_awal,
+            "ip_address"=> "",
+            "latitude"=> $request->latitude,
+            "longitude"=> $request->longitude
+        ]);
+
+        return response()->json([
+            'type' =>'success',
+            'data' => $cabang
+        ]);
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $cabang = Cabang::find($id);
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $cabang
+        ], 200); 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //

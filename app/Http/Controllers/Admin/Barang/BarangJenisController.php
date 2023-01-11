@@ -24,7 +24,6 @@ class BarangJenisController extends Controller
         ], 200);  
     }
 
-
     public function create()
     {
         //
@@ -33,13 +32,23 @@ class BarangJenisController extends Controller
 
     public function store(Request $request)
     {
-        //
+        $jenis = BarangJenis::create([
+            "jenis"=> $request->jenis,
+            "id_kategori"=> $request->id_kategori,
+            "golongan" => $request->golongan
+        ]);
+
+        return response()->json([
+            'type' =>'success',
+            'data' => $jenis
+        ]);
     }
 
    
     public function show($id)
     {
         $query = BarangJenis::find($id);
+        $query->barangKategori;
 
         return response()->json([
             'status' =>'success',

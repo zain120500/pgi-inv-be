@@ -18,7 +18,7 @@ class BarangKeluarController extends Controller
         return response()->json([
             'status' =>'success',
             'data' => $barang
-        ], 200); 
+        ], 200);
     }
 
     public function create()

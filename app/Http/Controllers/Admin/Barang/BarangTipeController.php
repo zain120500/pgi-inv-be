@@ -35,14 +35,25 @@ class BarangTipeController extends Controller
 
     public function store(Request $request)
     {
-        //
+        $tipe = BarangTipe::create([
+            "tipe"=> $request->tipe,
+            "satuan"=> $request->satuan,
+            "harga"=> $request->harga,
+            "tipe_kode"=> $request->tipe_kode,
+            "kode_barang"=> $request->kode_barang,
+            "id_merk"=> $request->id_merk
+        ]);
+
+        return response()->json([
+            'type' =>'success',
+            'data' => $tipe
+        ]);
     }
 
     public function show($id)
     {
         $query = BarangTipe::find($id);
         $query['merk'] = BarangMerk::find($query->id_merk);
-        $query->barangKeluar;
 
         return response()->json([
             'status' =>'success',

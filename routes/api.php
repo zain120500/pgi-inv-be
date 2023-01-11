@@ -46,6 +46,16 @@ Route::group([
         Route::get('/{id}', 'UserController@show');
     });
 
+    
+    Route::group([
+        'prefix' => 'cabang'
+    ], function ($router) {
+        Route::get('/', 'CabangController@index');
+        Route::get('/{id}', 'CabangController@show');
+        Route::post('/', 'CabangController@store');
+
+    });
+
 
     Route::group([
         // 'namespace' => 'Profile',
@@ -55,34 +65,51 @@ Route::group([
 
         Route::get('/', 'KategoriController@index');
         Route::get('/{id}', 'KategoriController@show');
+        Route::post('/', 'KategoriController@store');
+
     });
 
 
     Route::group([
-        // 'namespace' => 'Profile',
-        'prefix' => 'barang-jenis'
+        'namespace' => 'Barang'
     ], function ($router) {
 
-        Route::get('/', 'Barang\BarangJenisController@index');
-        Route::get('/{id}', 'Barang\BarangJenisController@show');
+        Route::group([
+            'prefix' => 'barang-jenis'
+        ], function ($router) {
+
+            Route::get('/', 'BarangJenisController@index');
+            Route::get('/{id}', 'BarangJenisController@show');
+            Route::post('/', 'BarangJenisController@store');
+
+        });
+
+        Route::group([
+            'prefix' => 'barang-keluar'
+        ], function ($router) {
+
+            Route::get('/', 'BarangKeluarController@index');
+            Route::get('/{id}', 'BarangKeluarController@show');
+        });
+
+        Route::group([
+            'prefix' => 'barang-tipe'
+        ], function ($router) {
+            Route::get('/', 'BarangTipeController@index');
+            Route::get('/{id}', 'BarangTipeController@show');
+            Route::post('/', 'BarangTipeController@store');
+
+        });
+
+        Route::group([
+            'prefix' => 'barang-merk'
+        ], function ($router) {
+
+            Route::get('/', 'BarangMerkController@index');
+            Route::get('/{id}', 'BarangMerkController@show');
+        });
     });
 
-    Route::group([
-        'prefix' => 'barang-keluar'
-    ], function ($router) {
 
-        Route::get('/', 'Barang\BarangKeluarController@index');
-        Route::get('/{id}', 'Barang\BarangKeluarController@show');
-    });
-
-    Route::group([
-        'prefix' => 'barang-tipe'
-    ], function ($router) {
-
-        Route::get('/', 'Barang\BarangTipeController@index');
-        Route::get('/{id}', 'Barang\BarangTipeController@show');
-    });
-
-    
 
 });

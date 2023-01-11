@@ -10,10 +10,14 @@ class BarangMerk extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
-
     public function barangTipe()
     {
-        return $this->belongTo('App\Model\BarangTipe', 'id_merk');
+        return $this->hasMany('App\Model\BarangTipe', 'id_merk');
     }
+
+    function barangJenis()
+    {
+        return $this->hasMany('App\Model\BarangJenis', 'id');
+	}
 
 }

@@ -11,9 +11,14 @@ class BarangTipe extends Model
     protected $guarded = [''];
 
 
+    // public function barangMerk()
+    // {
+    //     return $this->hasMany('App\Model\BarangMerk', 'id');
+    // }
+
     public function barangMerk()
     {
-        return $this->hasMany('App\Model\BarangMerk', 'id');
+        return $this->belongsTo('App\Model\BarangMerk', 'id');
     }
 
     function barangKeluar()
