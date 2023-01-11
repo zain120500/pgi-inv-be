@@ -29,4 +29,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function admin()
+    {
+        return $this->hasOne('App\Model\Admin');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo('App\Model\Role');
+    }
 }

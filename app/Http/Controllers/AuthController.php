@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ValidateUserRegistration;
 use App\Http\Requests\ValidateUserLogin;
 use App\User;
+
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 class AuthController extends Controller
 {
     public function __construct()
@@ -41,7 +44,11 @@ class AuthController extends Controller
  
     public function user()
     { 
-        return auth()->user();
+        $user = JWTAuth::parseToken()->authenticate();
+        $user['role'] = $user->role;
+        
+        return $user;
+        // return auth()->user();
        //return new UserResource(auth()->user());
     }
 }
