@@ -76,6 +76,11 @@ class BarangTipeController extends Controller
 
     public function destroy($id)
     {
-        //
+        $query = BarangTipe::find($id)->delete();
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $query
+        ], 200); 
     }
 }

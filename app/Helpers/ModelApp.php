@@ -268,32 +268,32 @@ function ModelApp()
 
     function datalist_pembelian_dropshipper($start_date, $end_date) //oke
     {
-    $level = $this->session->userdata('level');
+        $level = $this->session->userdata('level');
 
-    if($level == 'Finance'){
-        $where_status = "AND A.flag in(1) AND A.status in(1)";
-    } else {
-        $where_status = "";
-    }
+        if($level == 'Finance'){
+            $where_status = "AND A.flag in(1) AND A.status in(1)";
+        } else {
+            $where_status = "";
+        }
 
-    if($start_date > 0){
-        $start_dates = date('Y-m-d', $start_date);
-        $end_dates = date('Y-m-d', $end_date);
+        if($start_date > 0){
+            $start_dates = date('Y-m-d', $start_date);
+            $end_dates = date('Y-m-d', $end_date);
 
-        $where = "WHERE A.tanggal >='".$start_dates."' AND A.tanggal <= '".$end_dates."'";
-    } else {
-        $where = "WHERE MONTH(A.tanggal) = MONTH(CURDATE())";
-    }
+            $where = "WHERE A.tanggal >='".$start_dates."' AND A.tanggal <= '".$end_dates."'";
+        } else {
+            $where = "WHERE MONTH(A.tanggal) = MONTH(CURDATE())";
+        }
 
-    $query = $this->db->query("SELECT A.status, A.flag, A.id, A.no_invoice, A.tanggal, B.nama as supplier, SUM(C.total_harga) as total_pembelian,
-    COUNT(C.id_tipe) as unit
-    FROM dropshipper A
-    LEFT JOIN dropshipper_detail C ON C.id_dropshipper = A.id
-    LEFT JOIN supplier B ON B.id = A.id_supplier
-    $where $where_status
-    GROUP BY A.id ORDER BY A.status ASC");
+        $query = $this->db->query("SELECT A.status, A.flag, A.id, A.no_invoice, A.tanggal, B.nama as supplier, SUM(C.total_harga) as total_pembelian,
+        COUNT(C.id_tipe) as unit
+        FROM dropshipper A
+        LEFT JOIN dropshipper_detail C ON C.id_dropshipper = A.id
+        LEFT JOIN supplier B ON B.id = A.id_supplier
+        $where $where_status
+        GROUP BY A.id ORDER BY A.status ASC");
 
-    return $query->result();
+        return $query->result();
 
     }
 

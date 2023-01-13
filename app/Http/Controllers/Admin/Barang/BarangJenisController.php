@@ -69,6 +69,11 @@ class BarangJenisController extends Controller
 
     public function destroy($id)
     {
-        //
+        $query = BarangJenis::find($id)->delete();
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $query
+        ], 200); 
     }
 }

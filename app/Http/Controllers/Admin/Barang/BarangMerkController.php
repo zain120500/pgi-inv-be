@@ -34,7 +34,15 @@ class BarangMerkController extends Controller
 
     public function store(Request $request)
     {
-        //
+        $merk = BarangMerk::create([
+            "merk"=> $request->merk,
+            "id_jenis"=> $request->id_jenis
+        ]);
+
+        return response()->json([
+            'type' =>'success',
+            'data' => $merk
+        ]);
     }
 
     public function show($id)
@@ -61,6 +69,11 @@ class BarangMerkController extends Controller
 
     public function destroy($id)
     {
-        //
+        $query = BarangMerk::find($id)->delete();
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $query
+        ], 200); 
     }
 }

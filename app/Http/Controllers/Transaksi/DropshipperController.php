@@ -1,28 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Barang;
+namespace App\Http\Controllers\Transaksi;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Model\BarangTipe;
-use App\Model\BarangMasuk;
+use App\Model\Dropshipper;
+use App\Model\DropshipperDetail;
 
-class BarangMasukController extends Controller
+class DropshipperController extends Controller
 {
-    
+
     public function index()
     {
-        $barang = BarangMasuk::paginate(15);
-
-        $collect = $barang->getCollection()->map(function ($query) {
-            $query['tipe'] = BarangTipe::find($query->id_tipe);
-            return $query;
-        });
+        $query = Dropshipper::paginate(15);
 
         return response()->json([
             'status' =>'success',
-            'data' => $barang->setCollection($collect)
+            'data' => $query
         ], 200); 
     }
 
@@ -38,8 +33,8 @@ class BarangMasukController extends Controller
 
     public function show($id)
     {
-        $query = BarangMasuk::find($id);
-        $query['tipe'] = BarangTipe::find($query->id_tipe);
+        $query = Dropshipper::find($id);
+        $query['detail'] = DropshipperDetail::where('id_dropshipper', $query->id)->get();
 
         return response()->json([
             'status' =>'success',
@@ -51,7 +46,6 @@ class BarangMasukController extends Controller
     {
         //
     }
-
 
     public function update(Request $request, $id)
     {
