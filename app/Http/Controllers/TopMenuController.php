@@ -1,26 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Barang;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\BarangJenis;
+use App\User;
+use App\Model\RoleMenu;
+use App\Model\Menu;
+use App\Model\TopMenu;
 
-class BarangJenisController extends Controller
+class TopMenuController extends Controller
 {
-
     public function index()
     {
-        $barang = BarangJenis::paginate(15);
+        $getquery = TopMenu::paginate(15);
 
-        $collect = $barang->getCollection()->map(function ($query) {
-            $query->barangKategori;
+        $collect = $getquery->getCollection()->map(function ($query) {
+            $query['menu'] = Menu::where('parent_id', $query->id)->get();
+
             return $query;
         });
 
         return response()->json([
             'status' =>'success',
-            'data' => $barang->setCollection($collect)
+            'data' => $getquery->setCollection($collect)
         ], 200);  
     }
 
@@ -29,31 +31,29 @@ class BarangJenisController extends Controller
         //
     }
 
-
     public function store(Request $request)
     {
-        $jenis = BarangJenis::create([
-            "jenis"=> $request->jenis,
-            "id_kategori"=> $request->id_kategori,
-            "golongan" => $request->golongan
+        $query = TopMenu::create([
+            "id"=> $request->id,
+            "code"=> $request->code,
+            "name"=> $request->name
         ]);
 
         return response()->json([
             'type' =>'success',
-            'data' => $jenis
+            'data' => $query
         ]);
     }
 
-   
     public function show($id)
     {
-        $query = BarangJenis::find($id);
-        $query->barangKategori;
+        $query = TopMenu::find($id);
+        $query['menu'] = Menu::where('parent_id', $query->id)->get();
 
         return response()->json([
             'status' =>'success',
             'data' => $query
-        ], 200);  
+        ], 200); 
     }
 
     public function edit($id)
@@ -61,14 +61,12 @@ class BarangJenisController extends Controller
         //
     }
 
-
     public function update(Request $request, $id)
     {
-        $query = BarangJenis::where('id', $id)
+        $query = TopMenu::where('id', $id)
             ->update([
-                "jenis"=> $request->jenis,
-                "id_kategori"=> $request->id_kategori,
-                "golongan" => $request->golongan
+                "code"=> $request->code,
+                "name"=> $request->name,
             ]);
 
         return response()->json([
@@ -79,7 +77,7 @@ class BarangJenisController extends Controller
 
     public function destroy($id)
     {
-        $query = BarangJenis::find($id)->delete();
+        $query = TopMenu::find($id)->delete();
 
         return response()->json([
             'status' =>'success',

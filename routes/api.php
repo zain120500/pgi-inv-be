@@ -30,15 +30,34 @@ Route::group([
 });
 
 
-
-
 Route::group([
     'prefix' => 'supplier'
 ], function ($router) {
     Route::get('/', 'SupplierController@index');
     Route::get('/{id}', 'SupplierController@show');
     Route::post('/', 'SupplierController@store');
+    Route::delete('/delete/{id}', 'SupplierController@destroy');
+    Route::post('/{id}', 'SupplierController@update');
 });
+
+Route::group([
+    'prefix' => 'menu'
+], function ($router) {
+    Route::get('/', 'MenuController@index');
+    Route::get('/{id}', 'MenuController@show');
+    Route::post('/', 'MenuController@store');
+    Route::post('/{id}', 'MenuController@update');
+});
+
+Route::group([
+    'prefix' => 'topmenu'
+], function ($router) {
+    Route::get('/', 'TopMenuController@index');
+    Route::get('/{id}', 'TopMenuController@show');
+    Route::post('/', 'TopMenuController@store');
+    Route::post('/{id}', 'TopMenuController@update');
+});
+
 
 Route::group([
     'namespace' => 'Admin',
@@ -72,6 +91,8 @@ Route::group([
         Route::get('/', 'CabangController@index');
         Route::get('/{id}', 'CabangController@show');
         Route::post('/', 'CabangController@store');
+        Route::delete('/delete/{id}', 'CabangController@destroy')->name('cabang.delete');
+        Route::post('/{id}', 'CabangController@update');
 
     });
 
@@ -85,7 +106,8 @@ Route::group([
         Route::get('/', 'KategoriController@index');
         Route::get('/{id}', 'KategoriController@show');
         Route::post('/', 'KategoriController@store');
-
+        Route::delete('/delete/{id}', 'KategoriController@destroy')->name('kategory.delete');
+        Route::post('/{id}', 'KategoriController@update');
     });
 
     Route::group([
@@ -100,6 +122,8 @@ Route::group([
             Route::get('/{id}', 'BarangJenisController@show');
             Route::post('/', 'BarangJenisController@store');
             Route::delete('/delete/{id}', 'BarangJenisController@destroy')->name('barang-jenis.delete');
+            Route::post('/{id}', 'BarangJenisController@update');
+
         });
 
         Route::group([
@@ -125,6 +149,7 @@ Route::group([
             Route::get('/{id}', 'BarangTipeController@show');
             Route::post('/', 'BarangTipeController@store');
             Route::delete('/delete/{id}', 'BarangTipeController@destroy')->name('barang-tipe.delete');
+            Route::post('/{id}', 'BarangTipeController@update');
 
         });
 
@@ -135,6 +160,7 @@ Route::group([
             Route::get('/{id}', 'BarangMerkController@show');
             Route::post('/', 'BarangMerkController@store');
             Route::delete('/delete/{id}', 'BarangMerkController@destroy')->name('barang-merk.delete');
+            Route::post('/{id}', 'BarangMerkController@update');
 
         });
     });

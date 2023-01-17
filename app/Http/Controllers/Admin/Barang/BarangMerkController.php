@@ -64,7 +64,16 @@ class BarangMerkController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $query = BarangMerk::where('id', $id)
+            ->update([
+                "merk"=> $request->merk,
+                "id_jenis"=> $request->id_jenis
+            ]);
+
+        return response()->json([
+            'type' =>'success',
+            'data' => $query
+        ]);
     }
 
     public function destroy($id)

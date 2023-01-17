@@ -27,7 +27,7 @@ class SupplierController extends Controller
             "alamat"=> $request->alamat,
             "no_hp"=> $request->no_hp,
             "link_web"=> $request->link_web,
-            "keterangan	"=> $request->keterangan
+            "keterangan"=> $request->keterangan
         ]);
 
         return response()->json([
@@ -46,37 +46,37 @@ class SupplierController extends Controller
         ], 200);  
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $query = Supplier::where('id', $id)
+            ->update([
+                "nama"=> $request->nama,
+                "alamat"=> $request->alamat,
+                "no_hp"=> $request->no_hp,
+                "link_web"=> $request->link_web,
+                "keterangan"=> $request->keterangan
+            ]);
+
+        return response()->json([
+            'type' =>'success',
+            'data' => $query
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy($id)
     {
-        //
+        $query = Supplier::find($id)->delete();
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $query
+        ], 200); 
     }
 }

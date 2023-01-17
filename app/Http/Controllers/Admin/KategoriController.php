@@ -62,11 +62,25 @@ class KategoriController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $query = Kategori::where('id', $id)
+            ->update([
+            "nama"=> $request->nama,
+            "kode"=> $request->kode
+        ]);
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $query
+        ], 200);
     }
 
     public function destroy($id)
     {
-        //
+        $query = Kategori::find($id)->delete();
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $query
+        ], 200); 
     }
 }

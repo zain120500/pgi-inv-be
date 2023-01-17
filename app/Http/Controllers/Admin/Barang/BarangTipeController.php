@@ -70,7 +70,20 @@ class BarangTipeController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $query = BarangTipe::where('id', $id)
+            ->update([
+            "tipe"=> $request->tipe,
+            "satuan"=> $request->satuan,
+            "harga"=> $request->harga,
+            "tipe_kode"=> $request->tipe_kode,
+            "kode_barang"=> $request->kode_barang,
+            "id_merk"=> $request->id_merk
+        ]);
+
+        return response()->json([
+            'type' =>'success',
+            'data' => $query
+        ]);
     }
 
 

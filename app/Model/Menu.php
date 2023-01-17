@@ -11,15 +11,4 @@ class Menu extends Model
     protected $guarded = [''];
 
 
-
-    // public function roleMenu()
-    // {
-    //     return $this->belongTo('App\Model\RoleMenu');
-    // }
-
-    // public function setMenu()
-    // {
-    //     return $this->hasMany('App\Model\RoleMenu');
-    // }
-
 }
