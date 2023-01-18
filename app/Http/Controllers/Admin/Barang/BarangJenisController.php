@@ -9,9 +9,15 @@ use App\Model\BarangJenis;
 class BarangJenisController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $barang = BarangJenis::paginate(15);
+        if(!empty($request->jenis)){
+            $barang = BarangJenis::where('jenis', 'like', '%'.$request->jenis.'%')->paginate(15);
+        } else if(!empty($request->id_kategori)){
+            $barang = BarangJenis::where('id_kategori', 'like', '%'.$request->id_kategori.'%')->paginate(15);
+        } else {
+            $barang = BarangJenis::paginate(15);
+        }
 
         $collect = $barang->getCollection()->map(function ($query) {
             $query->barangKategori;
@@ -23,12 +29,6 @@ class BarangJenisController extends Controller
             'data' => $barang->setCollection($collect)
         ], 200);  
     }
-
-    public function create()
-    {
-        //
-    }
-
 
     public function store(Request $request)
     {

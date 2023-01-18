@@ -11,12 +11,18 @@ use App\Model\BarangMerk;
 class BarangTipeController extends Controller
 {
 
-    public function index()
-    {
-        $barang = BarangTipe::paginate(15);
+    public function index(Request $request)
+    {        
+        if(!empty($request->tipe)) {
+            $barang = BarangTipe::where('tipe', 'like', '%'.$request->tipe.'%')->paginate(15);
+        } else if(!empty($request->kode_barang)){
+            $barang = BarangTipe::where('kode_barang', 'like', '%'.$request->kode_barang.'%')->paginate(15);
+        } else {
+            $barang = BarangTipe::paginate(15);
+        }
+
         $collect = $barang->getCollection()->map(function ($query) {
             $query['merk'] = BarangMerk::find($query->id_merk);
-
             return $query;
         });
 

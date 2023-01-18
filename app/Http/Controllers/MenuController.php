@@ -14,9 +14,9 @@ class MenuController extends Controller
 
     public function index()
     {
-        $getquery = Menu::paginate(15);
+        $getquery = Menu::get();
 
-        $collect = $getquery->getCollection()->map(function ($query) {
+        $collect = $getquery->map(function ($query) {
             $query['top_menu'] = TopMenu::where('id', $query->parent_id)->get();
 
             return $query;
@@ -24,7 +24,7 @@ class MenuController extends Controller
 
         return response()->json([
             'status' =>'success',
-            'data' => $getquery->setCollection($collect)
+            'data' => $getquery
         ], 200);  
     }
 

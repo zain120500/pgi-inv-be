@@ -56,15 +56,25 @@ Route::group([
     Route::get('/{id}', 'TopMenuController@show');
     Route::post('/', 'TopMenuController@store');
     Route::post('/{id}', 'TopMenuController@update');
+    Route::delete('/delete/{id}', 'TopMenuController@destroy');
 });
 
+Route::group([
+    'prefix' => 'role-menu'
+], function ($router) {        
+    Route::get('/all', 'RoleMenuController@all');
+    Route::get('/', 'RoleMenuController@index');
+    Route::get('/{id}', 'RoleMenuController@show');
+    Route::post('/', 'RoleMenuController@store');
+    Route::post('/{id}', 'RoleMenuController@update');
+    Route::delete('/delete/{id}', 'RoleMenuController@destroy');
+});
 
 Route::group([
     'namespace' => 'Admin',
     'prefix' => 'admin',
-    'middleware' => 'auth:api',
+    'middleware' => 'auth:api'
 ], function ($router) {
-
 
     Route::group([
         'prefix' => 'role'
@@ -72,6 +82,8 @@ Route::group([
         Route::get('/', 'RoleController@index');
         Route::get('/{id}', 'RoleController@show');
         Route::post('/', 'RoleController@store');
+        Route::post('/{id}', 'RoleController@update');
+        Route::delete('/delete/{id}', 'RoleController@destroy');
     });
 
     Route::group([
@@ -186,6 +198,16 @@ Route::group([
             Route::get('/{id}', 'DropshipperController@show');
             Route::post('/', 'DropshipperController@store');
         });
+
+        Route::group([
+            'prefix' => 'pengiriman'
+        ], function ($router) {
+            Route::get('/', 'PengirimanController@index');
+            Route::get('/{id}', 'PengirimanController@show');
+            Route::post('/', 'PengirimanController@store');
+        });
+
+        
     });
 
     

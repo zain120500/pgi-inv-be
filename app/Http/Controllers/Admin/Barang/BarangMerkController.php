@@ -11,9 +11,14 @@ use App\Model\BarangMerk;
 class BarangMerkController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
-        $barang = BarangMerk::paginate(15);
+        if(!empty($request->merk)){
+            $barang = BarangMerk::where('merk', 'like', '%'.$request->merk.'%')->paginate(15);
+        } else {
+            $barang = BarangMerk::paginate(15);
+        }
+
         $collect = $barang->getCollection()->map(function ($query) {
             $query->barangJenis;
             return $query;

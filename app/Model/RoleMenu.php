@@ -10,7 +10,8 @@ class RoleMenu extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
-    
+    public $timestamps = false;
+
     public function role()
     {
         return $this->belongTo('App\Model\Role');

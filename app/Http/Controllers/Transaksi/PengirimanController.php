@@ -5,79 +5,75 @@ namespace App\Http\Controllers\Transaksi;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\User;
+use App\Model\Admin;
+use App\Model\Pengiriman;
+use App\Model\PengirimanDetail;
+use App\Model\PengirimanKategori;
+use App\Model\BarangTipe;
+
 class PengirimanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $query = Pengiriman::paginate(15);
+        $collect = $query->getCollection()->map(function ($q) {
+            $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
+            return $q;
+        });
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $query->setCollection($collect)
+        ], 200); 
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $query = Pengiriman::find($id);
+
+        if(!empty($query->id_user_input)){
+            $query['user_input'] = Admin::where('id',$query->id_user_input)->first()->makeHidden(['password']);
+        } else {
+            $query['user_input'] = Admin::where('username',$query->user_input)->first()->makeHidden(['password']);
+        }
+        $query['kategori'] = PengirimanKategori::where('id', $query->kategori)->first();
+
+        $pengiriman_detail = PengirimanDetail::where('id_pengiriman', $query->id)->get();
+        $collect = $pengiriman_detail->map(function ($q) {
+            $q['barang_tipe'] = BarangTipe::where('id', $q->id_tipe)->get();
+            return $q;
+        });
+
+        $query['detail'] = $pengiriman_detail;
+        
+        return response()->json([
+            'status' =>'success',
+            'data' => $query
+        ], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
