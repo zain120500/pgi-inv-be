@@ -22,7 +22,11 @@ class BarangTipeController extends Controller
         }
 
         $collect = $barang->getCollection()->map(function ($query) {
-            $query['merk'] = BarangMerk::find($query->id_merk);
+            $barangMerk = $query->barangMerk;
+            if(!empty($barangMerk)){
+                $barangMerk->barangJenis;
+            }
+
             return $query;
         });
 
@@ -59,12 +63,16 @@ class BarangTipeController extends Controller
     public function show($id)
     {
         $query = BarangTipe::find($id);
-        $query['merk'] = BarangMerk::find($query->id_merk);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        if(!empty($query)){
+            $barangMerk = $query->barangMerk;
+            if(!empty($barangMerk)){
+                $barangMerk->barangJenis;
+            }
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
 
     }
 

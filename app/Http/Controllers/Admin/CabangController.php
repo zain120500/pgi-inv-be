@@ -62,10 +62,11 @@ class CabangController extends Controller
     {
         $cabang = Cabang::find($id);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $cabang
-        ], 200); 
+        if(!empty($cabang)){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
     public function edit($id)

@@ -2,11 +2,25 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use App\Traits\ApiResponser;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Exception\HttpResponseException;
+
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class Handler extends ExceptionHandler
 {
+    use ApiResponser;
+
     /**
      * A list of the exception types that are not reported.
      *
@@ -50,6 +64,53 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
+        
+        $response = $this->handleException($request, $exception);
+        return $response;
     }
+
+    public function handleException($request, Exception $exception)
+    {
+
+        if ($exception instanceof MethodNotAllowedHttpException) {
+            return $this->errorResponse('The specified method for the request is invalid', 405);
+        }
+
+        if ($exception instanceof NotFoundHttpException) {
+            return $this->errorResponse('The specified URL cannot be found', 404);
+        }
+
+        if ($exception instanceof HttpException) {
+            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+        }
+
+        ///
+
+        
+        if ($exception instanceof HttpResponseException) {
+            // $exception = $exception->getResponse();
+            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+
+        }
+    
+        if ($exception instanceof AuthenticationException) {
+            // $exception = $this->unauthenticated($request, $exception);
+            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+
+        }
+    
+        if ($exception instanceof ValidationException) {
+            // $exception = $this->convertValidationExceptionToResponse($exception, $request);
+            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+        }
+
+        //
+        if (config('app.debug')) {
+            return parent::render($request, $exception);            
+        }
+
+        return $this->errorResponse('Unexpected Exception. Try later', 500);
+    }
+
+
 }

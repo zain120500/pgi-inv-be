@@ -48,12 +48,14 @@ class TopMenuController extends Controller
     public function show($id)
     {
         $query = TopMenu::find($id);
-        $query['menu'] = Menu::where('parent_id', $query->id)->get();
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        if(!empty($query)){
+            $query['menu'] = Menu::where('parent_id', $query->id)->get();
+
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
     public function edit($id)

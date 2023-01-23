@@ -14,7 +14,7 @@ use App\Model\BarangTipe;
 
 class PengirimanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $query = Pengiriman::paginate(15);
         $collect = $query->getCollection()->map(function ($q) {
@@ -22,10 +22,7 @@ class PengirimanController extends Controller
             return $q;
         });
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query->setCollection($collect)
-        ], 200); 
+        return $this->successResponse($query->setCollection($collect),'Success', 200);
 
     }
 
@@ -58,10 +55,7 @@ class PengirimanController extends Controller
 
         $query['detail'] = $pengiriman_detail;
         
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);
+        return $this->successResponse($query,'Success', 200);
     }
 
     public function edit($id)

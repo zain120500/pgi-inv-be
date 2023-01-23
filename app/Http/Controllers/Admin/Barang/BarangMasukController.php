@@ -16,14 +16,10 @@ class BarangMasukController extends Controller
         $barang = BarangMasuk::paginate(15);
 
         $collect = $barang->getCollection()->map(function ($query) {
-            $query['tipe'] = BarangTipe::find($query->id_tipe);
-            return $query;
+            return $query->barangTipe;
         });
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $barang->setCollection($collect)
-        ], 200); 
+        return $this->successResponse($barang->setCollection($collect),'Success', 200);
     }
 
     public function create()
@@ -39,12 +35,9 @@ class BarangMasukController extends Controller
     public function show($id)
     {
         $query = BarangMasuk::find($id);
-        $query['tipe'] = BarangTipe::find($query->id_tipe);
+        $query->barangTipe;
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);  
+        return $this->successResponse($query,'Success', 200);
     }
 
     public function edit($id)

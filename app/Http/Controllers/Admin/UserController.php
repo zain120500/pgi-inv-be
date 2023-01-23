@@ -52,10 +52,7 @@ class UserController extends Controller
             return $q;
         });
         
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);  
+        return $this->successResponse($query,'Success', 200);
     }
 
     public function edit($id)

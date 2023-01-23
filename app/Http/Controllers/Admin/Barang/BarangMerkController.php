@@ -53,12 +53,14 @@ class BarangMerkController extends Controller
     public function show($id)
     {
         $query = BarangMerk::find($id);
-        $query->barangJenis;
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        if(!empty($query)){
+            $query->barangJenis;
+
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
     public function edit($id)

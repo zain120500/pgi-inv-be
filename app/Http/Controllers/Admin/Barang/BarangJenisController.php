@@ -30,6 +30,17 @@ class BarangJenisController extends Controller
         ], 200);  
     }
 
+    public function all()
+    {
+        $query = BarangJenis::all();
+
+        if(!empty($query)){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
+    }
+
     public function store(Request $request)
     {
         $jenis = BarangJenis::create([
@@ -48,12 +59,13 @@ class BarangJenisController extends Controller
     public function show($id)
     {
         $query = BarangJenis::find($id);
-        $query->barangKategori;
-
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);  
+        if(!empty($query)){
+            $query->barangKategori;
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
+        
     }
 
     public function edit($id)

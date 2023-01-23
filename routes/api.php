@@ -129,6 +129,7 @@ Route::group([
         Route::group([
             'prefix' => 'barang-jenis'
         ], function ($router) {
+            Route::get('/all', 'BarangJenisController@all');
 
             Route::get('/', 'BarangJenisController@index');
             Route::get('/{id}', 'BarangJenisController@show');
@@ -208,6 +209,42 @@ Route::group([
         });
 
         
+    });
+
+    Route::group([
+        'namespace' => 'InternalMemo',
+        'prefix' => 'internal-memo'
+    ], function ($router) {
+
+        Route::group([
+            'prefix' => 'kategori-jenis'
+        ], function ($router) {
+            Route::get('/', 'KategoriJenisController@index');
+            Route::get('/all', 'KategoriJenisController@all');
+
+            Route::get('/{id}', 'KategoriJenisController@show');
+            Route::post('/', 'KategoriJenisController@store');
+        });
+
+        Route::group([
+            'prefix' => 'kategori'
+        ], function ($router) {
+            Route::get('/', 'KategoriController@index');
+            Route::get('/all', 'KategoriController@all');
+
+            Route::get('/{id}', 'KategoriController@show');
+            Route::post('/', 'KategoriController@store');
+        });
+
+        Route::group([
+            'prefix' => 'kategori-sub'
+        ], function ($router) {
+            Route::get('/', 'KategoriSubController@index');
+            Route::get('/all', 'KategoriSubController@all');
+
+            Route::get('/{id}', 'KategoriSubController@show');
+            Route::post('/', 'KategoriSubController@store');
+        });
     });
 
     

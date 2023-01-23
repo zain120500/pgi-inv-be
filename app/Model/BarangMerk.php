@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Model\BarangJenis;
 
 class BarangMerk extends Model
 {
@@ -17,7 +18,7 @@ class BarangMerk extends Model
 
     function barangJenis()
     {
-        return $this->hasMany('App\Model\BarangJenis', 'id');
+        return $this->hasMany('App\Model\BarangJenis', 'id', 'id_jenis');
 	}
 
 }
