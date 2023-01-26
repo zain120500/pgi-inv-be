@@ -14,7 +14,6 @@ class DevisiAccess extends Migration
     public function up()
     {
         Schema::create('_devisi_access', function (Blueprint $table) {
-            $table->integer('user_id');
             $table->integer('devisi_id');
             $table->integer('id_kategori_fpp');
             $table->integer('created_by');

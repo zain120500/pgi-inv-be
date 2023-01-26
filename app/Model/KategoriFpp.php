@@ -9,7 +9,7 @@ class KategoriFpp extends Model
     protected $table = 'kategori_fpp';
     protected $primaryKey = 'id';
     protected $guarded = [''];
-    
+
     protected $hidden = array('created_at', 'updated_at');
 
 

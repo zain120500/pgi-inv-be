@@ -15,6 +15,8 @@ class BarangMerkController extends Controller
     {
         if(!empty($request->merk)){
             $barang = BarangMerk::where('merk', 'like', '%'.$request->merk.'%')->paginate(15);
+        } else if(!empty($request->id_jenis)){
+            $barang = BarangMerk::where('id_jenis', $request->id_jenis)->paginate(15);
         } else {
             $barang = BarangMerk::paginate(15);
         }
@@ -31,9 +33,21 @@ class BarangMerkController extends Controller
     }
 
     
-    public function create()
-    {
-        //
+    public function all(Request $request)
+    {        
+        if(!empty($request->merk)){
+            $query = BarangMerk::where('merk', 'like', '%'.$request->merk.'%')->get();
+        } else if(!empty($request->id_jenis)){
+            $query = BarangMerk::where('id_jenis', $request->id_jenis)->get();
+        } else {
+            $query = BarangMerk::get();
+        }
+
+        if(!empty($query)){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
 

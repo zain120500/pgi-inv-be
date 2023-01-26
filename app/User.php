@@ -35,6 +35,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne('App\Model\Admin');
     }
 
+    public function devisi()
+    {
+        return $this->hasOne('App\Model\devisi', 'DivisiID', 'devisi_id');
+    }
+
     public function role()
     {
         return $this->belongsTo('App\Model\Role');

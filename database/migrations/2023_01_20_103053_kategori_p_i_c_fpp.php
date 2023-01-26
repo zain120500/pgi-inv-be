@@ -11,7 +11,6 @@ class KategoriPICFpp extends Migration
     {
         Schema::create('kategori_pic_fpp', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->integer('user_id');
             $table->integer('devisi_id');
             $table->integer('id_kategori_fpp');

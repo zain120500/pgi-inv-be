@@ -32,15 +32,16 @@ class KategoriController extends Controller
 
     public function store(Request $request)
     {
-        $kategori = Kategori::create([
+        $query = Kategori::create([
             "nama"=> $request->nama,
             "kode"=> $request->kode
         ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $kategori
-        ]);
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
     public function show($id)
@@ -70,19 +71,12 @@ class KategoriController extends Controller
             "kode"=> $request->kode
         ]);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);
+        return $this->successResponse($query,'Success', 200);
     }
 
     public function destroy($id)
     {
         $query = Kategori::find($id)->delete();
-
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        return $this->successResponse($query,'Success', 200);
     }
 }

@@ -22,15 +22,23 @@ class KategoriSubController extends Controller
 
     public function all()
     {
-        $query = KategoriSubFpp::pluck('name')->toArray();
-
+        $query = KategoriSubFpp::all();
         return $this->successResponse($query,'Success', 200);
     }
 
 
     public function store(Request $request)
     {
-        //
+        $query = KategoriSubFpp::create([
+                    "name"=> $request->name,
+                    "id_kategori_fpp"=> $request->id_kategori_fpp
+                ]);
+        
+        if ($query) {
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
     public function show($id)
@@ -52,12 +60,29 @@ class KategoriSubController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $query = KategoriSubFpp::where('id', $id)
+                ->update([
+                    "name"=> $request->name,
+                    "id_kategori_fpp"=> $request->id_kategori_fpp
+                ]);
+        
+        if ($query) {
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
 
     public function destroy($id)
     {
-        //
+        $query = KategoriSubFpp::find($id);
+
+        if (!empty($query)) {
+            $query->delete();
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 }

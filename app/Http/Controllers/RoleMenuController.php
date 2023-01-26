@@ -48,10 +48,12 @@ class RoleMenuController extends Controller
             }
         }
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $query
-        ]);
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process failed', 403);
+        }
+
     }
 
     public function show($id)

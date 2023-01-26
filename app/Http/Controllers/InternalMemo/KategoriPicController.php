@@ -4,82 +4,86 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Model\Devisi;
+use App\Model\DevisiAccessFpp;
+use App\User;
+use App\Model\KategoriPicFpp;
+use App\Model\KategoriJenisFpp;
+use App\Model\KategoriFpp;
+
 
 class KategoriPicController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $query = KategoriPicFpp::paginate(15);
+        return $this->successResponse($query,'Success', 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $query = KategoriPicFpp::create([
+            "user_id"=> $request->user_id,
+            "devisi_id"=> $request->devisi_id,
+            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "created_by"=> auth()->user()->id
+        ]);
+
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $query = KategoriPicFpp::find($id);
+        
+        if(!empty($query)){
+            $query->barangJenis;
+
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $query = KategoriPicFpp::where('id', $id)
+            ->update([
+                "user_id"=> $request->user_id,
+                "devisi_id"=> $request->devisi_id,
+                "id_kategori_fpp"=> $request->id_kategori_fpp,
+                "created_by"=> auth()->user()->id
+            ]);
+
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        $query = KategoriPicFpp::find($id)->delete();
+        
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 }

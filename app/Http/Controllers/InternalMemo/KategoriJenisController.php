@@ -17,10 +17,7 @@ class KategoriJenisController extends Controller
         $kategori = KategoriJenisFpp::paginate(15);
 
         $collect = $kategori->getCollection()->map(function ($query) {
-            $getKat = $query->kategori;
-            if(!empty($getKat)){
-                
-            }
+            $query->kategori;
             return $query;
         });
 
@@ -29,7 +26,7 @@ class KategoriJenisController extends Controller
 
     public function all()
     {
-        $query = KategoriJenisFpp::pluck('name')->toArray();
+        $query = KategoriJenisFpp::all();
 
         return $this->successResponse($query,'Success', 200);
     }
@@ -41,7 +38,15 @@ class KategoriJenisController extends Controller
 
     public function store(Request $request)
     {
-        //
+        $query = KategoriJenisFpp::create([
+                    "name"=> $request->name
+                ]);
+        
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
     public function show($id)
@@ -64,12 +69,28 @@ class KategoriJenisController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $query = KategoriJenisFpp::where('id', $id)
+                ->update([
+                    "name"=> $request->name
+                ]);
+        
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
 
     public function destroy($id)
     {
-        //
+        $query = KategoriJenisFpp::find($id);
+
+        if(!empty($query)){
+            $query->delete();
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 }

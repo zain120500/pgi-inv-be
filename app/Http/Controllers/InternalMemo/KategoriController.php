@@ -19,19 +19,27 @@ class KategoriController extends Controller
         });
 
         return $this->successResponse($kategori,'Success', 200);
-
     }
 
     public function all()
     {
-        $query = KategoriFpp::pluck('name')->toArray();
-
+        $query = KategoriFpp::all();
         return $this->successResponse($query,'Success', 200);
     }
 
     public function store(Request $request)
     {
-        //
+        $query = KategoriFpp::create([
+                    "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
+                    "name"=> $request->name,
+                    "created_by"=> auth()->user()->id,
+                ]);
+        
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
     public function show($id)
@@ -40,7 +48,7 @@ class KategoriController extends Controller
         $query = KategoriFpp::find($id);
 
         if(!empty($query)){
-            $query->kategoriJenis;
+            // $query->kategoriJenis;
             $query->kategoriSub;
             
             return $this->successResponse($query,'Success', 200);
@@ -56,11 +64,29 @@ class KategoriController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $query = KategoriFpp::where('id', $id)
+                ->update([
+                    "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
+                    "name"=> $request->name,
+                    "created_by"=> auth()->user()->id,
+                ]);
+        
+        if ($query) {
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
     public function destroy($id)
     {
-        //
+        $query = KategoriFpp::find($id);
+
+        if(!empty($query)){
+            $query->delete();
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 }

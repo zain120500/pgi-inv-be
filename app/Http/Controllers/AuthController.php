@@ -9,6 +9,7 @@ use App\Http\Requests\ValidateUserLogin;
 use App\User;
 use App\Model\RoleMenu;
 use App\Model\Menu;
+use App\Model\TopMenu;
 
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -31,32 +32,36 @@ class AuthController extends Controller
     public function login(ValidateUserLogin $request){
       
         $user = "";
-        $access_menu = "";
+        $id_top_menu = [];
 
         $credentials = request(['email', 'password']);
         if (!$token = auth()->attempt($credentials)) {
-            return  response()->json([ 
-                'errors' => [
-                    'msg' => ['Incorrect username or password.']
-                ]  
-            ], 401);
-
+            return $this->errorResponse('Incorrect username or password.', 401);
         } else {
             $user = auth()->user();
-
             $access_menu = $user->role->roleMenu;
-            $access_menu = $access_menu->map(function ($query) {
-                $query['menu'] = Menu::select(['id','code','name'])->where('id', $query->menu_id)->first();
-
+            $access_menu = $access_menu->map(function ($query) use ($id_top_menu) {
+                $query['menu'] = Menu::select(['id','code','name','parent_id'])->where('id', $query->menu_id)->first();
                 return $query;
             });
         }
-    
+
+        //get Top Menu from Menu Model
+        foreach ($user->role->roleMenu as $key => $val_menu) {
+            if(!empty($val_menu->menu->parent_id)){
+                if( !in_array( $val_menu->menu->parent_id ,$id_top_menu ) ){
+                    $id_top_menu[] = $val_menu->menu->parent_id;
+                }
+            }
+        }
+        $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
+
         return response()->json([
             'type' =>'success',
             'message' => 'Logged in.',
             'token' => $token,
-            'user' => $user
+            'user' => $user,
+            'top_menu'=> $top_menu
         ]);
     }
  

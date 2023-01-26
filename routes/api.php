@@ -87,6 +87,17 @@ Route::group([
     });
 
     Route::group([
+        'prefix' => 'devisi'
+    ], function ($router) {
+        Route::get('/all', 'DevisiController@all');
+        Route::get('/', 'DevisiController@index');
+        Route::get('/{id}', 'DevisiController@show');
+        Route::post('/', 'DevisiController@store');
+        Route::post('/{id}', 'DevisiController@update');
+        Route::delete('/delete/{id}', 'DevisiController@destroy');
+    });
+
+    Route::group([
         // 'namespace' => 'Profile',
         'prefix' => 'management-users'
         // 'middleware' => 'guest',
@@ -169,6 +180,8 @@ Route::group([
         Route::group([
             'prefix' => 'barang-merk'
         ], function ($router) {
+            Route::get('/all', 'BarangMerkController@all');
+
             Route::get('/', 'BarangMerkController@index');
             Route::get('/{id}', 'BarangMerkController@show');
             Route::post('/', 'BarangMerkController@store');
@@ -221,9 +234,10 @@ Route::group([
         ], function ($router) {
             Route::get('/', 'KategoriJenisController@index');
             Route::get('/all', 'KategoriJenisController@all');
-
             Route::get('/{id}', 'KategoriJenisController@show');
             Route::post('/', 'KategoriJenisController@store');
+            Route::post('/{id}', 'KategoriJenisController@update');
+            Route::delete('/delete/{id}', 'KategoriJenisController@destroy');
         });
 
         Route::group([
@@ -231,9 +245,10 @@ Route::group([
         ], function ($router) {
             Route::get('/', 'KategoriController@index');
             Route::get('/all', 'KategoriController@all');
-
             Route::get('/{id}', 'KategoriController@show');
             Route::post('/', 'KategoriController@store');
+            Route::post('/{id}', 'KategoriController@update');
+            Route::delete('/delete/{id}', 'KategoriController@destroy');
         });
 
         Route::group([
@@ -241,10 +256,36 @@ Route::group([
         ], function ($router) {
             Route::get('/', 'KategoriSubController@index');
             Route::get('/all', 'KategoriSubController@all');
-
             Route::get('/{id}', 'KategoriSubController@show');
             Route::post('/', 'KategoriSubController@store');
+            Route::post('/{id}', 'KategoriSubController@update');
+            Route::delete('/delete/{id}', 'KategoriSubController@destroy');
         });
+
+        Route::group([
+            'prefix' => 'kategori-pic'
+        ], function ($router) {
+            Route::get('/', 'KategoriPicController@index');
+            Route::get('/all', 'KategoriPicController@all');
+            Route::get('/{id}', 'KategoriPicController@show');
+            Route::post('/', 'KategoriPicController@store');
+            Route::post('/{id}', 'KategoriPicController@update');
+            Route::delete('/delete/{id}', 'KategoriPicController@destroy');
+        });
+
+        Route::group([
+            'prefix' => 'devisi-access'
+        ], function ($router) {
+            Route::get('/', 'DevisiAccessController@index');
+            Route::get('/all', 'DevisiAccessController@all');
+            Route::get('/{id}', 'DevisiAccessController@show');
+            Route::post('/', 'DevisiAccessController@store');
+            Route::post('/{id}', 'DevisiAccessController@update');
+            Route::delete('/delete/{id}', 'DevisiAccessController@destroy');
+        });
+
+        
+        
     });
 
     
