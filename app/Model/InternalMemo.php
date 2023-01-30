@@ -9,4 +9,32 @@ class InternalMemo extends Model
     protected $table = 'internal_memo';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+
+
+    function devisi()
+    {
+        return $this->hasOne('App\Model\Devisi','DivisiID', 'id_devisi');
+	}
+
+    function kategoriJenis()
+    {
+        return $this->hasOne('App\Model\KategoriJenisFpp','id', 'id_kategori_jenis_fpp');
+	}
+
+    function createdBy()
+    {
+        return $this->hasOne('App\User','id','created_by');
+	}
+
+    function kategoriSub()
+    {
+        return $this->hasOne('App\Model\KategoriSubFpp','id','id_kategori_sub_fpp');
+	}
+
+    function MemoFile()
+    {
+        
+        return $this->hasMany('App\Model\InternalMemoFile','id_internal_memo','id');
+	}
+    
 }

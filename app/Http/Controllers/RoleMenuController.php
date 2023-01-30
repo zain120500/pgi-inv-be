@@ -23,10 +23,16 @@ class RoleMenuController extends Controller
 
     public function all()
     {
-        $query = RoleMenu::all();
+        $getquery = Menu::select(['id','code','name'])->get();
+
+        $collect = $getquery->map(function ($query) {
+            $query['role'] = RoleMenu::where('menu_id', $query->id)->pluck('role_id')->toArray();
+            return $query;
+        });
+
         return response()->json([
             'status' =>'success',
-            'data' => $query
+            'data' => $getquery
         ], 200);
     }
 

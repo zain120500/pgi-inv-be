@@ -6,23 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class InternalMemoFile extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        //
+        Schema::create('internal_memo_files', function (Blueprint $table) {
+            $table->id();
+            $table->integer('id_internal_memo');
+            $table->string('path');
+            $table->string('keterangan');
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        //
+        Schema::dropIfExists('internal_memo_files');
+
     }
 }

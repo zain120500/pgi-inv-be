@@ -78,9 +78,10 @@ class KategoriPicController extends Controller
 
     public function destroy($id)
     {
-        $query = KategoriPicFpp::find($id)->delete();
+        $query = KategoriPicFpp::find($id);
         
         if($query){
+            $query->delete();
             return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);

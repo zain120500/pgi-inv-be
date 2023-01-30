@@ -6,23 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 class InternalMemo extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+
     public function up()
     {
-        //
+        Schema::create('internal_memo', function (Blueprint $table) {
+            $table->id();
+            $table->integer('id_kategori_fpp');
+            $table->integer('id_kategori_jenis_fpp');
+            $table->integer('id_kategori_sub_fpp');
+            $table->integer('id_devisi');
+            $table->integer('qty');
+            $table->integer('created_by');
+            $table->string('catatan');
+
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        //
+        Schema::dropIfExists('internal_memo');
+
     }
 }

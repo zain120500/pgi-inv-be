@@ -230,6 +230,17 @@ Route::group([
     ], function ($router) {
 
         Route::group([
+            'prefix' => 'memo'
+        ], function ($router) {
+            Route::get('/', 'InternalMemoController@index');
+            Route::get('/all', 'InternalMemoController@all');
+            Route::get('/{id}', 'InternalMemoController@show');
+            Route::post('/', 'InternalMemoController@store');
+            Route::post('/{id}', 'InternalMemoController@update');
+            Route::delete('/delete/{id}', 'InternalMemoController@destroy');
+        });
+
+        Route::group([
             'prefix' => 'kategori-jenis'
         ], function ($router) {
             Route::get('/', 'KategoriJenisController@index');
@@ -266,7 +277,6 @@ Route::group([
             'prefix' => 'kategori-pic'
         ], function ($router) {
             Route::get('/', 'KategoriPicController@index');
-            Route::get('/all', 'KategoriPicController@all');
             Route::get('/{id}', 'KategoriPicController@show');
             Route::post('/', 'KategoriPicController@store');
             Route::post('/{id}', 'KategoriPicController@update');

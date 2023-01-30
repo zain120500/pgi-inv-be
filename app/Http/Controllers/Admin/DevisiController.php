@@ -62,7 +62,8 @@ class DevisiController extends Controller
         $query = Devisi::where('DivisiID', $id)
             ->update([
                 "kd_Divisi"=> $request->kd_Divisi,
-                "nm_Divisi"=> $request->nm_Divisi
+                "nm_Divisi"=> $request->nm_Divisi,
+                "UserInput"=> $request->UserInput
             ]);
             
         return $this->successResponse($query,'Success', 200);
