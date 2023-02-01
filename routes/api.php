@@ -221,7 +221,16 @@ Route::group([
             Route::post('/', 'PengirimanController@store');
         });
 
-        
+        Route::group([
+            'prefix' => 'pembelian'
+        ], function ($router) {
+            Route::get('/', 'PembelianController@index');
+            Route::get('/{id}', 'PembelianController@show');
+            Route::post('/', 'PembelianController@store');
+            Route::post('/detail', 'PembelianController@storeDetail');
+            Route::delete('/delete/{id}', 'PembelianController@destroy');
+            Route::delete('/detail/delete/{id}', 'PembelianController@destroyDetail');
+        });
     });
 
     Route::group([

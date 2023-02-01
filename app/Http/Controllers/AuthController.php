@@ -8,9 +8,10 @@ use App\Http\Requests\ValidateUserRegistration;
 use App\Http\Requests\ValidateUserLogin;
 use App\User;
 use App\Model\RoleMenu;
+use App\Model\Role;
 use App\Model\Menu;
 use App\Model\TopMenu;
-
+use App\Model\Cabang;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -54,6 +55,16 @@ class AuthController extends Controller
                 }
             }
         }
+
+        $cabang = "";
+        if ($user->role_id == 3) {         //Jika Kepala Unit (3)
+            $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
+        } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
+            $cabang = Cabang::select('id','name')->where('kepala_cabang_id', $user->id)->get();
+        } elseif ($user->role_id == 5) {        //Jika Kepala Cabang Senior (5)
+            $cabang = Cabang::select('id','name')->where('kepala_cabang_senior_id', $user->id)->get();
+        }
+
         $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
 
         return response()->json([
@@ -61,7 +72,8 @@ class AuthController extends Controller
             'message' => 'Logged in.',
             'token' => $token,
             'user' => $user,
-            'top_menu'=> $top_menu
+            'top_menu'=> $top_menu,
+            'cabang' => $cabang
         ]);
     }
  

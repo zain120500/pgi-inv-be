@@ -52,19 +52,19 @@ function ModelApp()
 
     function getkodebarang($id_jenis) //oke
     {
-        $sql = $this->db->query("SELECT A.id_kategori, B.kode FROM barang_jenis A
+        $rows = DB::statement("SELECT A.id_kategori, B.kode FROM barang_jenis A
         LEFT JOIN kategori B ON B.id = A.id_kategori WHERE A.id ='$id_jenis'");
-        $rows = $sql->row();
+        // $rows = $sql->row();
 
         $id_kategori = $rows->id_kategori;
         $kode = $rows->kode;
 
-        $query = $this->db->query("SELECT max(A.kode_barang) as max_code FROM barang_tipe A
+        $row = DB::statement("SELECT max(A.kode_barang) as max_code FROM barang_tipe A
                 LEFT JOIN barang_merk B ON B.id = A.id_merk
                 LEFT JOIN barang_jenis C ON C.id = B.id_jenis
                 WHERE C.id_kategori='$id_kategori'");
 
-        $row = $query->row_array();
+        // $row = $query->row_array();
 
         $max_id = $row['max_code'];
         $max_fix = (int) substr($max_id, 3, 7);

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\BarangTipe;
 use App\Model\BarangMerk;
-
+use App\Helpers\StatusHelper;
 
 class BarangTipeController extends Controller
 {

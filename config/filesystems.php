@@ -64,6 +64,22 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
         ],
+        'sftp' => [
+            'driver' => 'sftp',
+            'host' => 'example.com',
+            'username' => 'your-username',
+            'password' => 'your-password',
+            'root' => 'DIR_PATH_TO_WHERE_FILE_STORE', // for example: /public_html/images
+         
+            // Settings for SSH key based authentication...
+            'privateKey' => '/path/to/privateKey',
+            'password' => 'encryption-password',
+         
+            // Optional SFTP Settings...
+            // 'port' => 22,
+            // 'timeout' => 30,
+            //Storage::disk('sftp')->put($filenametostore, fopen($request->file('profile_image'), 'r+'));
+        ],
 
     ],
 

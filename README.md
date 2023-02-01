@@ -11,3 +11,5 @@ Laravel 7,
 
 
 https://cerwyn.medium.com/laravel-generalizing-api-response-error-handling-85646a195fea
+
+https://artisansweb.net/how-to-upload-images-to-another-server-through-ftp-in-laravel/
