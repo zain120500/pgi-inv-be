@@ -13,7 +13,7 @@ class DropshipperController extends Controller
 
     public function index()
     {
-        $query = Dropshipper::paginate(15);
+        $query = Dropshipper::orderBy('tanggal', 'DESC')->paginate(15);
 
         return response()->json([
             'status' =>'success',

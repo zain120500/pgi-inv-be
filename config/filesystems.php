@@ -66,14 +66,14 @@ return [
         ],
         'sftp' => [
             'driver' => 'sftp',
-            'host' => 'example.com',
-            'username' => 'your-username',
-            'password' => 'your-password',
-            'root' => 'DIR_PATH_TO_WHERE_FILE_STORE', // for example: /public_html/images
+            'host' => env('FTP_HOST'),
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD'),
+            'root' => env('FTP_PATH'), // for example: /public_html/images
          
             // Settings for SSH key based authentication...
-            'privateKey' => '/path/to/privateKey',
-            'password' => 'encryption-password',
+            // 'privateKey' => '/path/to/privateKey',
+            // 'password' => 'encryption-password',
          
             // Optional SFTP Settings...
             // 'port' => 22,

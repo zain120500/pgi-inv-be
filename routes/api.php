@@ -34,6 +34,7 @@ Route::group([
     'prefix' => 'supplier'
 ], function ($router) {
     Route::get('/', 'SupplierController@index');
+    Route::get('/all', 'SupplierController@all');
     Route::get('/{id}', 'SupplierController@show');
     Route::post('/', 'SupplierController@store');
     Route::delete('/delete/{id}', 'SupplierController@destroy');
@@ -84,6 +85,15 @@ Route::group([
         Route::post('/', 'RoleController@store');
         Route::post('/{id}', 'RoleController@update');
         Route::delete('/delete/{id}', 'RoleController@destroy');
+    });
+
+    Route::group([
+        'prefix' => 'wilayah'
+    ], function ($router) {
+        Route::get('/kabupaten', 'WilayahController@getKabupatenAll');
+        Route::get('/kelurahan', 'WilayahController@getKelurahanAll');
+        Route::get('/kecamatan', 'WilayahController@getKecamatanAll');
+        Route::get('/provinsi', 'WilayahController@getProvinsiAll');
     });
 
     Route::group([
@@ -228,6 +238,10 @@ Route::group([
             Route::get('/{id}', 'PembelianController@show');
             Route::post('/', 'PembelianController@store');
             Route::post('/detail', 'PembelianController@storeDetail');
+
+            Route::post('/update', 'PembelianController@updatePembelian');
+            Route::post('/update/detail', 'PembelianController@updatePembelianDetail');
+
             Route::delete('/delete/{id}', 'PembelianController@destroy');
             Route::delete('/detail/delete/{id}', 'PembelianController@destroyDetail');
         });
@@ -242,6 +256,8 @@ Route::group([
             'prefix' => 'memo'
         ], function ($router) {
             Route::get('/', 'InternalMemoController@index');
+            Route::get('/create', 'InternalMemoController@create');
+
             Route::get('/all', 'InternalMemoController@all');
             Route::get('/{id}', 'InternalMemoController@show');
             Route::post('/', 'InternalMemoController@store');

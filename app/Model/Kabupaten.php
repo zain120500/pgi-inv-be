@@ -4,10 +4,11 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Devisi extends Model
+class Kabupaten extends Model
 {
-    protected $table = 'tbl_divisi';
-    protected $primaryKey = 'DivisiID';
+    protected $table = 'kabupaten_kota';
+    protected $primaryKey = 'id';
     protected $guarded = [''];
+
 
 }

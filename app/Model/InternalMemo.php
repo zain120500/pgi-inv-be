@@ -10,6 +10,10 @@ class InternalMemo extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
+    function cabang()
+    {
+        return $this->hasOne('App\Model\Cabang','id','id_cabang');
+	}
 
     function devisi()
     {
@@ -33,7 +37,6 @@ class InternalMemo extends Model
 
     function MemoFile()
     {
-        
         return $this->hasMany('App\Model\InternalMemoFile','id_internal_memo','id');
 	}
     

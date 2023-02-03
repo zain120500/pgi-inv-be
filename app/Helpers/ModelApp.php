@@ -1,11 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
-// use App\Model\Cart;
 
-
-function ModelApp()
-{
 
     //Contohh select : $results = DB::select('select * from users where id = :id', ['id' => 1]);
     //Contoh Native Query : DB::statement('drop table users');
@@ -77,12 +72,8 @@ function ModelApp()
 
     function getkodeinvoice() //oke
     {
-
-        $query = $this->db->query("select max(no_invoice) as max_code FROM pembelian WHERE MONTH(tanggal)=MONTH(CURDATE()) AND YEAR(tanggal)=YEAR(CURDATE())");
-
-        $row = $query->row_array();
-
-        $max_id = $row['max_code'];
+        $row = DB::statement("select max(no_invoice) as max_code FROM pembelian WHERE MONTH(tanggal)=MONTH(CURDATE()) AND YEAR(tanggal)=YEAR(CURDATE())");
+        $max_id = $row;
         $max_fix = (int) substr($max_id, 9, 4);
 
         $max_nik = $max_fix + 1;
@@ -1150,5 +1141,3 @@ function ModelApp()
     ORDER BY C.jenis ASC");
     return $query->result();
     }
-
-}

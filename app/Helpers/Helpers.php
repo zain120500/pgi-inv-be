@@ -1,10 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
-// use App\Model\Cart;
 
-function Helpers()
-{
+
+    function upload_file_directory($asd)
+    {
+        return $asd;
+    }
+
+    function getFiles($files){
+        return env('EXTERNAL_SERVER_URL')."/".$files;
+    }
+
+
+    /*
     function getkodebarang($id_jenis) //oke
     {
         $rows = DB::statement("SELECT A.id_kategori, B.kode FROM barang_jenis A
@@ -30,4 +38,4 @@ function Helpers()
         return $nik;
     }
 
-}
+    */

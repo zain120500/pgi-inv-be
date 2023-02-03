@@ -19,6 +19,16 @@ class SupplierController extends Controller
         ], 200); 
     }
 
+    public function all()
+    {
+        $supplier = Supplier::all()->makeHidden(['created_at','updated_at']);
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $supplier
+        ], 200); 
+    }
+
     
     public function store(Request $request)
     {

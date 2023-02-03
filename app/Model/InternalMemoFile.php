@@ -9,4 +9,9 @@ class InternalMemoFile extends Model
     protected $table = 'internal_memo_files';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+
+    public function getPathAttribute()
+    {
+        return getFiles($this->attributes['path']);
+    }
 }

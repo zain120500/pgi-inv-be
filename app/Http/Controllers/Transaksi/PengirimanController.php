@@ -16,8 +16,13 @@ class PengirimanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pengiriman::paginate(15);
+        $query = Pengiriman::orderBy('tanggal', 'DESC')->paginate(15);
         $collect = $query->getCollection()->map(function ($q) {
+            $details = PengirimanDetail::where('id_pengiriman', $q->id);
+
+            $q['total_unit'] = $details->sum('jumlah');
+            $q['total_pembelian'] = $details->sum('total_harga');
+
             $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
             return $q;
         });
@@ -53,6 +58,10 @@ class PengirimanController extends Controller
             return $q;
         });
 
+        $details = PengirimanDetail::where('id_pengiriman', $query->id);
+        $query['total_unit'] = $details->sum('jumlah');
+        $query['total_pembelian'] = $details->sum('total_harga');
+        
         $query['detail'] = $pengiriman_detail;
         
         return $this->successResponse($query,'Success', 200);

@@ -19,9 +19,14 @@ class DevisiController extends Controller
         return $this->successResponse($getData,'Success', 200);
     }
 
-    public function all()
+    public function all(Request $request)
     {
-        $getData = Devisi::all()->makeHidden(['created_at','updated_at']);
+        if(!empty($request->is_fpp)){
+            $getData = Devisi::where('isFpp', $request->is_fpp)->get()->makeHidden(['created_at','updated_at']);
+        } else {
+            $getData = Devisi::all()->makeHidden(['created_at','updated_at']);
+        }
+
         return $this->successResponse($getData,'Success', 200);
     }
 

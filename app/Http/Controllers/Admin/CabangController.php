@@ -63,7 +63,7 @@ class CabangController extends Controller
         $cabang = Cabang::find($id);
 
         if(!empty($cabang)){
-            return $this->successResponse($query,'Success', 200);
+            return $this->successResponse($cabang,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
         }

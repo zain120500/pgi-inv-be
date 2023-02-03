@@ -4,10 +4,9 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Devisi extends Model
+class Provinsi extends Model
 {
-    protected $table = 'tbl_divisi';
-    protected $primaryKey = 'DivisiID';
+    protected $table = 'provinsi';
+    protected $primaryKey = 'id';
     protected $guarded = [''];
-
 }

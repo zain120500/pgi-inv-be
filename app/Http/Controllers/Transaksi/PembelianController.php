@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Model\Pembelian;
 use App\Model\PembelianDetail;
 use App\Model\BarangTipe;
+use App\Model\BarangMasuk;
 use App\Model\Admin;
 use App\User;
 use DB;
@@ -17,17 +18,22 @@ class PembelianController extends Controller
     {
 
         if(!empty($request->no_invoice)){
-            $query = Pembelian::where('no_invoice', 'like', '%'.$request->no_invoice.'%')->paginate(15);
+            $query = Pembelian::where('no_invoice', 'like', '%'.$request->no_invoice.'%')->orderBy('tanggal', 'DESC')->paginate(15);
         } else if(!empty($request->user_input)){
-            $query = Pembelian::where('user_input', 'like', '%'.$request->user_input.'%')->paginate(15);
+            $query = Pembelian::where('user_input', 'like', '%'.$request->user_input.'%')->orderBy('tanggal', 'DESC')->paginate(15);
         } else {
-            $query = Pembelian::paginate(15);
+            $query = Pembelian::orderBy('tanggal', 'DESC')->paginate(15);
         }
 
         $collect = $query->getCollection()->map(function ($q) {
+            $details = PembelianDetail::where('id_pembelian', $q->id);
+
+            $q['total_unit'] = $details->sum('jumlah');
+            $q['total_pembelian'] = $details->sum('total_harga');
             $q->supplier->makeHidden(['created_at','updated_at']);
             $q['status_flag'] = $this->getCodeFlag($q->flag);
             $q['user_input'] = Admin::select('username')->where('username', $q->user_input)->first();
+
             return $q;
         });
 
@@ -80,7 +86,7 @@ class PembelianController extends Controller
                 "imei"=> $request->imei,
                 "detail_barang"=> $request->detail_barang,
                 "keterangan"=> $request->keterangan,
-                "status"=> $request->status
+                "status"=> 0
             ]);
     
             if($query){
@@ -97,6 +103,10 @@ class PembelianController extends Controller
     {
         $query = Pembelian::find($id);
         if(!empty($query)){
+            $details = PembelianDetail::where('id_pembelian', $query->id);
+            $query['total_unit'] = $details->sum('jumlah');
+            $query['total_pembelian'] = $details->sum('total_harga');
+
             $query['status_flag'] = $this->getCodeFlag($query->flag);
 
             $pembelianDetail = $query->detail;
@@ -131,6 +141,63 @@ class PembelianController extends Controller
                 "user_input"=> auth()->user()->id
             ]);
 
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
+    }
+
+    public function updatePembelian(Request $request){ //merubah status pembelian
+
+        $id = $request->id;
+        $flag = $request->flag;
+
+        $pembelian = Pembelian::where('id', $id)->first();
+        $pembelian->update(["flag" => $flag]);
+
+        if($flag == 0){  // request void pembelian
+            PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 0]); //update barang jadi request void
+        } else if($flag == 6){  // request void pembelian
+            PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 4]); //update barang jadi request void
+        } else if($flag == 2){ //terima barang
+
+        } else if($flag == 3){ //terima barang
+            $details = PembelianDetail::where('id_pembelian', $pembelian->id);
+            foreach ($details->get() as $key => $detail) {
+                $detail->update(["status" => 1]);  //update barang jadi OK
+
+                BarangMasuk::create([
+                    "tanggal"=> date("Y-m-d"),
+                    "id_tipe"=> $detail->id_tipe,
+                    "nomer_barang"=> $detail->nomer_barang,
+                    "detail_barang"=> $detail->detail_barang,
+                    "imei"=> $detail->imei,
+                    "pic"=> $pembelian->pic,
+                    "jumlah"=> $detail->jumlah,
+                    "satuan"=> $detail->satuan,
+                    "total_harga"=> $detail->total_harga,
+                    "user_input"=> auth()->user()->admin->username
+                ]);
+
+            }
+            
+        } else if($flag == 4){ // Approve Void Pembelian
+            PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 2]); //update barang jadi void
+        }
+
+        if($pembelian){
+            return $this->successResponse($pembelian,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
+    }
+
+    public function updatePembelianDetail(Request $request){ //merubah status pembelian detail (barang pembelian)
+        $id = $request->id;
+        $status = $request->status;
+
+        $query = PembelianDetail::where('id', $id)->update(["status" => $status]);
         if($query){
             return $this->successResponse($query,'Success', 200);
         } else {
