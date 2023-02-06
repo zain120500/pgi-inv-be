@@ -32,6 +32,7 @@ class KategoriController extends Controller
         $query = KategoriFpp::create([
                     "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
                     "name"=> $request->name,
+                    "sla" => $request->sla,
                     "created_by"=> auth()->user()->id,
                 ]);
         
@@ -68,6 +69,7 @@ class KategoriController extends Controller
                 ->update([
                     "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
                     "name"=> $request->name,
+                    "sla" => $request->sla,
                     "created_by"=> auth()->user()->id,
                 ]);
         

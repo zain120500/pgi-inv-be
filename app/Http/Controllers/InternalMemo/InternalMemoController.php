@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\KategoriFpp;
 use App\Model\KategoriJenisFpp;
+use App\Model\KategoriPicFpp;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoFile;
+use App\Model\HistoryMemo;
 use Storage;
 use Str;
 
@@ -15,9 +17,18 @@ class InternalMemoController extends Controller
 {
     public function index()
     {
-        $query = InternalMemo::orderBy('created_at', 'DESC')->paginate(15);
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->get();
 
-        return $this->successResponse($query,'Success', 200);
+        $collect = $internal->map(function ($query) {
+            $query->cabang;
+            $query->devisi;
+            $query->kategoriJenis->kategori;
+            $query->kategoriSub;
+
+            return $query;
+        });
+
+        return $this->successResponse($internal,'Success', 200);
     }
 
     public function create()
@@ -40,7 +51,13 @@ class InternalMemoController extends Controller
             "created_by"=> auth()->user()->id
         ]);
 
-        $filenametostore ="";
+        HistoryMemo::create([
+            "id_internal_memo"=> $internalMemo->id,
+            "user_id"=> auth()->user()->id,
+            "status"=> 0,
+            "keterangan"=> "Internal memo baru dibuat oleh ". auth()->user()->name
+        ]);
+
         if(!empty($files)) {
 
             foreach ($files as $key => $file) {
@@ -50,7 +67,7 @@ class InternalMemoController extends Controller
                 $image = str_replace($replace, '', $image_64); 
                 $image = str_replace(' ', '+', $image); 
                 $imageName = Str::random(10).'.'.$extension;
-                $filenametostore = Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
 
                 InternalMemoFile::create([
                     "id_internal_memo"=> $internalMemo->id,
@@ -78,6 +95,10 @@ class InternalMemoController extends Controller
         $query->kategoriSub;
 
         return $this->successResponse($query,'Success', 200);
+    }
+
+    public function accMemo(){
+
     }
 
     public function edit($id)

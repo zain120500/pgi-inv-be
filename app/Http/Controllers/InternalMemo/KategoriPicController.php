@@ -16,8 +16,30 @@ class KategoriPicController extends Controller
 {
     public function index()
     {
-        $query = KategoriPicFpp::paginate(15);
-        return $this->successResponse($query,'Success', 200);
+        $kategori = KategoriPicFpp::paginate(15);
+
+        $collect = $kategori->getCollection()->map(function ($query) {
+            $query->user->makeHidden(['created_at','updated_at']);
+            $query->kategori;
+            $query->devisi->makeHidden(['created_at','updated_at']);
+            return $query;
+        });
+        
+        return $this->successResponse($kategori,'Success', 200);
+    }
+
+    public function all()
+    {
+        $kategori = KategoriPicFpp::get();
+
+        $collect = $kategori->map(function ($query) {
+            $query->user->makeHidden(['created_at','updated_at']);
+            $query->kategori;
+            $query->devisi->makeHidden(['created_at','updated_at']);
+            return $query;
+        });
+        
+        return $this->successResponse($kategori,'Success', 200);
     }
 
     public function create()
@@ -47,7 +69,9 @@ class KategoriPicController extends Controller
         
         if(!empty($query)){
             $query->barangJenis;
-
+            $query->user->makeHidden(['created_at','updated_at']);
+            $query->kategori->kategoriJenis;
+            $query->devisi->makeHidden(['created_at','updated_at']);
             return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);

@@ -234,14 +234,13 @@ Route::group([
         Route::group([
             'prefix' => 'pembelian'
         ], function ($router) {
+            Route::get('/create', 'PembelianController@create');
             Route::get('/', 'PembelianController@index');
             Route::get('/{id}', 'PembelianController@show');
             Route::post('/', 'PembelianController@store');
             Route::post('/detail', 'PembelianController@storeDetail');
-
             Route::post('/update', 'PembelianController@updatePembelian');
             Route::post('/update/detail', 'PembelianController@updatePembelianDetail');
-
             Route::delete('/delete/{id}', 'PembelianController@destroy');
             Route::delete('/detail/delete/{id}', 'PembelianController@destroyDetail');
         });
@@ -302,6 +301,7 @@ Route::group([
             'prefix' => 'kategori-pic'
         ], function ($router) {
             Route::get('/', 'KategoriPicController@index');
+            Route::get('/all', 'KategoriPicController@all');
             Route::get('/{id}', 'KategoriPicController@show');
             Route::post('/', 'KategoriPicController@store');
             Route::post('/{id}', 'KategoriPicController@update');

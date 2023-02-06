@@ -25,6 +25,11 @@ class InternalMemo extends Model
         return $this->hasOne('App\Model\KategoriJenisFpp','id', 'id_kategori_jenis_fpp');
 	}
 
+    function kategori()
+    {
+        return $this->hasOne('App\Model\KategoriFpp','id', 'id_kategori_fpp');
+	}
+
     function createdBy()
     {
         return $this->hasOne('App\User','id','created_by');

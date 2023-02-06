@@ -16,5 +16,14 @@ class Kategori extends Model
         return $this->hasMany('App\Model\BarangJenis', 'id_kategori');
 	}
 
+    function kategoriJenis()
+    {
+        return $this->hasMany('App\Model\KategoriJenisFpp', 'id', 'id_kategori_jenis_fpp');
+	}
+
+    function kategoriPic()
+    {
+        return $this->hasMany('App\Model\KategoriPicFpp', 'id_kategori_fpp', 'id');
+	}
 
 }

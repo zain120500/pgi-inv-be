@@ -42,10 +42,8 @@ class PembelianController extends Controller
 
     public function create()
     {
-        //
+        return $this->generateInvoice();
     }
-
-    
 
     public function store(Request $request)
     {
@@ -266,8 +264,8 @@ class PembelianController extends Controller
 
     public function generateInvoice()
     {
-        $max_id = DB::statement("select max(no_invoice) as max_code FROM pembelian WHERE MONTH(tanggal)=MONTH(CURDATE()) AND YEAR(tanggal)=YEAR(CURDATE())");
-        $max_fix = (int) substr($max_id, 9, 4);
+        $max_id = DB::select("select max(no_invoice) as max_code FROM pembelian WHERE MONTH(tanggal)=MONTH(CURDATE()) AND YEAR(tanggal)=YEAR(CURDATE())");
+        $max_fix = (int) substr($max_id[0]->max_code, 9, 4);
         $max_nik = $max_fix + 1;
         $tanggal = $time = date("d");
         $bulan = $time = date("m");
