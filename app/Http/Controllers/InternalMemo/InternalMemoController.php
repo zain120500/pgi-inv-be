@@ -47,6 +47,7 @@ class InternalMemoController extends Controller
             "id_devisi"=> $request->id_devisi,
             "id_cabang"=> $request->id_cabang,
             "qty"=> $request->qty,
+            "flag" => 0,
             "catatan"=> $request->catatan,
             "created_by"=> auth()->user()->id
         ]);
@@ -89,10 +90,11 @@ class InternalMemoController extends Controller
         $query = InternalMemo::find($id);
         $query->MemoFile->makeHidden(['created_at','updated_at']);
         $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
-        $query->cabang->makeHidden(['created_at','updated_at']);
+        $query->cabang;
         $query->devisi->makeHidden(['created_at','updated_at']);
         $query->kategoriJenis->kategori->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
+        $query->historyMemo;
 
         return $this->successResponse($query,'Success', 200);
     }

@@ -37,6 +37,23 @@ class BarangTipeController extends Controller
 
     }
 
+    public function all(Request $request)
+    {        
+        if(!empty($request->tipe)) {
+            $barang = BarangTipe::where('tipe', 'like', '%'.$request->tipe.'%')->get();
+        } else if(!empty($request->kode_barang)){
+            $barang = BarangTipe::where('kode_barang', 'like', '%'.$request->kode_barang.'%')->get();
+        } else {
+            $barang = BarangTipe::all();
+        }
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $barang
+        ], 200); 
+
+    }
+
     public function create()
     {
         //

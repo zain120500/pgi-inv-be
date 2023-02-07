@@ -230,34 +230,34 @@ class PembelianController extends Controller
 
     public function getCodeFlag($id)
     {
-        if($id = 0){
+        if($id == 0){
             return "belum proses";
-        } else if($id = 1){
+        } else if($id == 1){
             return "sudah diproses";
-        } else if($id = 2){
+        } else if($id == 2){
             return "sudah dibayar";
-        } else if($id = 3){
+        } else if($id == 3){
             return "diterima";
-        } else if($id = 4){
+        } else if($id == 4){
             return "dibatalkan";
-        } else if($id = 5){
+        } else if($id == 5){
             return "barang selisih";
-        }else if($id = 6){
+        }else if($id == 6){
             return "request void";
         }
     }
 
     public function getCodeStatus($id)
     {
-        if($id = 0){
+        if($id == 0){
             return "Pending";
-        } else if($id = 1){
+        } else if($id == 1){
             return "Ok";
-        } else if($id = 2){
+        } else if($id == 2){
             return "Void";
-        } else if($id = 3){
+        } else if($id == 3){
             return "Selisih";
-        }else if($id = 4){
+        }else if($id == 4){
             return "request void";
         }
     }

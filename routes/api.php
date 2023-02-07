@@ -179,6 +179,7 @@ Route::group([
         Route::group([
             'prefix' => 'barang-tipe'
         ], function ($router) {
+            Route::get('/all', 'BarangTipeController@all');
             Route::get('/', 'BarangTipeController@index');
             Route::get('/{id}', 'BarangTipeController@show');
             Route::post('/', 'BarangTipeController@store');
