@@ -159,7 +159,7 @@ class InternalMemoController extends Controller
 
     public function dropdownKategoriFpp(Request $request)
     {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_fpp', 'like', $request->id_kategori_fpp)->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_fpp', $request->id_kategori_fpp)->get();
 
         if($internal){
             return $this->successResponse($internal,'Success', 200);
@@ -170,7 +170,7 @@ class InternalMemoController extends Controller
 
     public function dropdownJenisKategoriFpp(Request $request)
     {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_jenis_fpp', 'like', $request->id_kategori_jenis_fpp)->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->get();
 
         if($internal){
             return $this->successResponse($internal,'Success', 200);
@@ -181,7 +181,7 @@ class InternalMemoController extends Controller
 
     public function dropdownSubKategoriFpp(Request $request)
     {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_sub_fpp', 'like', $request->id_kategori_sub_fpp)->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->get();
 
         if($internal){
             return $this->successResponse($internal,'Success', 200);
@@ -192,7 +192,7 @@ class InternalMemoController extends Controller
 
     public function dropdownDivisi(Request $request)
     {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_devisi', 'like', $request->id_devisi)->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_devisi', $request->id_devisi)->get();
 
         if($internal){
             return $this->successResponse($internal,'Success', 200);
@@ -203,7 +203,7 @@ class InternalMemoController extends Controller
 
     public function dropdownCabang(Request $request)
     {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_cabang', 'like', $request->id_cabang)->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_cabang', $request->id_cabang)->get();
 
         if($internal){
             return $this->successResponse($internal,'Success', 200);
