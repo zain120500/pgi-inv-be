@@ -26,12 +26,12 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'role_id' => 1
-        ]); 
-        return new UserResource($user); 
+        ]);
+        return new UserResource($user);
     }
 
     public function login(ValidateUserLogin $request){
-      
+
         $user = "";
         $id_top_menu = [];
 
@@ -76,18 +76,18 @@ class AuthController extends Controller
             'cabang' => $cabang
         ]);
     }
- 
+
     public function user()
-    { 
+    {
         $user = JWTAuth::parseToken()->authenticate();
-        
+
         $roleMenu = $user->role->roleMenu;
         $roleMenu = $roleMenu->map(function ($query) {
             $query['menu'] = Menu::select(['id','code','name'])->where('id', $query->menu_id)->first();
 
             return $query;
         });
-        
+
         return $user;
         // return auth()->user();
        //return new UserResource(auth()->user());

@@ -49,6 +49,11 @@ class InternalMemo extends Model
     {
         return $this->hasOne('App\Model\HistoryMemo','id_internal_memo','id');
 	}
-    
-    
+
+    function listHistoryMemo()
+    {
+        return $this->hasMany('App\Model\HistoryMemo','id_internal_memo','id');
+    }
+
+
 }

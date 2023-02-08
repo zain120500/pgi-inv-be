@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\InternalMemo;
 
 use App\Http\Controllers\Controller;
+use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
 use App\Model\KategoriFpp;
 use App\Model\KategoriJenisFpp;
@@ -22,7 +23,7 @@ class InternalMemoController extends Controller
         $collect = $internal->map(function ($query) {
             $query->cabang;
             $query->devisi;
-            $query->kategoriJenis->kategori;
+            $query->kategoriJenis;
             $query->kategoriSub;
 
             return $query;
@@ -64,9 +65,9 @@ class InternalMemoController extends Controller
             foreach ($files as $key => $file) {
                 $image_64 = $file; //your base64 encoded data
                 $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-                $replace = substr($image_64, 0, strpos($image_64, ',')+1); 
-                $image = str_replace($replace, '', $image_64); 
-                $image = str_replace(' ', '+', $image); 
+                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                $image = str_replace($replace, '', $image_64);
+                $image = str_replace(' ', '+', $image);
                 $imageName = Str::random(10).'.'.$extension;
                 Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
 
@@ -75,9 +76,9 @@ class InternalMemoController extends Controller
                     "path" => $imageName
                 ]);
             }
-            
+
         }
-    
+
         if($internalMemo){
             return $this->successResponse($internalMemo,'Success', 200);
         } else {
@@ -94,13 +95,9 @@ class InternalMemoController extends Controller
         $query->devisi->makeHidden(['created_at','updated_at']);
         $query->kategoriJenis->kategori->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
-        $query->historyMemo;
+        $query->listHistoryMemo;
 
         return $this->successResponse($query,'Success', 200);
-    }
-
-    public function accMemo(Request $request){
-
     }
 
     public function edit($id)
@@ -140,6 +137,33 @@ class InternalMemoController extends Controller
         }
     }
 
+    public function accMemo(Request $request, $id){
+        //        $internalMemo = $this->show($id);
+
+        $historyMemo = HistoryMemo::where('id_internal_memo', '=', $id)->first();
+
+        $create = HistoryMemo::create([
+            "id_internal_memo"=> $historyMemo->id_internal_memo,
+            "user_id"=> auth()->user()->id,
+            "status"=> 1,
+            "keterangan"=> $request->keterangan. " ". auth()->user()->name
+        ]);
+
+        if($create){
+            return $this->successResponse($create,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function search(Request $request)
+    {
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->with('devisi')->get();
+
+        return $internal;
+    }
+
+
     //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus	
     public function getFlagStatus($id)
     {
@@ -163,4 +187,5 @@ class InternalMemoController extends Controller
             return "DiHapus";
         }
     }
+
 }
