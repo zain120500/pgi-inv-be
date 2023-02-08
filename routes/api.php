@@ -25,7 +25,7 @@ Route::group([
     // 'middleware' => 'guest',
 ], function ($router) {
     Route::post('/register', 'AuthController@register');
-    Route::post('/login', 'AuthController@login');
+    Route::post('/login', 'AuthController@login')->name('login');
     Route::get('/user', 'AuthController@user');
 });
 
@@ -62,7 +62,7 @@ Route::group([
 
 Route::group([
     'prefix' => 'role-menu'
-], function ($router) {        
+], function ($router) {
     Route::get('/all', 'RoleMenuController@all');
     Route::get('/', 'RoleMenuController@index');
     Route::get('/{id}', 'RoleMenuController@show');
@@ -117,7 +117,7 @@ Route::group([
         Route::get('/{id}', 'UserController@show');
     });
 
-    
+
     Route::group([
         'prefix' => 'cabang'
     ], function ($router) {
@@ -167,7 +167,7 @@ Route::group([
             Route::get('/', 'BarangMasukController@index');
             Route::get('/{id}', 'BarangMasukController@show');
         });
-        
+
         Route::group([
             'prefix' => 'barang-keluar'
         ], function ($router) {
@@ -255,6 +255,9 @@ Route::group([
         Route::group([
             'prefix' => 'memo'
         ], function ($router) {
+            Route::get('/search', 'InternalMemoController@search');
+            Route::get('/history/acc/{id}', 'InternalMemoController@accMemo');
+
             Route::get('/', 'InternalMemoController@index');
             Route::get('/create', 'InternalMemoController@create');
 
@@ -263,6 +266,8 @@ Route::group([
             Route::post('/', 'InternalMemoController@store');
             Route::post('/{id}', 'InternalMemoController@update');
             Route::delete('/delete/{id}', 'InternalMemoController@destroy');
+
+
         });
 
         Route::group([
@@ -320,9 +325,9 @@ Route::group([
             Route::delete('/delete/{id}', 'DevisiAccessController@destroy');
         });
 
-        
-        
+
+
     });
 
-    
+
 });
