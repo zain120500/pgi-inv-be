@@ -9,6 +9,7 @@ use App\Model\PembelianDetail;
 use App\Model\BarangTipe;
 use App\Model\BarangMasuk;
 use App\Model\Admin;
+use App\Model\LogRefund;
 use App\User;
 use DB;
 
@@ -21,6 +22,12 @@ class PembelianController extends Controller
             $query = Pembelian::where('no_invoice', 'like', '%'.$request->no_invoice.'%')->orderBy('tanggal', 'DESC')->paginate(15);
         } else if(!empty($request->user_input)){
             $query = Pembelian::where('user_input', 'like', '%'.$request->user_input.'%')->orderBy('tanggal', 'DESC')->paginate(15);
+        } else if(!empty($request->flag)){
+            $query = Pembelian::where('flag', $request->flag)->orderBy('tanggal', 'DESC')->paginate(15);
+        } else if(!empty($request->from) and !empty($request->to)){
+            $query = Pembelian::whereBetween('tanggal', [$request->from, $request->to])->orderBy('tanggal', 'DESC')->paginate(15);
+        } else if(!empty($request->id_supplier)){
+            $query = Pembelian::where('id_supplier', $request->id_supplier)->orderBy('tanggal', 'DESC')->paginate(15);
         } else {
             $query = Pembelian::orderBy('tanggal', 'DESC')->paginate(15);
         }
@@ -52,6 +59,7 @@ class PembelianController extends Controller
             "no_invoice"=> $this->generateInvoice(),
             "tanggal"=> $request->tanggal,
             "id_supplier"=> $request->id_supplier,
+            "is_dropship" => $request->is_dropship, // true/false
             "pic"=> $request->pic,
             "ongkir"=> $request->ongkir,
             "flag" => 0,
@@ -84,6 +92,7 @@ class PembelianController extends Controller
                 "imei"=> $request->imei,
                 "detail_barang"=> $request->detail_barang,
                 "keterangan"=> $request->keterangan,
+                "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
                 "status"=> 0
             ]);
     
@@ -110,7 +119,7 @@ class PembelianController extends Controller
             $pembelianDetail = $query->detail;
             foreach ($pembelianDetail as $key => $detail) {
                 $detail->tipeBarang;
-                
+                $detail->cabang;
                 $detail['status_code'] = $this->getCodeStatus($detail->status);
             }
             return $this->successResponse($query,'Success', 200);
@@ -151,7 +160,6 @@ class PembelianController extends Controller
         $flag = $request->flag;
 
         $pembelian = Pembelian::where('id', $id)->first();
-        $pembelian->update(["flag" => $flag]);
 
         if($flag == 0){  // request void pembelian
             PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 0]); //update barang jadi request void
@@ -180,8 +188,28 @@ class PembelianController extends Controller
             }
             
         } else if($flag == 4){ // Approve Void Pembelian
-            PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 2]); //update barang jadi void
+
+            $details = PembelianDetail::where('id_pembelian', $pembelian->id);
+
+            foreach ($details->get() as $key => $detail) {
+
+                $detail->update(["status" => 2]); //update barang jadi void
+            
+                LogRefund::create([
+                    "nomer_barang" => $detail->nomer_barang,
+                    "id_tipe" => $detail->id_tipe,
+                    "harga" => $detail->harga,
+                    "jumlah" => $detail->jumlah,
+                    "satuan" => $detail->satuan,
+                    "total_harga" => $detail->total_harga,
+                    "id_pembelian" => $detail->id_pembelian,
+                    "keterangan" => "void pembelian",
+                    "status" => 0
+                ]);
+            }
         }
+
+        $pembelian->update(["flag" => $flag]);
 
         if($pembelian){
             return $this->successResponse($pembelian,'Success', 200);

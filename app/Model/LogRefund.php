@@ -4,12 +4,9 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StokBarang extends Model
+class LogRefund extends Model
 {
-    protected $table = 'stok_barang';
+    protected $table = 'log_refund';
     protected $primaryKey = 'id';
     protected $guarded = [''];
-
-    protected $hidden = array('created_at', 'updated_at');
-
 }

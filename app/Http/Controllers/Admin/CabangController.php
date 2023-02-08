@@ -21,7 +21,7 @@ class CabangController extends Controller
 
     public function all()
     {
-        $cabang = Cabang::get();
+        $cabang = Cabang::select('id','name','alamat','hp','kode')->get();
 
         return response()->json([
             'status' =>'success',
