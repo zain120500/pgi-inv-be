@@ -143,7 +143,7 @@ Route::group([
         // Route::delete('/delete/{id}', 'CabangUserController@destroy');
     });
 
-    
+
 
 
     Route::group([
@@ -271,7 +271,12 @@ Route::group([
         Route::group([
             'prefix' => 'memo'
         ], function ($router) {
-            Route::get('/search', 'InternalMemoController@search');
+            Route::get('/dropdownKategoriFpp', 'InternalMemoController@dropdownKategoriFpp');
+            Route::get('/dropdownJenisKategoriFpp', 'InternalMemoController@dropdownJenisKategoriFpp');
+            Route::get('/dropdownSubKategoriFpp', 'InternalMemoController@dropdownSubKategoriFpp');
+            Route::get('/dropdownDivisi', 'InternalMemoController@dropdownDivisi');
+            Route::get('/dropdownCabang', 'InternalMemoController@dropdownCabang');
+            Route::get('/ascDesc', 'InternalMemoController@ascDesc');
             Route::get('/history/acc/{id}', 'InternalMemoController@accMemo');
 
             Route::get('/', 'InternalMemoController@index');

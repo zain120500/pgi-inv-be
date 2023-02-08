@@ -11,6 +11,7 @@ use App\Model\KategoriPicFpp;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoFile;
 use App\Model\HistoryMemo;
+use Illuminate\Support\Arr;
 use Storage;
 use Str;
 
@@ -89,6 +90,7 @@ class InternalMemoController extends Controller
     public function show($id)
     {
         $query = InternalMemo::find($id);
+
         $query->MemoFile->makeHidden(['created_at','updated_at']);
         $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
         $query->cabang;
@@ -138,15 +140,14 @@ class InternalMemoController extends Controller
     }
 
     public function accMemo(Request $request, $id){
-        //        $internalMemo = $this->show($id);
-
-        $historyMemo = HistoryMemo::where('id_internal_memo', '=', $id)->first();
+        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+        $historyMemo = HistoryMemo::where('id_internal_memo', '=', $internalMemo->id)->first();
 
         $create = HistoryMemo::create([
             "id_internal_memo"=> $historyMemo->id_internal_memo,
             "user_id"=> auth()->user()->id,
-            "status"=> 1,
-            "keterangan"=> $request->keterangan. " ". auth()->user()->name
+            "status"=> $internalMemo->flag,
+            "keterangan"=> $this->getFlagStatus($internalMemo->flag). " Di Acc Oleh ". auth()->user()->name
         ]);
 
         if($create){
@@ -156,15 +157,69 @@ class InternalMemoController extends Controller
         }
     }
 
-    public function search(Request $request)
+    public function dropdownKategoriFpp(Request $request)
     {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->with('devisi')->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_fpp', $request->id_kategori_fpp)->get();
 
-        return $internal;
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
+    public function dropdownJenisKategoriFpp(Request $request)
+    {
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->get();
 
-    //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus	
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function dropdownSubKategoriFpp(Request $request)
+    {
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->get();
+
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function dropdownDivisi(Request $request)
+    {
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_devisi', $request->id_devisi)->get();
+
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function dropdownCabang(Request $request)
+    {
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_cabang', $request->id_cabang)->get();
+
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function ascDesc(Request $request)
+    {
+        $internal = InternalMemo::orderBy('created_at', $request->param)->get();
+
+        return $this->successResponse($internal,'Success', 200);
+    }
+
+    //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus
     public function getFlagStatus($id)
     {
         if($id == 0){
