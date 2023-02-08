@@ -9,4 +9,6 @@ class Cabang extends Model
     protected $table = 'cabang';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+
+    
 }

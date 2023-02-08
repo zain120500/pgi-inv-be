@@ -99,7 +99,7 @@ class InternalMemoController extends Controller
         return $this->successResponse($query,'Success', 200);
     }
 
-    public function accMemo(){
+    public function accMemo(Request $request){
 
     }
 
@@ -137,6 +137,30 @@ class InternalMemoController extends Controller
             return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
+        }
+    }
+
+    //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus	
+    public function getFlagStatus($id)
+    {
+        if($id == 0){
+            return "Pending";
+        } else if($id == 1){
+            return "Disetujui";
+        } else if($id == 2){
+            return "DiProses";
+        } else if($id == 3){
+            return "DiSelesaikan";
+        } else if($id == 4){
+            return "DiKonfirmasi";
+        } else if($id == 5){
+            return "Selesai";
+        } else if($id == 6){
+            return "Request Batal";
+        } else if($id == 7){
+            return "Batal";
+        } else if($id == 10){
+            return "DiHapus";
         }
     }
 }

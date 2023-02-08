@@ -43,6 +43,8 @@ class BarangTipeController extends Controller
             $barang = BarangTipe::where('tipe', 'like', '%'.$request->tipe.'%')->get();
         } else if(!empty($request->kode_barang)){
             $barang = BarangTipe::where('kode_barang', 'like', '%'.$request->kode_barang.'%')->get();
+        } else if(!empty($request->id_merk)){
+            $barang = BarangTipe::where('id_merk', $request->id_merk)->get();
         } else {
             $barang = BarangTipe::all();
         }

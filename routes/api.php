@@ -122,12 +122,28 @@ Route::group([
         'prefix' => 'cabang'
     ], function ($router) {
         Route::get('/', 'CabangController@index');
+        Route::get('/all', 'CabangController@all');
         Route::get('/{id}', 'CabangController@show');
         Route::post('/', 'CabangController@store');
         Route::delete('/delete/{id}', 'CabangController@destroy')->name('cabang.delete');
         Route::post('/{id}', 'CabangController@update');
 
     });
+
+    Route::group([
+        'prefix' => 'cabang-user'
+    ], function ($router) {
+        Route::get('/', 'CabangUserController@index');
+        Route::post('/{id}', 'CabangUserController@update');
+        Route::get('/user-kcs', 'CabangUserController@getUserKCS');
+        Route::get('/user-kc', 'CabangUserController@getUserKC');
+        Route::get('/user-ku', 'CabangUserController@getUserKU');
+        Route::get('/{id}', 'CabangUserController@show');
+        // Route::post('/', 'CabangUserController@store');
+        // Route::delete('/delete/{id}', 'CabangUserController@destroy');
+    });
+
+    
 
 
     Route::group([

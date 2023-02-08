@@ -19,6 +19,16 @@ class CabangController extends Controller
         ], 200); 
     }
 
+    public function all()
+    {
+        $cabang = Cabang::get();
+
+        return response()->json([
+            'status' =>'success',
+            'data' => $cabang
+        ], 200); 
+    }
+
     public function create()
     {
         //

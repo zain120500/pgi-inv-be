@@ -30,7 +30,7 @@ class PembelianController extends Controller
 
             $q['total_unit'] = $details->sum('jumlah');
             $q['total_pembelian'] = $details->sum('total_harga');
-            $q->supplier->makeHidden(['created_at','updated_at']);
+            $q->supplier;
             $q['status_flag'] = $this->getCodeFlag($q->flag);
             $q['user_input'] = Admin::select('username')->where('username', $q->user_input)->first();
 
@@ -109,8 +109,7 @@ class PembelianController extends Controller
 
             $pembelianDetail = $query->detail;
             foreach ($pembelianDetail as $key => $detail) {
-                $detail->tipeBarang->makeHidden(['created_at','updated_at'])
-                    ->barangMerk->makeHidden(['created_at','updated_at','id_jenis']);
+                $detail->tipeBarang;
                 
                 $detail['status_code'] = $this->getCodeStatus($detail->status);
             }
