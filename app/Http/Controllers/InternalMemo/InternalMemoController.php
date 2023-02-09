@@ -13,6 +13,7 @@ use App\Model\InternalMemoFile;
 use App\Model\HistoryMemo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Storage;
 use Str;
 
@@ -42,6 +43,7 @@ class InternalMemoController extends Controller
     public function store(Request $request)
     {
         $files = $request['files'];
+        $videos = $request['videos'];
 
         $internalMemo = InternalMemo::create([
             "id_kategori_fpp"=> $request->id_kategori_fpp,
@@ -80,6 +82,24 @@ class InternalMemoController extends Controller
             }
 
         }
+            if(!empty($videos)) {
+
+                foreach ($videos as $key => $video) {
+                    $video_64 = $video; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($video_64, 0, strpos($video_64, ';')))[1])[1];   // .mp4 .avi .mkv
+                    $replace = substr($video_64, 0, strpos($video_64, ',')+1);
+                    $video = str_replace($replace, '', $video_64);
+                    $videos = str_replace(' ', '+', $video);
+                    $videoName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($videoName, base64_decode(($videos), 'r+'));
+
+                    InternalMemoFile::create([
+                        "id_internal_memo"=> $internalMemo->id,
+                        "path_video" => $videoName
+                    ]);
+                }
+
+            }
 
         if($internalMemo){
             return $this->successResponse($internalMemo,'Success', 200);

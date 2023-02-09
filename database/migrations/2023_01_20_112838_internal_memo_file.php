@@ -11,7 +11,8 @@ class InternalMemoFile extends Migration
         Schema::create('internal_memo_files', function (Blueprint $table) {
             $table->id();
             $table->integer('id_internal_memo');
-            $table->string('path');
+            $table->string('path')->nullable();
+            $table->string('path_video')->nullable();
             $table->string('keterangan');
             $table->timestamps();
         });
