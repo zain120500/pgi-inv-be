@@ -95,7 +95,7 @@ class Handler extends ExceptionHandler
     
         if ($exception instanceof AuthenticationException) {
             // $exception = $this->unauthenticated($request, $exception);
-            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+            return $this->errorResponse($exception->getMessage(), 403);
 
         }
     

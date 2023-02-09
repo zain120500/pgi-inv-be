@@ -101,9 +101,7 @@ class PembelianController extends Controller
             } else {
                 return $this->errorResponse('Data is Null', 403);
             }
-        }
-
-        
+        }        
     }
 
     public function show($id)
@@ -137,20 +135,45 @@ class PembelianController extends Controller
     {
         $query = Pembelian::where('id', $id)
             ->update([
-                "no_invoice"=> $request->no_invoice,
-                "tanggal"=> $request->tanggal,
                 "id_supplier"=> $request->id_supplier,
+                "is_dropship" => $request->is_dropship, // true/false
                 "pic"=> $request->pic,
                 "ongkir"=> $request->ongkir,
-                "flag" => 0,
                 "keterangan"=> $request->keterangan,
-                "user_input"=> auth()->user()->id
+                "user_input"=> auth()->user()->admin->username
             ]);
-
         if($query){
             return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
+        }
+    }
+
+    public function updateDetail(Request $request, $id)
+    {
+        $barangTipe = BarangTipe::find($request->id_tipe);   
+        
+        if(empty($barangTipe)){
+            return $this->errorResponse('Barang Tipe is Null', 403);
+        } else {
+            $query = PembelianDetail::where('id', $id)
+                ->update([
+                    "id_tipe"=> $request->id_tipe,
+                    "nomer_barang"=> $barangTipe->kode_barang,
+                    "harga"=> $request->harga,
+                    "jumlah"=> $request->jumlah,
+                    "total_harga"=> (int)$request->harga * (int)$request->jumlah,
+                    "satuan"=> $request->satuan,
+                    "imei"=> $request->imei,
+                    "detail_barang"=> $request->detail_barang,
+                    "keterangan"=> $request->keterangan,
+                    "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL
+                ]);
+            if($query){
+                return $this->successResponse($query,'Success', 200);
+            } else {
+                return $this->errorResponse('Data is Null', 403);
+            }
         }
     }
 
@@ -253,7 +276,6 @@ class PembelianController extends Controller
             return $this->errorResponse('Data is Null', 403);
         }
     }
-
 
     public function getCodeFlag($id)
     {

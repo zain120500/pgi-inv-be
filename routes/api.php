@@ -246,6 +246,15 @@ Route::group([
             Route::get('/', 'PengirimanController@index');
             Route::get('/{id}', 'PengirimanController@show');
             Route::post('/', 'PengirimanController@store');
+
+            Route::post('/detail', 'PengirimanController@storeDetail');
+            Route::post('/update', 'PengirimanController@updatePembelian');
+            Route::post('/update/detail', 'PengirimanController@updatePembelianDetail');
+            Route::delete('/delete/{id}', 'PengirimanController@destroy');
+            Route::delete('/detail/delete/{id}', 'PengirimanController@destroyDetail');
+
+            Route::post('/{id}', 'PengirimanController@update');
+            Route::post('/detail/{id}', 'PengirimanController@updateDetail');
         });
 
         Route::group([
@@ -260,6 +269,10 @@ Route::group([
             Route::post('/update/detail', 'PembelianController@updatePembelianDetail');
             Route::delete('/delete/{id}', 'PembelianController@destroy');
             Route::delete('/detail/delete/{id}', 'PembelianController@destroyDetail');
+
+            Route::post('/{id}', 'PembelianController@update');
+            Route::post('/detail/{id}', 'PembelianController@updateDetail');
+
         });
     });
 
