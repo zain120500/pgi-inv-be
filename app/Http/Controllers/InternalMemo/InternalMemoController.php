@@ -12,6 +12,8 @@ use App\Model\InternalMemo;
 use App\Model\InternalMemoFile;
 use App\Model\HistoryMemo;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Storage;
 use Str;
 
@@ -41,6 +43,7 @@ class InternalMemoController extends Controller
     public function store(Request $request)
     {
         $files = $request['files'];
+        $videos = $request['videos'];
 
         $internalMemo = InternalMemo::create([
             "id_kategori_fpp"=> $request->id_kategori_fpp,
@@ -79,6 +82,24 @@ class InternalMemoController extends Controller
             }
 
         }
+            if(!empty($videos)) {
+
+                foreach ($videos as $key => $video) {
+                    $video_64 = $video; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($video_64, 0, strpos($video_64, ';')))[1])[1];   // .mp4 .avi .mkv
+                    $replace = substr($video_64, 0, strpos($video_64, ',')+1);
+                    $video = str_replace($replace, '', $video_64);
+                    $videos = str_replace(' ', '+', $video);
+                    $videoName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($videoName, base64_decode(($videos), 'r+'));
+
+                    InternalMemoFile::create([
+                        "id_internal_memo"=> $internalMemo->id,
+                        "path_video" => $videoName
+                    ]);
+                }
+
+            }
 
         if($internalMemo){
             return $this->successResponse($internalMemo,'Success', 200);
@@ -216,7 +237,26 @@ class InternalMemoController extends Controller
     {
         $internal = InternalMemo::orderBy('created_at', $request->param)->get();
 
-        return $this->successResponse($internal,'Success', 200);
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function dateRange(Request $request)
+    {
+//        $startDate = Carbon::format('Y/m/d', '2023/01/30');
+        $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+        $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+
+        $internal = InternalMemo::whereBetween('created_at', [$startDate, $endDate])->get();
+
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
     //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus

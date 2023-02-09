@@ -290,6 +290,7 @@ Route::group([
             Route::get('/dropdownDivisi', 'InternalMemoController@dropdownDivisi');
             Route::get('/dropdownCabang', 'InternalMemoController@dropdownCabang');
             Route::get('/ascDesc', 'InternalMemoController@ascDesc');
+            Route::get('/dateRange', 'InternalMemoController@dateRange');
             Route::get('/history/acc/{id}', 'InternalMemoController@accMemo');
 
             Route::get('/', 'InternalMemoController@index');

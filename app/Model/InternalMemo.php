@@ -10,6 +10,12 @@ class InternalMemo extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+        'deleted_at' => 'datetime:Y-m-d h:i:s'
+    ];
+
     function cabang()
     {
         return $this->hasOne('App\Model\Cabang','id','id_cabang');
