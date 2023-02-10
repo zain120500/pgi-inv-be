@@ -46,12 +46,10 @@ class InternalMemoController extends Controller
         $files = $request['files'];
         $videos = $request['videos'];
 
-        /**
-         * MASIH ADA PR DISINI UNTUK GENERATE NUMER AUTO INCREMENT
-         */
+        $number = InternalMemo::count('id');
+
         $internalMemo = InternalMemo::create([
-//            "im_number" => "IM". Carbon::now()->format('Ymd') . str_pad(0, 4, 0, STR_PAD_LEFT),
-            "im_number" => "IM". Carbon::now()->format('Ymd') . str_pad(rand(0, 10), 4, 0, STR_PAD_LEFT),
+            "im_number" => "IM". Carbon::now()->format('Ymd') . str_pad($number+1, 4, 0, STR_PAD_LEFT),
             "id_kategori_fpp"=> $request->id_kategori_fpp,
             "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
             "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
