@@ -11,6 +11,7 @@ class InternalMemo extends Migration
     {
         Schema::create('internal_memo', function (Blueprint $table) {
             $table->id();
+            $table->string('im_number');
             $table->integer('id_kategori_fpp');
             $table->integer('id_kategori_jenis_fpp');
             $table->integer('id_kategori_sub_fpp');

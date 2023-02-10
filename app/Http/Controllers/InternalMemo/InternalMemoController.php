@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\InternalMemo;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\User;
 use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
 use App\Model\KategoriFpp;
@@ -45,7 +46,12 @@ class InternalMemoController extends Controller
         $files = $request['files'];
         $videos = $request['videos'];
 
+        /**
+         * MASIH ADA PR DISINI UNTUK GENERATE NUMER AUTO INCREMENT
+         */
         $internalMemo = InternalMemo::create([
+//            "im_number" => "IM". Carbon::now()->format('Ymd') . str_pad(0, 4, 0, STR_PAD_LEFT),
+            "im_number" => "IM". Carbon::now()->format('Ymd') . str_pad(rand(0, 10), 4, 0, STR_PAD_LEFT),
             "id_kategori_fpp"=> $request->id_kategori_fpp,
             "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
             "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
@@ -161,6 +167,27 @@ class InternalMemoController extends Controller
     }
 
     public function accMemo(Request $request, $id){
+        $user = auth()->user()->id;
+        $pic = KategoriPicFpp::where('user_id', $user)->first();
+
+        if($pic->kategori_proses === 1) {
+            InternalMemo::where('id', $id)->update([
+                'flag' => 1
+            ]);
+        }elseif($pic->kategori_proses === 2) {
+            InternalMemo::where('id', $id)->update([
+                'flag' => 2
+            ]);
+        }elseif($pic->kategori_proses === 3) {
+            InternalMemo::where('id', $id)->update([
+                'flag' => 3
+            ]);
+        }else{
+            InternalMemo::where('id', $id)->update([
+                'flag' => 0
+            ]);
+        }
+
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
         $historyMemo = HistoryMemo::where('id_internal_memo', '=', $internalMemo->id)->first();
 

@@ -14,6 +14,7 @@ class KategoriPICFpp extends Migration
             $table->integer('user_id');
             $table->integer('devisi_id');
             $table->integer('id_kategori_fpp');
+            $table->bigIncrements('kategori_proses')->default(0);
             $table->integer('created_by');
             $table->timestamps();
         });

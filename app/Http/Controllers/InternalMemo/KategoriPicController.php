@@ -24,7 +24,7 @@ class KategoriPicController extends Controller
             $query->devisi->makeHidden(['created_at','updated_at']);
             return $query;
         });
-        
+
         return $this->successResponse($kategori,'Success', 200);
     }
 
@@ -38,7 +38,7 @@ class KategoriPicController extends Controller
             $query->devisi->makeHidden(['created_at','updated_at']);
             return $query;
         });
-        
+
         return $this->successResponse($kategori,'Success', 200);
     }
 
@@ -53,6 +53,7 @@ class KategoriPicController extends Controller
             "user_id"=> $request->user_id,
             "devisi_id"=> $request->devisi_id,
             "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "kategori_proses" => $request->kategori_proses,
             "created_by"=> auth()->user()->id
         ]);
 
@@ -66,7 +67,7 @@ class KategoriPicController extends Controller
     public function show($id)
     {
         $query = KategoriPicFpp::find($id);
-        
+
         if(!empty($query)){
             $query->barangJenis;
             $query->user->makeHidden(['created_at','updated_at']);
@@ -90,6 +91,7 @@ class KategoriPicController extends Controller
                 "user_id"=> $request->user_id,
                 "devisi_id"=> $request->devisi_id,
                 "id_kategori_fpp"=> $request->id_kategori_fpp,
+                "kategori_proses" => $request->kategori_proses,
                 "created_by"=> auth()->user()->id
             ]);
 
@@ -103,7 +105,7 @@ class KategoriPicController extends Controller
     public function destroy($id)
     {
         $query = KategoriPicFpp::find($id);
-        
+
         if($query){
             $query->delete();
             return $this->successResponse($query,'Success', 200);
