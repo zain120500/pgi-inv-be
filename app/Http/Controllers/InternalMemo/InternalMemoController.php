@@ -25,6 +25,7 @@ class InternalMemoController extends Controller
         $internal = InternalMemo::orderBy('created_at', 'DESC')->get();
 
         $collect = $internal->map(function ($query) {
+            $query['flag_status'] = $this->getFlagStatus($query->flag);
             $query->cabang;
             $query->devisi;
             $query->kategoriJenis;
@@ -134,8 +135,15 @@ class InternalMemoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $query = InternalMemo::where('id', $id)
-            ->update([
+        $files = $request['files'];
+        $videos = $request['videos'];
+
+        $query = InternalMemo::where('id', $id)->first();
+        $imFile = InternalMemoFile::where('id_internal_memo', $id)->get();
+
+        if($imFile->isEmpty())
+        {
+            $query->update([
                 "id_kategori_fpp"=> $request->id_kategori_fpp,
                 "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
                 "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
@@ -144,6 +152,54 @@ class InternalMemoController extends Controller
                 "catatan"=> $request->catatan,
                 "created_by"=> auth()->user()->id
             ]);
+
+            if(!empty($files)) {
+
+                foreach ($files as $key => $file) {
+                    $image_64 = $file; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                    $image = str_replace($replace, '', $image_64);
+                    $image = str_replace(' ', '+', $image);
+                    $imageName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                    InternalMemoFile::where('id_internal_memo', $query->id)->updateOrCreate([
+                        "id_internal_memo"=> $query->id,
+                        "path" => $imageName
+                    ]);
+                }
+
+            }
+            if(!empty($videos)) {
+
+                foreach ($videos as $key => $video) {
+                    $video_64 = $video; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($video_64, 0, strpos($video_64, ';')))[1])[1];   // .mp4 .avi .mkv
+                    $replace = substr($video_64, 0, strpos($video_64, ',')+1);
+                    $video = str_replace($replace, '', $video_64);
+                    $videos = str_replace(' ', '+', $video);
+                    $videoName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($videoName, base64_decode(($videos), 'r+'));
+
+                    InternalMemoFile::where('id_internal_memo', $query->id)->updateOrCreate([
+                        "id_internal_memo"=> $query->id,
+                        "path_video" => $videoName
+                    ]);
+                }
+
+            }
+        }else{
+            $query->update([
+                "id_kategori_fpp"=> $request->id_kategori_fpp,
+                "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
+                "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
+                "id_devisi"=> $request->id_devisi,
+                "qty"=> $request->qty,
+                "catatan"=> $request->catatan,
+                "created_by"=> auth()->user()->id
+            ]);
+        }
 
         if($query){
             return $this->successResponse($query,'Success', 200);
@@ -195,6 +251,51 @@ class InternalMemoController extends Controller
             "status"=> $internalMemo->flag,
             "keterangan"=> $this->getFlagStatus($internalMemo->flag). " Di Acc Oleh ". auth()->user()->name
         ]);
+
+        if($create){
+            return $this->successResponse($create,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function accMemoAll(Request $request)
+    {
+        $user = auth()->user()->id;
+        $pic = KategoriPicFpp::where('user_id', $user)->first();
+
+        if($pic->kategori_proses === 1) {
+            InternalMemo::whereIn('id', $request->id)->update([
+                'flag' => 1
+            ]);
+        }elseif($pic->kategori_proses === 2) {
+            InternalMemo::whereIn('id', $request->id)->update([
+                'flag' => 2
+            ]);
+        }elseif($pic->kategori_proses === 3) {
+            InternalMemo::whereIn('id', $request->id)->update([
+                'flag' => 3
+            ]);
+        }else{
+            InternalMemo::whereIn('id', $request->id)->update([
+                'flag' => 0
+            ]);
+        }
+
+        $internal = InternalMemo::whereIn('id', $request->id)->get(['id', 'flag']);
+        $station_ids = [];
+
+        foreach ($internal as $station) {
+            $station_ids['id'] =  $station->id;
+            $station_ids['flag'] =  $station->flag;
+
+            $create = HistoryMemo::create([
+                "id_internal_memo"=> $station_ids['id'],
+                "user_id"=> auth()->user()->id,
+                "status"=> $station_ids['flag'],
+                "keterangan"=> $this->getFlagStatus($station_ids['flag']). " Di Acc Oleh ". auth()->user()->name
+            ]);
+        }
 
         if($create){
             return $this->successResponse($create,'Success', 200);
