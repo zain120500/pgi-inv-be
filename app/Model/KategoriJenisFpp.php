@@ -12,7 +12,7 @@ class KategoriJenisFpp extends Model
 
     protected $hidden = array('created_at', 'updated_at');
 
-    function kategori()
+    function kategoriJenis()
     {
         return $this->hasMany('App\Model\KategoriFpp','id_kategori_jenis_fpp');
 	}
