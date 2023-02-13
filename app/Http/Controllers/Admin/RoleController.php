@@ -13,7 +13,7 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $query = Role::paginate(15);
+        $query = Role::all();
 
         return response()->json([
             'status' =>'success',

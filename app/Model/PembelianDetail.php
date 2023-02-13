@@ -9,8 +9,6 @@ class PembelianDetail extends Model
     protected $table = 'pembelian_detail';
     protected $primaryKey = 'id';
     protected $guarded = [''];
-    public $timestamps = false;
-
     
     function tipeBarang()
     {
@@ -20,6 +18,11 @@ class PembelianDetail extends Model
     function cabang()
     {
         return $this->hasOne('App\Model\Cabang', 'id', 'id_gudang');
+	}
+
+    function pembelian()
+    {
+        return $this->hasOne('App\Model\Pembelian', 'id', 'id_pembelian');
 	}
 
 }

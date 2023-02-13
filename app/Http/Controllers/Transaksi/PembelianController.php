@@ -50,26 +50,24 @@ class PembelianController extends Controller
     public function indexDetail(Request $request)
     {
         if(!empty($request->nomer_barang)){
-            $query = PembelianDetail::where('nomer_barang', 'like', '%'.$request->nomer_barang.'%')->orderBy('id', 'DESC')->paginate(15);
+            $query = PembelianDetail::where('nomer_barang', 'like', '%'.$request->nomer_barang.'%')->orderBy('created_at', 'DESC')->paginate(15);
         } else if(!empty($request->id_tipe)){
-            $query = PembelianDetail::where('id_tipe', 'like', '%'.$request->id_tipe.'%')->orderBy('id', 'DESC')->paginate(15);
-        } 
-        // else if(!empty($request->from) and !empty($request->to)){
-        //     $query = PembelianDetail::whereBetween('created_at', [$request->from, $request->to])->orderBy('id', 'DESC')->paginate(15);
-        // } 
-        else if(!empty($request->id_pengiriman)){
-            $query = PembelianDetail::where('id_pengiriman', $request->id_pengiriman)->orderBy('id', 'DESC')->paginate(15);
+            $query = PembelianDetail::where('id_tipe', 'like', '%'.$request->id_tipe.'%')->orderBy('created_at', 'DESC')->paginate(15);
+        } else if(!empty($request->from) and !empty($request->to)){
+            $query = PembelianDetail::whereBetween('created_at', [$request->from, $request->to])->orderBy('created_at', 'DESC')->paginate(15);
+        } else if(!empty($request->id_pengiriman)){
+            $query = PembelianDetail::where('id_pengiriman', $request->id_pengiriman)->orderBy('created_at', 'DESC')->paginate(15);
         } else if(!empty($request->status)){
-            $query = PembelianDetail::where('status', $request->status)->orderBy('id', 'DESC')->paginate(15);
+            $query = PembelianDetail::where('status', $request->status)->orderBy('created_at', 'DESC')->paginate(15);
         } else {
-            $query = PembelianDetail::orderBy('id', 'DESC')->paginate(15);
+            $query = PembelianDetail::orderBy('created_at', 'DESC')->paginate(15);
         }
 
         $collect = $query->getCollection()->map(function ($q) {
-            $q->supplier;
             $q['status_flag'] = $this->getCodeFlag($q->flag);
             $q->tipeBarang;
             $q->cabang;
+            $q->pembelian->supplier;
             return $q;
         });
 
