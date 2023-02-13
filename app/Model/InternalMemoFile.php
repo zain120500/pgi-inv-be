@@ -14,4 +14,9 @@ class InternalMemoFile extends Model
     {
         return getFiles($this->attributes['path']);
     }
+
+    public function getPathVideoAttribute()
+    {
+        return getFiles($this->attributes['path_video']);
+    }
 }

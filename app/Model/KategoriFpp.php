@@ -15,7 +15,7 @@ class KategoriFpp extends Model
 
     function kategoriJenis()
     {
-        return $this->hasOne('App\Model\KategoriJenisFpp','id', 'id_kategori_jenis_fpp');
+        return $this->hasMany('App\Model\KategoriJenisFpp','id', 'id_kategori_jenis_fpp');
 	}
 
     function kategoriSub()

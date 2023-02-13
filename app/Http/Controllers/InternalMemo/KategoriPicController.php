@@ -20,7 +20,7 @@ class KategoriPicController extends Controller
 
         $collect = $kategori->getCollection()->map(function ($query) {
             $query->user->makeHidden(['created_at','updated_at']);
-            $query->kategori;
+            $query->kategori->kategoriJenis;
             $query->devisi->makeHidden(['created_at','updated_at']);
             return $query;
         });
@@ -34,7 +34,7 @@ class KategoriPicController extends Controller
 
         $collect = $kategori->map(function ($query) {
             $query->user->makeHidden(['created_at','updated_at']);
-            $query->kategori;
+            $query->kategori->kategoriJenis;
             $query->devisi->makeHidden(['created_at','updated_at']);
             return $query;
         });
@@ -53,7 +53,6 @@ class KategoriPicController extends Controller
             "user_id"=> $request->user_id,
             "devisi_id"=> $request->devisi_id,
             "id_kategori_fpp"=> $request->id_kategori_fpp,
-            "kategori_proses" => $request->kategori_proses,
             "created_by"=> auth()->user()->id
         ]);
 
@@ -91,7 +90,6 @@ class KategoriPicController extends Controller
                 "user_id"=> $request->user_id,
                 "devisi_id"=> $request->devisi_id,
                 "id_kategori_fpp"=> $request->id_kategori_fpp,
-                "kategori_proses" => $request->kategori_proses,
                 "created_by"=> auth()->user()->id
             ]);
 

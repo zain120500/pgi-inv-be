@@ -22,6 +22,6 @@ class KategoriPicFpp extends Model
 
     function kategori()
     {
-        return $this->hasMany('App\Model\KategoriFpp', 'id', 'id_kategori_fpp');
+        return $this->hasOne('App\Model\KategoriFpp', 'id', 'id_kategori_fpp');
 	}
 }
