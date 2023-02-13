@@ -248,8 +248,8 @@ Route::group([
             Route::post('/', 'PengirimanController@store');
 
             Route::post('/detail', 'PengirimanController@storeDetail');
-            Route::post('/update', 'PengirimanController@updatePembelian');
-            Route::post('/update/detail', 'PengirimanController@updatePembelianDetail');
+            Route::post('/update', 'PengirimanController@updatePengiriman');
+            Route::post('/update/detail', 'PengirimanController@updatePengirimanDetail');
             Route::delete('/delete/{id}', 'PengirimanController@destroy');
             Route::delete('/detail/delete/{id}', 'PengirimanController@destroyDetail');
 

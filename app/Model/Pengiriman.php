@@ -10,5 +10,9 @@ class Pengiriman extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
+    function detail()
+    {
+        return $this->hasMany('App\Model\PengirimanDetail', 'id_pengiriman', 'id');
+	}
     
 }

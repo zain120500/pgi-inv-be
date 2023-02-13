@@ -10,6 +10,7 @@ class BarangKeluar extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
+    public $timestamps = false;
 
     public function barangTipe()
     {
