@@ -25,6 +25,7 @@ class InternalMemoController extends Controller
         $internal = InternalMemo::orderBy('created_at', 'DESC')->get();
 
         $collect = $internal->map(function ($query) {
+            $query['flag_status'] = $this->getFlagStatus($query->flag);
             $query->cabang;
             $query->devisi;
             $query->kategoriJenis;
