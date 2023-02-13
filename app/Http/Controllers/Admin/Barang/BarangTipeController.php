@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Model\BarangTipe;
 use App\Model\BarangMerk;
 use App\Helpers\StatusHelper;
+use DB;
 
 class BarangTipeController extends Controller
 {
@@ -69,7 +70,7 @@ class BarangTipeController extends Controller
             "satuan"=> $request->satuan,
             "harga"=> $request->harga,
             "tipe_kode"=> $request->tipe_kode,
-            "kode_barang"=> $request->kode_barang,
+            "kode_barang"=> $this->getkodebarang($request->id_jenis),
             "id_merk"=> $request->id_merk
         ]);
 
@@ -109,7 +110,7 @@ class BarangTipeController extends Controller
             "satuan"=> $request->satuan,
             "harga"=> $request->harga,
             "tipe_kode"=> $request->tipe_kode,
-            "kode_barang"=> $request->kode_barang,
+            "kode_barang"=> $this->getkodebarang($request->id_jenis),
             "id_merk"=> $request->id_merk
         ]);
 
@@ -128,5 +129,27 @@ class BarangTipeController extends Controller
             'status' =>'success',
             'data' => $query
         ], 200); 
+    }
+
+    public function getkodebarang($id_jenis) //oke
+    {
+        $rows = DB::select("SELECT A.id_kategori, B.kode FROM barang_jenis A
+          LEFT JOIN kategori B ON B.id = A.id_kategori WHERE A.id ='$id_jenis'");
+
+        $id_kategori = $rows[0]->id_kategori;
+        $kode = $rows[0]->kode;
+
+        $query = DB::select("SELECT max(A.kode_barang) as max_code FROM barang_tipe A
+                 LEFT JOIN barang_merk B ON B.id = A.id_merk
+                 LEFT JOIN barang_jenis C ON C.id = B.id_jenis
+                 WHERE C.id_kategori='$id_kategori'");
+
+        $max_id = $query[0]->max_code;
+        $max_fix = (int) substr($max_id, 3, 7);
+
+        $max_nik = $max_fix + 1;
+
+        $nik = $kode.sprintf("%07s", $max_nik);
+        return $nik;
     }
 }

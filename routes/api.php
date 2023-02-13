@@ -262,6 +262,8 @@ Route::group([
         ], function ($router) {
             Route::get('/create', 'PembelianController@create');
             Route::get('/', 'PembelianController@index');
+            Route::get('/detail', 'PembelianController@indexDetail');
+
             Route::get('/{id}', 'PembelianController@show');
             Route::post('/', 'PembelianController@store');
             Route::post('/detail', 'PembelianController@storeDetail');
