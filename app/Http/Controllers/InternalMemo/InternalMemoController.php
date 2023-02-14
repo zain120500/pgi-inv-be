@@ -121,7 +121,7 @@ class InternalMemoController extends Controller
         $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
         $query->cabang;
         $query->devisi->makeHidden(['created_at','updated_at']);
-        $query->kategoriJenis->kategori->makeHidden(['created_at','updated_at']);
+        $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->listHistoryMemo;
 
