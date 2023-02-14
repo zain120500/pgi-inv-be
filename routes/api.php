@@ -292,6 +292,7 @@ Route::group([
             Route::get('/dropdownSubKategoriFpp', 'InternalMemoController@dropdownSubKategoriFpp');
             Route::get('/dropdownDivisi', 'InternalMemoController@dropdownDivisi');
             Route::get('/dropdownCabang', 'InternalMemoController@dropdownCabang');
+            Route::get('/dropdownStatus', 'InternalMemoController@dropdownStatus');
             Route::get('/ascDesc', 'InternalMemoController@ascDesc');
             Route::get('/dateRange', 'InternalMemoController@dateRange');
             Route::post('/history/acc/{id}', 'InternalMemoController@accMemo');

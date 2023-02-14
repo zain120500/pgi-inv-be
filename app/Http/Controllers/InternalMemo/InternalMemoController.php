@@ -189,6 +189,55 @@ class InternalMemoController extends Controller
                 }
 
             }
+        }
+        else if(!$imFile->isEmpty())
+        {
+            $query->update([
+                "id_kategori_fpp"=> $request->id_kategori_fpp,
+                "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
+                "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
+                "id_devisi"=> $request->id_devisi,
+                "qty"=> $request->qty,
+                "catatan"=> $request->catatan,
+                "created_by"=> auth()->user()->id
+            ]);
+
+            if(!empty($files)) {
+
+                foreach ($files as $key => $file) {
+                    $image_64 = $file; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                    $image = str_replace($replace, '', $image_64);
+                    $image = str_replace(' ', '+', $image);
+                    $imageName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                    InternalMemoFile::where('id_internal_memo', $query->id)->update([
+                        "id_internal_memo"=> $query->id,
+                        "path" => $imageName
+                    ]);
+                }
+
+            }
+            if(!empty($videos)) {
+
+                foreach ($videos as $key => $video) {
+                    $video_64 = $video; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($video_64, 0, strpos($video_64, ';')))[1])[1];   // .mp4 .avi .mkv
+                    $replace = substr($video_64, 0, strpos($video_64, ',')+1);
+                    $video = str_replace($replace, '', $video_64);
+                    $videos = str_replace(' ', '+', $video);
+                    $videoName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($videoName, base64_decode(($videos), 'r+'));
+
+                    InternalMemoFile::where('id_internal_memo', $query->id)->update([
+                        "id_internal_memo"=> $query->id,
+                        "path_video" => $videoName
+                    ]);
+                }
+
+            }
         }else{
             $query->update([
                 "id_kategori_fpp"=> $request->id_kategori_fpp,
@@ -385,11 +434,22 @@ class InternalMemoController extends Controller
         }
     }
 
+    public function dropdownStatus(Request $request)
+    {
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('flag', $request->flag)->get();
+
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
     //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus
     public function getFlagStatus($id)
     {
         if($id == 0){
-            return "Pending";
+            return "Ditinjau Ulang";
         } else if($id == 1){
             return "Disetujui";
         } else if($id == 2){
