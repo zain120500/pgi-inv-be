@@ -288,6 +288,7 @@ Route::group([
         ], function ($router) {
             Route::post('/history/acc/all', 'InternalMemoController@accMemoAll');
             Route::post('/history/acc/{id}', 'InternalMemoController@accMemo');
+            Route::post('/history/ignore/{id}', 'InternalMemoController@ignoreMemo');
 
             Route::get('/', 'InternalMemoController@index');
             Route::get('/create', 'InternalMemoController@create');

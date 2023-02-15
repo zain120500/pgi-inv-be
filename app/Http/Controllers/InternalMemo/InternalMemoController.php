@@ -232,10 +232,9 @@ class InternalMemoController extends Controller
         }
 
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
-        $historyMemo = HistoryMemo::where('id_internal_memo', '=', $internalMemo->id)->first();
 
         $create = HistoryMemo::create([
-            "id_internal_memo"=> $historyMemo->id_internal_memo,
+            "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> $internalMemo->flag,
             "keterangan"=> $this->getFlagStatus($internalMemo->flag). " Di Acc Oleh ". auth()->user()->name
@@ -293,6 +292,23 @@ class InternalMemoController extends Controller
         }
     }
 
+    public function ignoreMemo($id){
+        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+
+        $create = HistoryMemo::create([
+            "id_internal_memo"=> $internalMemo->id,
+            "user_id"=> auth()->user()->id,
+            "status"=> 11,
+            "keterangan"=> $this->getFlagStatus(11). " Di Acc Oleh ". auth()->user()->name
+        ]);
+
+        if($create){
+            return $this->successResponse($create,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
     //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus
     public function getFlagStatus($id)
     {
@@ -314,6 +330,8 @@ class InternalMemoController extends Controller
             return "Batal";
         } else if($id == 10){
             return "DiHapus";
+        } else if($id == 11){
+            return "DiTolak";
         }
     }
 
