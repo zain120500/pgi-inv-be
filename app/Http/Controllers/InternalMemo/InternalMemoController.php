@@ -199,8 +199,8 @@ class InternalMemoController extends Controller
     public function destroy($id)
     {
         $imFile = InternalMemoFile::find($id);
-        Storage::delete($imFile->path);
 
+        Storage::disk('sftp')->delete(basename($imFile->path));
         if(!empty($imFile)){
             $imFile->delete();
             return $this->successResponse($imFile,'Success', 200);
