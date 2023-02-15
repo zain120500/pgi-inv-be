@@ -287,18 +287,11 @@ Route::group([
             'prefix' => 'memo'
         ], function ($router) {
             Route::post('/history/acc/all', 'InternalMemoController@accMemoAll');
-            Route::get('/dropdownKategoriFpp', 'InternalMemoController@dropdownKategoriFpp');
-            Route::get('/dropdownJenisKategoriFpp', 'InternalMemoController@dropdownJenisKategoriFpp');
-            Route::get('/dropdownSubKategoriFpp', 'InternalMemoController@dropdownSubKategoriFpp');
-            Route::get('/dropdownDivisi', 'InternalMemoController@dropdownDivisi');
-            Route::get('/dropdownCabang', 'InternalMemoController@dropdownCabang');
-            Route::get('/dropdownStatus', 'InternalMemoController@dropdownStatus');
-            Route::get('/ascDesc', 'InternalMemoController@ascDesc');
-            Route::get('/dateRange', 'InternalMemoController@dateRange');
             Route::post('/history/acc/{id}', 'InternalMemoController@accMemo');
 
             Route::get('/', 'InternalMemoController@index');
             Route::get('/create', 'InternalMemoController@create');
+            Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
 
             Route::get('/all', 'InternalMemoController@all');
             Route::get('/{id}', 'InternalMemoController@show');
