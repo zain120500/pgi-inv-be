@@ -20,9 +20,39 @@ use Str;
 
 class InternalMemoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $internal = InternalMemo::orderBy('created_at', 'DESC')->get();
+        if($request->id_devisi){
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('id_devisi', $request->id_devisi)->get();
+        }else if($request->id_kategori_fpp){
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('id_kategori_fpp', $request->id_kategori_fpp)->get();
+        }else if($request->id_cabang){
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('id_cabang', $request->id_cabang)->get();
+        }else if($request->id_kategori_jenis_fpp){
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->get();
+        }else if($request->id_kategori_sub_fpp){
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->get();
+        }else if($request->flag){
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('flag', $request->flag)->get();
+        }else if($request->created_at){
+            $internal = InternalMemo::orderBy('created_at', $request->created_at)->get();
+        }else if($request->startDate && $request->endDate){
+            $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+            $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+
+            $internal = InternalMemo::whereBetween('created_at', [$startDate, $endDate])->get();
+        }else if($request->id_cabang_multiple) {
+            $record = $request->id_cabang_multiple;
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->whereIn('id_cabang', $record)->get();
+        }
 
         $collect = $internal->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
@@ -45,7 +75,6 @@ class InternalMemoController extends Controller
     public function store(Request $request)
     {
         $files = $request['files'];
-        $videos = $request['videos'];
 
         $number = InternalMemo::count('id');
 
@@ -82,29 +111,11 @@ class InternalMemoController extends Controller
 
                 InternalMemoFile::create([
                     "id_internal_memo"=> $internalMemo->id,
-                    "path" => $imageName
+                    "path" => $imageName,
                 ]);
             }
 
         }
-            if(!empty($videos)) {
-
-                foreach ($videos as $key => $video) {
-                    $video_64 = $video; //your base64 encoded data
-                    $extension = explode('/', explode(':', substr($video_64, 0, strpos($video_64, ';')))[1])[1];   // .mp4 .avi .mkv
-                    $replace = substr($video_64, 0, strpos($video_64, ',')+1);
-                    $video = str_replace($replace, '', $video_64);
-                    $videos = str_replace(' ', '+', $video);
-                    $videoName = Str::random(10).'.'.$extension;
-                    Storage::disk('sftp')->put($videoName, base64_decode(($videos), 'r+'));
-
-                    InternalMemoFile::create([
-                        "id_internal_memo"=> $internalMemo->id,
-                        "path_video" => $videoName
-                    ]);
-                }
-
-            }
 
         if($internalMemo){
             return $this->successResponse($internalMemo,'Success', 200);
@@ -135,119 +146,47 @@ class InternalMemoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $files = $request['files'];
-        $videos = $request['videos'];
-
         $query = InternalMemo::where('id', $id)->first();
-        $imFile = InternalMemoFile::where('id_internal_memo', $id)->get();
 
-        if($imFile->isEmpty())
-        {
-            $query->update([
-                "id_kategori_fpp"=> $request->id_kategori_fpp,
-                "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
-                "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
-                "id_devisi"=> $request->id_devisi,
-                "qty"=> $request->qty,
-                "catatan"=> $request->catatan,
-                "created_by"=> auth()->user()->id
-            ]);
+        $query->update([
+            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
+            "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
+            "id_devisi"=> $request->id_devisi,
+            "qty"=> $request->qty,
+            "catatan"=> $request->catatan,
+            "created_by"=> auth()->user()->id
+        ]);
 
-            if(!empty($files)) {
-
-                foreach ($files as $key => $file) {
-                    $image_64 = $file; //your base64 encoded data
-                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
-                    $image = str_replace($replace, '', $image_64);
-                    $image = str_replace(' ', '+', $image);
-                    $imageName = Str::random(10).'.'.$extension;
-                    Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
-
-                    InternalMemoFile::where('id_internal_memo', $query->id)->updateOrCreate([
-                        "id_internal_memo"=> $query->id,
-                        "path" => $imageName
-                    ]);
-                }
-
-            }
-            if(!empty($videos)) {
-
-                foreach ($videos as $key => $video) {
-                    $video_64 = $video; //your base64 encoded data
-                    $extension = explode('/', explode(':', substr($video_64, 0, strpos($video_64, ';')))[1])[1];   // .mp4 .avi .mkv
-                    $replace = substr($video_64, 0, strpos($video_64, ',')+1);
-                    $video = str_replace($replace, '', $video_64);
-                    $videos = str_replace(' ', '+', $video);
-                    $videoName = Str::random(10).'.'.$extension;
-                    Storage::disk('sftp')->put($videoName, base64_decode(($videos), 'r+'));
-
-                    InternalMemoFile::where('id_internal_memo', $query->id)->updateOrCreate([
-                        "id_internal_memo"=> $query->id,
-                        "path_video" => $videoName
-                    ]);
-                }
-
-            }
+        if($query){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
         }
-        else if(!$imFile->isEmpty())
-        {
-            $query->update([
-                "id_kategori_fpp"=> $request->id_kategori_fpp,
-                "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
-                "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
-                "id_devisi"=> $request->id_devisi,
-                "qty"=> $request->qty,
-                "catatan"=> $request->catatan,
-                "created_by"=> auth()->user()->id
-            ]);
+    }
 
-            if(!empty($files)) {
+    public function updateFile(Request $request, $id)
+    {
+        $files = $request['files'];
 
-                foreach ($files as $key => $file) {
-                    $image_64 = $file; //your base64 encoded data
-                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
-                    $image = str_replace($replace, '', $image_64);
-                    $image = str_replace(' ', '+', $image);
-                    $imageName = Str::random(10).'.'.$extension;
-                    Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+        $query = InternalMemoFile::where('id', $id)->first();
 
-                    InternalMemoFile::where('id_internal_memo', $query->id)->update([
-                        "id_internal_memo"=> $query->id,
-                        "path" => $imageName
-                    ]);
-                }
+        if(!empty($files)) {
 
+            foreach ($files as $key => $file) {
+                $image_64 = $file; //your base64 encoded data
+                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                $image = str_replace($replace, '', $image_64);
+                $image = str_replace(' ', '+', $image);
+                $imageName = Str::random(10).'.'.$extension;
+                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                $query->update([
+                    "path" => $imageName,
+                ]);
             }
-            if(!empty($videos)) {
 
-                foreach ($videos as $key => $video) {
-                    $video_64 = $video; //your base64 encoded data
-                    $extension = explode('/', explode(':', substr($video_64, 0, strpos($video_64, ';')))[1])[1];   // .mp4 .avi .mkv
-                    $replace = substr($video_64, 0, strpos($video_64, ',')+1);
-                    $video = str_replace($replace, '', $video_64);
-                    $videos = str_replace(' ', '+', $video);
-                    $videoName = Str::random(10).'.'.$extension;
-                    Storage::disk('sftp')->put($videoName, base64_decode(($videos), 'r+'));
-
-                    InternalMemoFile::where('id_internal_memo', $query->id)->update([
-                        "id_internal_memo"=> $query->id,
-                        "path_video" => $videoName
-                    ]);
-                }
-
-            }
-        }else{
-            $query->update([
-                "id_kategori_fpp"=> $request->id_kategori_fpp,
-                "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
-                "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
-                "id_devisi"=> $request->id_devisi,
-                "qty"=> $request->qty,
-                "catatan"=> $request->catatan,
-                "created_by"=> auth()->user()->id
-            ]);
         }
 
         if($query){
@@ -259,11 +198,12 @@ class InternalMemoController extends Controller
 
     public function destroy($id)
     {
-        $query = InternalMemo::find($id);
+        $imFile = InternalMemoFile::find($id);
 
-        if(!empty($query)){
-            $query->delete();
-            return $this->successResponse($query,'Success', 200);
+        Storage::disk('sftp')->delete(basename($imFile->path));
+        if(!empty($imFile)){
+            $imFile->delete();
+            return $this->successResponse($imFile,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
         }
@@ -292,10 +232,9 @@ class InternalMemoController extends Controller
         }
 
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
-        $historyMemo = HistoryMemo::where('id_internal_memo', '=', $internalMemo->id)->first();
 
         $create = HistoryMemo::create([
-            "id_internal_memo"=> $historyMemo->id_internal_memo,
+            "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> $internalMemo->flag,
             "keterangan"=> $this->getFlagStatus($internalMemo->flag). " Di Acc Oleh ". auth()->user()->name
@@ -353,93 +292,18 @@ class InternalMemoController extends Controller
         }
     }
 
-    public function dropdownKategoriFpp(Request $request)
-    {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_fpp', $request->id_kategori_fpp)->get();
+    public function ignoreMemo($id){
+        $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
-        } else {
-            return $this->errorResponse('Process Data error', 403);
-        }
-    }
+        $create = HistoryMemo::create([
+            "id_internal_memo"=> $internalMemo->id,
+            "user_id"=> auth()->user()->id,
+            "status"=> 11,
+            "keterangan"=> $this->getFlagStatus(11). " Di Acc Oleh ". auth()->user()->name
+        ]);
 
-    public function dropdownJenisKategoriFpp(Request $request)
-    {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->get();
-
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
-        } else {
-            return $this->errorResponse('Process Data error', 403);
-        }
-    }
-
-    public function dropdownSubKategoriFpp(Request $request)
-    {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->get();
-
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
-        } else {
-            return $this->errorResponse('Process Data error', 403);
-        }
-    }
-
-    public function dropdownDivisi(Request $request)
-    {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_devisi', $request->id_devisi)->get();
-
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
-        } else {
-            return $this->errorResponse('Process Data error', 403);
-        }
-    }
-
-    public function dropdownCabang(Request $request)
-    {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('id_cabang', $request->id_cabang)->get();
-
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
-        } else {
-            return $this->errorResponse('Process Data error', 403);
-        }
-    }
-
-    public function ascDesc(Request $request)
-    {
-        $internal = InternalMemo::orderBy('created_at', $request->param)->get();
-
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
-        } else {
-            return $this->errorResponse('Process Data error', 403);
-        }
-    }
-
-    public function dateRange(Request $request)
-    {
-//        $startDate = Carbon::format('Y/m/d', '2023/01/30');
-        $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
-        $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
-
-        $internal = InternalMemo::whereBetween('created_at', [$startDate, $endDate])->get();
-
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
-        } else {
-            return $this->errorResponse('Process Data error', 403);
-        }
-    }
-
-    public function dropdownStatus(Request $request)
-    {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->where('flag', $request->flag)->get();
-
-        if($internal){
-            return $this->successResponse($internal,'Success', 200);
+        if($create){
+            return $this->successResponse($create,'Success', 200);
         } else {
             return $this->errorResponse('Process Data error', 403);
         }
@@ -466,6 +330,8 @@ class InternalMemoController extends Controller
             return "Batal";
         } else if($id == 10){
             return "DiHapus";
+        } else if($id == 11){
+            return "DiTolak";
         }
     }
 
