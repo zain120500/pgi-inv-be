@@ -10,6 +10,7 @@ use App\Model\Admin;
 use App\Model\Pengiriman;
 use App\Model\PengirimanDetail;
 use App\Model\PengirimanKategori;
+use App\Model\InternalMemoPengiriman;
 use App\Model\BarangTipe;
 use App\Model\BarangKeluar;
 use DB;
@@ -53,6 +54,13 @@ class PengirimanController extends Controller
             "user_input"=> auth()->user()->admin->username,
             "last_update" => date('Y-m-d H:i:s', strtotime('now'))
         ]);
+
+        if(!empty($request->id_internal_memo)) {
+            InternalMemoPengiriman::create([
+                "id_internal_memo"=> $request->id_internal_memo,
+                "id_pengiriman"   => $request->id_pengiriman,
+            ]);
+        }
 
         if($query){
             return $this->successResponse($query,'Success', 200);
@@ -254,6 +262,8 @@ class PengirimanController extends Controller
             $query->delete();
 
             PengirimanDetail::where('id_pengiriman',$query->id)->delete();
+            InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
+
             return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);

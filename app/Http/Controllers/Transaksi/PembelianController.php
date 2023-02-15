@@ -214,7 +214,7 @@ class PembelianController extends Controller
         if($flag == 0){  // request void pembelian
             PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 0]); //update barang jadi request void
         } else if($flag == 6){  // request void pembelian
-            PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 4]); //update barang jadi request void
+            
         } else if($flag == 2){ //terima barang
 
         } else if($flag == 3){ //terima barang
