@@ -15,9 +15,9 @@ class CreateInternalMemoRatingTable extends Migration
     {
         Schema::create('internal_memo_rating', function (Blueprint $table) {
             $table->id();
-            $table->bigIncrements('user_id');
-            $table->bigIncrements('id_internal_memo');
-            $table->bigIncrements('rating')->nullable();
+            $table->bigInteger('user_id');
+            $table->bigInteger('id_internal_memo');
+            $table->bigInteger('rating')->nullable();
             $table->string('keterangan')->nullable();
             $table->string('created_by')->nullable();
             $table->timestamps();

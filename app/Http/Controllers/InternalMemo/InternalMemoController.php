@@ -320,7 +320,7 @@ class InternalMemoController extends Controller
 
     public function createInternalRating(Request $request, $id)
     {
-        $internal = InternalMemo::find($id)->first();
+        $internal = InternalMemo::find($id);
 
         $create = InternalMemoRating::create([
             'id_internal_memo' => $internal->id,
@@ -339,7 +339,7 @@ class InternalMemoController extends Controller
 
     public function getRating($id)
     {
-        $internal = InternalMemo::find($id)->first();
+        $internal = InternalMemo::find($id);
 
         $rating = InternalMemoRating::where('id_internal_memo', $internal->id)->first();
 

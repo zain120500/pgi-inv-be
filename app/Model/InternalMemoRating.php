@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InternalMemoRating extends Model
 {
-    protected $table = 'internal_rating_memo';
+    protected $table = 'internal_memo_rating';
     protected $primaryKey = 'id';
     protected $guarded = [''];
 }

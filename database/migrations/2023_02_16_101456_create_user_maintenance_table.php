@@ -15,7 +15,7 @@ class CreateUserMaintenanceTable extends Migration
     {
         Schema::create('user_maintenance', function (Blueprint $table) {
             $table->id();
-            $table->bigIncrements('user_id');
+            $table->bigInteger('user_id');
             $table->string('nama');
             $table->string('pekerjaan');
             $table->string('keterangan');

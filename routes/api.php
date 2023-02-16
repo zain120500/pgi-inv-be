@@ -217,6 +217,16 @@ Route::group([
 
         });
     });
+
+    Route::group([
+        'prefix' => 'user-maintenance'
+    ], function ($router) {
+        Route::get('/', 'UserMaintenanceController@index');
+        Route::get('/{id}', 'UserMaintenanceController@show');
+        Route::post('/', 'UserMaintenanceController@store');
+        Route::post('/{id}', 'UserMaintenanceController@update');
+        Route::delete('/delete/{id}', 'UserMaintenanceController@destroy');
+    });
 });
 
 
