@@ -4,6 +4,7 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\User;
+use App\Model\InternalMemoRating;
 use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
 use App\Model\KategoriFpp;
@@ -14,6 +15,7 @@ use App\Model\InternalMemoFile;
 use App\Model\HistoryMemo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Storage;
 use Str;
@@ -64,7 +66,11 @@ class InternalMemoController extends Controller
             return $query;
         });
 
-        return $this->successResponse($internal,'Success', 200);
+        if($internal){
+            return $this->successResponse($internal,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
     }
 
     public function create()
@@ -210,13 +216,25 @@ class InternalMemoController extends Controller
     }
 
     public function accMemo(Request $request, $id){
-        $user = auth()->user()->id;
-        $pic = KategoriPicFpp::where('user_id', $user)->first();
+        $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        if($pic->kategori_proses === 1) {
-            InternalMemo::where('id', $id)->update([
-                'flag' => 1
-            ]);
+        $create = HistoryMemo::create([
+            "id_internal_memo"=> $internalMemo->id,
+            "user_id"=> auth()->user()->id,
+            "status"=> 1,
+            "keterangan"=> $this->getFlagStatus(1). " Di Acc Oleh ". auth()->user()->name
+        ]);
+
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        $history = HistoryMemo::where('id_internal_memo', $id)->get()->sum('status');
+
+        if($history === 2){
+            if($pic->kategori_proses === 1) {
+                InternalMemo::where('id', $id)->update([
+                    'flag' => 1
+                ]);
+            }
         }elseif($pic->kategori_proses === 2) {
             InternalMemo::where('id', $id)->update([
                 'flag' => 2
@@ -230,15 +248,6 @@ class InternalMemoController extends Controller
                 'flag' => 0
             ]);
         }
-
-        $internalMemo = InternalMemo::where('id', '=', $id)->first();
-
-        $create = HistoryMemo::create([
-            "id_internal_memo"=> $internalMemo->id,
-            "user_id"=> auth()->user()->id,
-            "status"=> $internalMemo->flag,
-            "keterangan"=> $this->getFlagStatus($internalMemo->flag). " Di Acc Oleh ". auth()->user()->name
-        ]);
 
         if($create){
             return $this->successResponse($create,'Success', 200);
@@ -304,6 +313,38 @@ class InternalMemoController extends Controller
 
         if($create){
             return $this->successResponse($create,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function createInternalRating(Request $request, $id)
+    {
+        $internal = InternalMemo::find($id)->first();
+
+        $create = InternalMemoRating::create([
+            'id_internal_memo' => $internal->id,
+            'user_id' => auth()->user()->id,
+            'rating' => $request->rating,
+            'keterangan' => $request->keterangan,
+            'created_by' => auth()->user()->id,
+        ]);
+
+        if($create){
+            return $this->successResponse($create,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function getRating($id)
+    {
+        $internal = InternalMemo::find($id)->first();
+
+        $rating = InternalMemoRating::where('id_internal_memo', $internal->id)->first();
+
+        if($rating){
+            return $this->successResponse($rating,'Success', 200);
         } else {
             return $this->errorResponse('Process Data error', 403);
         }
