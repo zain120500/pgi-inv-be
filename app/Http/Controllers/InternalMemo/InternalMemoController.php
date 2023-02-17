@@ -4,6 +4,7 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\User;
+use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
 use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
@@ -216,7 +217,7 @@ class InternalMemoController extends Controller
         }
     }
 
-    public function accMemo(Request $request, $id){
+    public function accMemo($id){
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
         $create = HistoryMemo::create([
@@ -397,6 +398,53 @@ class InternalMemoController extends Controller
 
         if($query){
             return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function createMemoMaintenance(Request $request, $id)
+    {
+        $interenal = InternalMemo::find($id);
+
+        $imMaintenance = InternalMemoMaintenance::create([
+            'user_id' => auth()->user()->id,
+            'id_internal_memo' => $interenal->id,
+            'id_user_maintenance' => $request->id_user_maintenance,
+            'date' => $request->date,
+            'created_by' => auth()->user()->id
+        ]);
+
+        if($imMaintenance){
+            $this->accMemoByPic($interenal->id);
+            return $this->successResponse($imMaintenance,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function accMemoByPic($id){
+        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if($pic->kategori_proses === 2) {
+            InternalMemo::where('id', $id)->update([
+                'flag' => 2
+            ]);
+
+            $memo = InternalMemo::where('id', '=', $id)->first();
+
+            $create = HistoryMemo::create([
+                "id_internal_memo"=> $internalMemo->id,
+                "user_id"=> auth()->user()->id,
+                "status"=> 1,
+                "keterangan"=> $this->getFlagStatus($memo->flag). " Di Acc Oleh ". auth()->user()->name
+            ]);
+        }
+
+        if($create){
+            return $this->successResponse($create,'Success', 200);
         } else {
             return $this->errorResponse('Process Data error', 403);
         }
