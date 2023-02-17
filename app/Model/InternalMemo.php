@@ -10,11 +10,11 @@ class InternalMemo extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d h:i:s',
-        'updated_at' => 'datetime:Y-m-d h:i:s',
-        'deleted_at' => 'datetime:Y-m-d h:i:s'
-    ];
+//    protected $casts = [
+//        'created_at' => 'datetime:Y-m-d h:i:s',
+//        'updated_at' => 'datetime:Y-m-d h:i:s',
+//        'deleted_at' => 'datetime:Y-m-d h:i:s'
+//    ];
 
     function cabang()
     {
@@ -59,6 +59,11 @@ class InternalMemo extends Model
     function listHistoryMemo()
     {
         return $this->hasMany('App\Model\HistoryMemo','id_internal_memo','id');
+    }
+
+    function listHistoryMemoSum()
+    {
+        return $this->hasMany('App\Model\HistoryMemo','id_internal_memo','id')->selectRaw('SUM(history_memo.status) as status');
     }
 
 

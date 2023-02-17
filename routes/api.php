@@ -217,6 +217,7 @@ Route::group([
 
         });
     });
+
 });
 
 
@@ -294,6 +295,18 @@ Route::group([
             Route::get('/create', 'InternalMemoController@create');
             Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
 
+            /**
+             * PIC MEMO ROUTE
+             */
+            Route::post('/uploadBuktiPic/{id}', 'InternalMemoController@uploadBuktiPic');
+            Route::post('/createMemoMaintenance/{id}', 'InternalMemoController@createMemoMaintenance');
+
+            /**
+             * RATING MEMO
+             */
+            Route::post('/createInternalRating/{id}', 'InternalMemoController@createInternalRating');
+            Route::get('/getRating/{id}', 'InternalMemoController@getRating');
+
             Route::get('/all', 'InternalMemoController@all');
             Route::get('/{id}', 'InternalMemoController@show');
             Route::post('/', 'InternalMemoController@store');
@@ -358,7 +371,15 @@ Route::group([
             Route::delete('/delete/{id}', 'DevisiAccessController@destroy');
         });
 
-
+        Route::group([
+            'prefix' => 'user-maintenance'
+        ], function ($router) {
+            Route::get('/', 'UserMaintenanceController@index');
+            Route::get('/{id}', 'UserMaintenanceController@show');
+            Route::post('/', 'UserMaintenanceController@store');
+            Route::post('/{id}', 'UserMaintenanceController@update');
+            Route::delete('/delete/{id}', 'UserMaintenanceController@destroy');
+        });
 
     });
 
