@@ -14,6 +14,7 @@ class InternalMemoFile extends Migration
             $table->string('path')->nullable();
             $table->string('path_video')->nullable();
             $table->string('keterangan');
+            $table->bigInteger('flag');
             $table->timestamps();
         });
     }

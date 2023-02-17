@@ -303,9 +303,11 @@ Route::group([
             Route::get('/', 'InternalMemoController@index');
             Route::get('/create', 'InternalMemoController@create');
             Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
+            Route::post('/uploadBuktiPic/{id}', 'InternalMemoController@uploadBuktiPic');
 
-            // pagination memo by pic //
-            Route::get('/getMemoByPic', 'InternalMemoController@getMemoByPic');
+            /**
+             * RATING MEMO
+             */
             Route::post('/createInternalRating/{id}', 'InternalMemoController@createInternalRating');
             Route::get('/getRating/{id}', 'InternalMemoController@getRating');
 

@@ -118,6 +118,7 @@ class InternalMemoController extends Controller
                 InternalMemoFile::create([
                     "id_internal_memo"=> $internalMemo->id,
                     "path" => $imageName,
+                    "flag" => 0
                 ]);
             }
 
@@ -258,28 +259,8 @@ class InternalMemoController extends Controller
 
     public function accMemoAll(Request $request)
     {
-        $user = auth()->user()->id;
-        $pic = KategoriPicFpp::where('user_id', $user)->first();
-
-        if($pic->kategori_proses === 1) {
-            InternalMemo::whereIn('id', $request->id)->update([
-                'flag' => 1
-            ]);
-        }elseif($pic->kategori_proses === 2) {
-            InternalMemo::whereIn('id', $request->id)->update([
-                'flag' => 2
-            ]);
-        }elseif($pic->kategori_proses === 3) {
-            InternalMemo::whereIn('id', $request->id)->update([
-                'flag' => 3
-            ]);
-        }else{
-            InternalMemo::whereIn('id', $request->id)->update([
-                'flag' => 0
-            ]);
-        }
-
         $internal = InternalMemo::whereIn('id', $request->id)->get(['id', 'flag']);
+
         $station_ids = [];
 
         foreach ($internal as $station) {
@@ -294,6 +275,30 @@ class InternalMemoController extends Controller
             ]);
         }
 
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        $history = HistoryMemo::where('id_internal_memo', $request->id)->get()->sum('status');
+
+        if($history === 2){
+            if($pic->kategori_proses === 1) {
+                InternalMemo::whereIn('id', $request->id)->update([
+                    'flag' => 1
+                ]);
+            }
+        }elseif($pic->kategori_proses === 2) {
+            InternalMemo::whereIn('id', $request->id)->update([
+                'flag' => 2
+            ]);
+        }elseif($pic->kategori_proses === 3) {
+            InternalMemo::whereIn('id', $request->id)->update([
+                'flag' => 3
+            ]);
+        }else{
+            InternalMemo::whereIn('id', $request->id)->update([
+                'flag' => 0
+            ]);
+        }
+
         if($create){
             return $this->successResponse($create,'Success', 200);
         } else {
@@ -303,6 +308,10 @@ class InternalMemoController extends Controller
 
     public function ignoreMemo($id){
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
+
+        $internalMemo->update([
+            'flag' => 0
+        ]);
 
         $create = HistoryMemo::create([
             "id_internal_memo"=> $internalMemo->id,
@@ -345,6 +354,49 @@ class InternalMemoController extends Controller
 
         if($rating){
             return $this->successResponse($rating,'Success', 200);
+        } else {
+            return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function uploadBuktiPic(Request $request, $id)
+    {
+        $files = $request['files'];
+
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if($pic->kategori_proses === 2){
+            $query = InternalMemoFile::where('id', $id)->first();
+
+            InternalMemo::where('id', $query->id)->update([
+                'flag' => 3
+            ]);
+
+            if(!empty($files)) {
+
+                foreach ($files as $key => $file) {
+                    $image_64 = $file; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                    $image = str_replace($replace, '', $image_64);
+                    $image = str_replace(' ', '+', $image);
+                    $imageName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                    $query->create([
+                        "id_internal_memo" => $query->id,
+                        "path" => $imageName,
+                        "flag" => 1
+                    ]);
+                }
+
+            }
+        }else{
+            return $this->errorResponse('Anda Bukan Pic', 403);
+        }
+
+        if($query){
+            return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Process Data error', 403);
         }
