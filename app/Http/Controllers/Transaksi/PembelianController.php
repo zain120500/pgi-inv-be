@@ -119,7 +119,7 @@ class PembelianController extends Controller
                     "no_invoice"=> $no_invoice,
                     "tanggal"=> $request->tanggal,
                     "id_supplier"=> $request->id_supplier,
-                    "is_dropship" => $request->is_dropship, // true/false
+                    "is_dropship" => ($request->kode_cabang) ? true : false, // true/false
                     "pic"=> $request->pic,
                     "ongkir"=> $request->ongkir,
                     "flag" => 0,
@@ -130,7 +130,7 @@ class PembelianController extends Controller
                 $no_invoice = $request->no_invoice;
             }
             
-            $pembelian = Pembelian::create(['no_invoice', $no_invoice ])->first();
+            $pembelian = Pembelian::where('no_invoice', $no_invoice)->first();
 
             if(empty($pembelian)) {
                 return $this->errorResponse('Data pembelian is Null', 403);
@@ -145,7 +145,7 @@ class PembelianController extends Controller
                     "satuan"=> $request->satuan,
                     "imei"=> $request->imei,
                     "detail_barang"=> $request->detail_barang,
-                    "keterangan"=> $request->keterangan,
+                    "keterangan_detail"=> $request->keterangan_detail,
                     "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
                     "status"=> 0
                 ]);
