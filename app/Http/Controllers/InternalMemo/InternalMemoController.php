@@ -363,9 +363,7 @@ class InternalMemoController extends Controller
 
     public function getRating($id)
     {
-        $internal = InternalMemo::find($id);
-
-        $rating = InternalMemoRating::where('id_internal_memo', $internal->id)->get();
+        $rating = InternalMemoRating::where('id_internal_memo', $id)->get();
 
         $collect = $rating->map(function ($query) {
             $query->internalMemo;
@@ -374,9 +372,9 @@ class InternalMemoController extends Controller
         });
 
         if($rating){
-            return $this->successResponse($rating,'Success', 200);
+            return $this->successResponse($rating,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -430,6 +428,23 @@ class InternalMemoController extends Controller
         }
     }
 
+    public function getMemoMaintenance($id)
+    {
+        $internal = InternalMemoMaintenance::where('id_internal_memo', $id)->get();
+
+        $collect = $internal->map(function ($query) {
+            $query->internalMemo;
+
+            return $query;
+        });
+
+        if($internal){
+            return $this->successResponse($internal,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function createMemoMaintenance(Request $request, $id)
     {
         $interenal = InternalMemo::find($id);
@@ -464,7 +479,7 @@ class InternalMemoController extends Controller
             $create = HistoryMemo::create([
                 "id_internal_memo"=> $internalMemo->id,
                 "user_id"=> auth()->user()->id,
-                "status"=> 1,
+                "status"=> 2,
                 "keterangan"=> $this->getFlagStatus($memo->flag). " Di Acc Oleh ". auth()->user()->name
             ]);
         }
