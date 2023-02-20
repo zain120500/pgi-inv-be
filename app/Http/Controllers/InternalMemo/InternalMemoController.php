@@ -144,6 +144,7 @@ class InternalMemoController extends Controller
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->listHistoryMemo;
+        $query->memoMaintenance;
 
         return $this->successResponse($query,'Success', 200);
     }
@@ -210,7 +211,7 @@ class InternalMemoController extends Controller
     {
         $files = $request['files'];
 
-        $query = InternalMemoFile::where('id', $id)->first();
+        $internal = InternalMemo::where('id', $id)->first();
 
         if(!empty($files)) {
 
@@ -223,17 +224,18 @@ class InternalMemoController extends Controller
                 $imageName = Str::random(10).'.'.$extension;
                 Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
 
-                $query->create([
+                InternalMemoFile::create([
+                    "id_internal_memo"=> $internal->id,
                     "path" => $imageName,
                 ]);
             }
 
         }
 
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if($internal){
+            return $this->successResponse($internal,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -269,7 +271,7 @@ class InternalMemoController extends Controller
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> $pic->kategori_proses,
-            "keterangan"=> $this->getFlagStatus($pic->kategori_proses). " Di Acc Oleh ". auth()->user()->name
+            "keterangan"=> $this->getFlagStatus($pic->kategori_proses). auth()->user()->name
         ]);
 
         if($create){
@@ -303,7 +305,7 @@ class InternalMemoController extends Controller
                 "id_internal_memo"=> $value,
                 "user_id"=> auth()->user()->id,
                 "status"=> $pic->kategori_proses,
-                "keterangan"=> $this->getFlagStatus($pic->kategori_proses). " Di Acc Oleh ". auth()->user()->name
+                "keterangan"=> $this->getFlagStatus($pic->kategori_proses). auth()->user()->name
             ]);
 
         }
@@ -326,7 +328,7 @@ class InternalMemoController extends Controller
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> 11,
-            "keterangan"=> $this->getFlagStatus(11). " Di Acc Oleh ". auth()->user()->name
+            "keterangan"=> $this->getFlagStatus(11). auth()->user()->name
         ]);
 
         if($create){
@@ -385,17 +387,15 @@ class InternalMemoController extends Controller
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
         if($pic->kategori_proses == 0 || $pic->kategori_proses == 2){
-            $query = InternalMemoFile::where('id', $id)->first();
-
-            InternalMemo::where('id', $query->id)->update([
+            InternalMemo::where('id', $id)->update([
                 'flag' => 3
             ]);
 
             HistoryMemo::create([
-                "id_internal_memo"=> $query->id,
+                "id_internal_memo"=> $id,
                 "user_id"=> auth()->user()->id,
                 "status"=> 3,
-                "keterangan"=> $this->getFlagStatus(3). " Di Acc Oleh ". auth()->user()->name
+                "keterangan"=> $this->getFlagStatus(3). auth()->user()->name
             ]);
 
             if(!empty($files)) {
@@ -409,8 +409,8 @@ class InternalMemoController extends Controller
                     $imageName = Str::random(10).'.'.$extension;
                     Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
 
-                    $query->create([
-                        "id_internal_memo" => $query->id,
+                    $file = InternalMemoFile::create([
+                        "id_internal_memo" => $id,
                         "path" => $imageName,
                         "flag" => 1
                     ]);
@@ -421,10 +421,10 @@ class InternalMemoController extends Controller
             return $this->errorResponse('Anda Bukan Pic', 403);
         }
 
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if($file){
+            return $this->successResponse($file,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -480,7 +480,7 @@ class InternalMemoController extends Controller
                 "id_internal_memo"=> $internalMemo->id,
                 "user_id"=> auth()->user()->id,
                 "status"=> 2,
-                "keterangan"=> $this->getFlagStatus($memo->flag). " Di Acc Oleh ". auth()->user()->name
+                "keterangan"=> $this->getFlagStatus($memo->flag). auth()->user()->name
             ]);
         }
 
@@ -499,7 +499,7 @@ class InternalMemoController extends Controller
         } else if($id == 1){
             return "Disetujui";
         } else if($id == 2){
-            return "DiProses";
+            return "Diproses";
         } else if($id == 3){
             return "DiSelesaikan";
         } else if($id == 4){
