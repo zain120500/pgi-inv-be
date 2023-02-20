@@ -294,6 +294,7 @@ Route::group([
             Route::get('/', 'InternalMemoController@index');
             Route::get('/create', 'InternalMemoController@create');
             Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
+            Route::post('/addNewFile/{id}', 'InternalMemoController@addNewFile');
 
             /**
              * PIC MEMO ROUTE
@@ -307,6 +308,9 @@ Route::group([
             Route::post('/createInternalRating/{id}', 'InternalMemoController@createInternalRating');
             Route::get('/getRating/{id}', 'InternalMemoController@getRating');
 
+            /**
+             * Internal Memo
+             */
             Route::get('/all', 'InternalMemoController@all');
             Route::get('/{id}', 'InternalMemoController@show');
             Route::post('/', 'InternalMemoController@store');
