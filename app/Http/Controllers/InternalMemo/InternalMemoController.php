@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\InternalMemo;
 
+use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\User;
 use App\Model\InternalMemoMaintenance;
@@ -442,9 +443,9 @@ class InternalMemoController extends Controller
 
         if($imMaintenance){
             $this->accMemoByPic($interenal->id);
-            return $this->successResponse($imMaintenance,'Success', 200);
+            return $this->successResponse($imMaintenance,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
