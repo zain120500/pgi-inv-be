@@ -385,7 +385,7 @@ class InternalMemoController extends Controller
 
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
-        if($pic->kategori_proses === 2){
+        if($pic->kategori_proses == 0 || $pic->kategori_proses == 2){
             $query = InternalMemoFile::where('id', $id)->first();
 
             InternalMemo::where('id', $query->id)->update([
@@ -436,7 +436,7 @@ class InternalMemoController extends Controller
         $imMaintenance = InternalMemoMaintenance::create([
             'id_internal_memo' => $interenal->id,
             'id_user_maintenance' => $request->id_user_maintenance,
-            'date' => $request->date,
+            'date' => Carbon::now(),
             'created_by' => auth()->user()->id
         ]);
 
