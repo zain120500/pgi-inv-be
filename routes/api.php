@@ -300,6 +300,7 @@ Route::group([
              * PIC MEMO ROUTE
              */
             Route::post('/uploadBuktiPic/{id}', 'InternalMemoController@uploadBuktiPic');
+            Route::post('/uploadBuktiPicTesting/{id}', 'InternalMemoController@uploadBuktiPicTesting');
 
             /**
              * INTERNAL MEMO MAINTENANCE

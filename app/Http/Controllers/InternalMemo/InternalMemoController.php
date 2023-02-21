@@ -4,21 +4,14 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\User;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
-use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
-use App\Model\KategoriFpp;
-use App\Model\KategoriJenisFpp;
 use App\Model\KategoriPicFpp;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoFile;
 use App\Model\HistoryMemo;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Storage;
 use Str;
 
@@ -26,7 +19,7 @@ class InternalMemoController extends Controller
 {
     public function index(Request $request)
     {
-        $internal = InternalMemo::orderBy('created_at', 'DESC')->get();
+        $internal = InternalMemo::where('flag', '!=', 3)->orderBy('created_at', 'DESC')->get();
         if($request->id_devisi){
             $internal = InternalMemo::orderBy('created_at', 'DESC')
                 ->where('id_devisi', $request->id_devisi)->get();
@@ -69,9 +62,9 @@ class InternalMemoController extends Controller
         });
 
         if($internal){
-            return $this->successResponse($internal,'Success', 200);
+            return $this->successResponse($internal,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -103,7 +96,7 @@ class InternalMemoController extends Controller
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> 0,
-            "keterangan"=> "Internal memo baru dibuat oleh ". auth()->user()->name
+            "keterangan"=> "Internal memo baru dibuat oleh".' '.auth()->user()->name
         ]);
 
         if(!empty($files)) {
@@ -127,9 +120,9 @@ class InternalMemoController extends Controller
         }
 
         if($internalMemo){
-            return $this->successResponse($internalMemo,'Success', 200);
+            return $this->successResponse($internalMemo,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -146,7 +139,11 @@ class InternalMemoController extends Controller
         $query->listHistoryMemo;
         $query->memoMaintenance;
 
-        return $this->successResponse($query,'Success', 200);
+        if($query){
+            return $this->successResponse($query,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 
     public function edit($id)
@@ -170,9 +167,9 @@ class InternalMemoController extends Controller
         ]);
 
         if($query){
-            return $this->successResponse($query,'Success', 200);
+            return $this->successResponse($query,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -201,9 +198,9 @@ class InternalMemoController extends Controller
         }
 
         if($query){
-            return $this->successResponse($query,'Success', 200);
+            return $this->successResponse($query,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -246,9 +243,9 @@ class InternalMemoController extends Controller
         Storage::disk('sftp')->delete(basename($imFile->path));
         if(!empty($imFile)){
             $imFile->delete();
-            return $this->successResponse($imFile,'Success', 200);
+            return $this->successResponse($imFile,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -271,13 +268,13 @@ class InternalMemoController extends Controller
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> $pic->kategori_proses,
-            "keterangan"=> $this->getFlagStatus($pic->kategori_proses). auth()->user()->name
+            "keterangan"=> $this->getFlagStatus($pic->kategori_proses).' '.auth()->user()->name
         ]);
 
         if($create){
-            return $this->successResponse($create,'Success', 200);
+            return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -305,15 +302,15 @@ class InternalMemoController extends Controller
                 "id_internal_memo"=> $value,
                 "user_id"=> auth()->user()->id,
                 "status"=> $pic->kategori_proses,
-                "keterangan"=> $this->getFlagStatus($pic->kategori_proses). auth()->user()->name
+                "keterangan"=> $this->getFlagStatus($pic->kategori_proses).' '.auth()->user()->name
             ]);
 
         }
 
         if($array){
-            return $this->successResponse($array,'Success', 200);
+            return $this->successResponse($array,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -328,13 +325,13 @@ class InternalMemoController extends Controller
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> 11,
-            "keterangan"=> $this->getFlagStatus(11). auth()->user()->name
+            "keterangan"=> $this->getFlagStatus(11).' '.auth()->user()->name
         ]);
 
         if($create){
-            return $this->successResponse($create,'Success', 200);
+            return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -353,13 +350,13 @@ class InternalMemoController extends Controller
                 'created_by' => auth()->user()->id,
             ]);
         }else{
-            return $this->errorResponse('Anda Bukan Pic', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9000, 403);
         }
 
         if($create){
-            return $this->successResponse($create,'Success', 200);
+            return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -395,7 +392,7 @@ class InternalMemoController extends Controller
                 "id_internal_memo"=> $id,
                 "user_id"=> auth()->user()->id,
                 "status"=> 3,
-                "keterangan"=> $this->getFlagStatus(3). auth()->user()->name
+                "keterangan"=> $this->getFlagStatus(3).' '.auth()->user()->name
             ]);
 
             if(!empty($files)) {
@@ -418,7 +415,7 @@ class InternalMemoController extends Controller
 
             }
         }else{
-            return $this->errorResponse('Anda Bukan Pic', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9000, 403);
         }
 
         if($file){
@@ -480,14 +477,154 @@ class InternalMemoController extends Controller
                 "id_internal_memo"=> $internalMemo->id,
                 "user_id"=> auth()->user()->id,
                 "status"=> 2,
-                "keterangan"=> $this->getFlagStatus($memo->flag). auth()->user()->name
+                "keterangan"=> $this->getFlagStatus($memo->flag).' '.auth()->user()->name
             ]);
         }
 
         if($create){
-            return $this->successResponse($create,'Success', 200);
+            return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+
+    /**
+     * TESTING FUNCTION FOR NEXT PHASE
+     */
+    public function uploadBuktiPicTesting(Request $request, $id)
+    {
+        $files = $request['files'];
+        $videos = $request['videos'];
+
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        /**
+         * Cek Kategori Ku / Pic
+         */
+        if($pic->kategori_proses == 0 || $pic->kategori_proses == 2){
+            InternalMemo::where('id', $id)->update([
+                'flag' => 3
+            ]);
+
+            HistoryMemo::create([
+                "id_internal_memo"=> $id,
+                "user_id"=> auth()->user()->id,
+                "status"=> 3,
+                "keterangan"=> $this->getFlagStatus(3).' '.auth()->user()->name
+            ]);
+
+            if(!empty($files)) {
+                foreach ($files as $key => $file) {
+                    $image_64 = $file; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                    $image = str_replace($replace, '', $image_64);
+                    $image = str_replace(' ', '+', $image);
+                    $imageName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                    $file = InternalMemoFile::create([
+                        "id_internal_memo" => $id,
+                        "path" => $imageName,
+                        "flag" => "foto_pic_ku"
+                    ]);
+                }
+            }
+            if(!empty($videos)){
+                foreach ($videos as $key => $video) {
+                    $image_64 = $video; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                    $image = str_replace($replace, '', $image_64);
+                    $image = str_replace(' ', '+', $image);
+                    $videoName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($videoName, base64_decode(($image), 'r+'));
+
+                    $video = InternalMemoFile::create([
+                        "id_internal_memo" => $id,
+                        "path" => $videoName,
+                        "flag" => "video_pic_ku"
+                    ]);
+                }
+            }
+        }else{
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9000, 403);
+        }
+
+        if($pic){
+            return $this->successResponse($pic,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function storeTesting(Request $request)
+    {
+        $files = $request['files'];
+        $videos = $request['videos'];
+
+        $number = InternalMemo::count('id');
+
+        $internalMemo = InternalMemo::create([
+            "im_number" => "IM". Carbon::now()->format('Ymd') . str_pad($number+1, 4, 0, STR_PAD_LEFT),
+            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
+            "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
+            "id_devisi"=> $request->id_devisi,
+            "id_cabang"=> $request->id_cabang,
+            "qty"=> $request->qty,
+            "flag" => 0,
+            "catatan"=> $request->catatan,
+            "created_by"=> auth()->user()->id
+        ]);
+
+        HistoryMemo::create([
+            "id_internal_memo"=> $internalMemo->id,
+            "user_id"=> auth()->user()->id,
+            "status"=> 0,
+            "keterangan"=> "Internal memo baru dibuat oleh".' '.auth()->user()->name
+        ]);
+
+        if(!empty($files)) {
+            foreach ($files as $key => $file) {
+                $image_64 = $file; //your base64 encoded data
+                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                $image = str_replace($replace, '', $image_64);
+                $image = str_replace(' ', '+', $image);
+                $imageName = Str::random(10).'.'.$extension;
+                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                InternalMemoFile::create([
+                    "id_internal_memo"=> $internalMemo->id,
+                    "path" => $imageName,
+                    "flag" => 0
+                ]);
+            }
+        }
+        if(!empty($videos)){
+            foreach ($videos as $key => $video) {
+                $image_64 = $video; //your base64 encoded data
+                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                $image = str_replace($replace, '', $image_64);
+                $image = str_replace(' ', '+', $image);
+                $videoName = Str::random(10).'.'.$extension;
+                Storage::disk('sftp')->put($videoName, base64_decode(($image), 'r+'));
+
+                $video = InternalMemoFile::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "path" => $videoName,
+                    "flag" => "video_pic_ku"
+                ]);
+            }
+        }
+
+        if($internalMemo){
+            return $this->successResponse($internalMemo,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
