@@ -33,7 +33,6 @@ class UserMaintenanceController extends Controller
     public function store(Request $request)
     {
         $record = UserMaintenance::create([
-            'user_id' => auth()->user()->id,
             'nama' => $request->nama,
             'pekerjaan' => $request->pekerjaan,
             'keterangan' => $request->keterangan,
