@@ -17,19 +17,25 @@ class PembelianController extends Controller
 {
     public function index(Request $request)
     {
+        if(!empty($request->from) and !empty($request->to)){
+            $query = Pembelian::orderBy('tanggal', 'DESC')
+                ->whereBetween('tanggal', [$request->from, $request->to]);
+        } else {
+            $query = Pembelian::orderBy('tanggal', 'DESC');
+        }
 
         if(!empty($request->no_invoice)){
-            $query = Pembelian::where('no_invoice', 'like', '%'.$request->no_invoice.'%')->orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $query->where('no_invoice', 'like', '%'.$request->no_invoice.'%')->paginate(15);
         } else if(!empty($request->user_input)){
-            $query = Pembelian::where('user_input', 'like', '%'.$request->user_input.'%')->orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $query->where('user_input', 'like', '%'.$request->user_input.'%')->paginate(15);
         } else if(!empty($request->flag)){
-            $query = Pembelian::where('flag', $request->flag)->orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $query->where('flag', $request->flag)->paginate(15);
         } else if(!empty($request->from) and !empty($request->to)){
-            $query = Pembelian::whereBetween('tanggal', [$request->from, $request->to])->orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $query->whereBetween('tanggal', [$request->from, $request->to])->paginate(15);
         } else if(!empty($request->id_supplier)){
-            $query = Pembelian::where('id_supplier', $request->id_supplier)->orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $query->where('id_supplier', $request->id_supplier)->paginate(15);
         } else {
-            $query = Pembelian::orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $query->paginate(15);
         }
 
         $collect = $query->getCollection()->map(function ($q) {
