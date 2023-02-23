@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\InternalMemo;
 
+use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\InternalMemo;
 use App\Model\UserMaintenance;
 use Illuminate\Http\Request;
 
@@ -71,6 +73,17 @@ class UserMaintenanceController extends Controller
             return $this->successResponse($record,'Success', 200);
         } else {
             return $this->errorResponse('Process Data error', 403);
+        }
+    }
+
+    public function getInternalMemo()
+    {
+        $record = InternalMemo::orderBy('id', 'DESC')->get();
+
+        if($record){
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 }
