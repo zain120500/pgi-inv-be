@@ -10,14 +10,32 @@ use Illuminate\Http\Request;
 
 class UserMaintenanceController extends Controller
 {
-    public function index()
+    public function all(Request $request)
     {
         $record = UserMaintenance::orderBy('id', 'DESC')->get();
+        if($request->nama){
+            $record = UserMaintenance::where('nama', 'LIKE', $request->nama)->get();
+        }elseif ($request->no_telp){
+            $record = UserMaintenance::where('no_telp', 'LIKE', $request->no_telp)->get();
+        }elseif ($request->pekerjaan){
+            $record = UserMaintenance::where('pekerjaan', 'LIKE', $request->pekerjaan)->get();
+        }
 
         if($record){
-            return $this->successResponse($record,'Success', 200);
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function paginate()
+    {
+        $record = UserMaintenance::orderBy('id', 'DESC')->paginate(15);
+
+        if($record){
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -26,9 +44,9 @@ class UserMaintenanceController extends Controller
         $record = UserMaintenance::find($id);
 
         if($record){
-            return $this->successResponse($record,'Success', 200);
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -37,14 +55,15 @@ class UserMaintenanceController extends Controller
         $record = UserMaintenance::create([
             'nama' => $request->nama,
             'pekerjaan' => $request->pekerjaan,
+            'no_telp' => $request->no_telp,
             'keterangan' => $request->keterangan,
             'created_by' => auth()->user()->id
         ]);
 
         if($record){
-            return $this->successResponse($record,'Success', 200);
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -55,13 +74,14 @@ class UserMaintenanceController extends Controller
         $update = UserMaintenance::where('id', $record->id)->update([
             'nama' => $request->nama,
             'pekerjaan' => $request->pekerjaan,
+            'no_telp' => $request->no_telp,
             'keterangan' => $request->keterangan,
         ]);
 
-        if($update){
-            return $this->successResponse($update,'Success', 200);
+        if($record){
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -70,9 +90,9 @@ class UserMaintenanceController extends Controller
         $record = UserMaintenance::find($id)->delete();
 
         if($record){
-            return $this->successResponse($record,'Success', 200);
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 

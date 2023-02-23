@@ -6,6 +6,7 @@ use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
+use App\Model\UserMaintenance;
 use Illuminate\Http\Request;
 use App\Model\KategoriPicFpp;
 use App\Model\InternalMemo;
@@ -255,6 +256,10 @@ class InternalMemoController extends Controller
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
         $history = HistoryMemo::where('id_internal_memo', $id)->count('status');
+
+        $history = HistoryMemo::where('id_internal_memo', $id)->whereIn('status', [0, 1])->count();
+
+        return $history;
 
         $countPic =  KategoriPicFpp::where(['kategori_proses' => 1, 'id_kategori_jenis_fpp' => 2])->count('id');
 
