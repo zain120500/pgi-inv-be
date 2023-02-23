@@ -86,6 +86,7 @@ class MaintenanceController extends Controller
             foreach ($barang[0] as $ke => $barangs){
                 $imBarang = InternalMemoBarang::create([
                     'id_internal_memo' => $memos,
+                    'id_maintenance' => $imMaintenance->id,
                     'id_barang' => $barangs,
                     'created_by' => auth()->user()->id
                 ]);
