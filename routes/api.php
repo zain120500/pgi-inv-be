@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -309,6 +309,13 @@ Route::group([
             Route::post('/createMemoMaintenance/{id}', 'InternalMemoController@createMemoMaintenance');
 
             /**
+             * Testing Route For Internal Memo Maintenance
+             */
+            Route::post('/internalUserMaintenance', 'MaintenanceController@internalUserMaintenance');
+            Route::post('/internalBarangMaintenance', 'MaintenanceController@internalBarangMaintenance');
+            Route::post('/internalMaintenance', 'MaintenanceController@internalMaintenance');
+
+            /**
              * RATING MEMO
              */
             Route::post('/createInternalRating/{id}', 'InternalMemoController@createInternalRating');
@@ -384,11 +391,12 @@ Route::group([
         Route::group([
             'prefix' => 'user-maintenance'
         ], function ($router) {
-            Route::get('/', 'UserMaintenanceController@index');
-            Route::get('/{id}', 'UserMaintenanceController@show');
-            Route::post('/', 'UserMaintenanceController@store');
-            Route::post('/{id}', 'UserMaintenanceController@update');
-            Route::delete('/delete/{id}', 'UserMaintenanceController@destroy');
+            Route::get('/', [UserMaintenanceController::class, 'all']);
+            Route::get('/paginate', [UserMaintenanceController::class, 'paginate']);
+            Route::get('/{id}', [UserMaintenanceController::class, 'show']);
+            Route::post('/', [UserMaintenanceController::class, 'store']);
+            Route::post('/{id}', [UserMaintenanceController::class, 'update']);
+            Route::delete('/delete/{id}', [UserMaintenanceController::class, 'destroy']);
         });
 
     });
