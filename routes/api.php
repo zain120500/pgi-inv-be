@@ -322,6 +322,13 @@ Route::group([
             Route::get('/getRating/{id}', 'InternalMemoController@getRating');
 
             /**
+             * Testing Route
+             */
+            Route::get('/pdfTesting', 'InternalMemoController@pdfTesting');
+            Route::get('/menuArchive', 'InternalMemoController@menuArchive');
+            Route::get('/getStockBarang', 'MaintenanceController@getStockBarang');
+
+            /**
              * Internal Memo
              */
             Route::get('/all', 'InternalMemoController@all');
