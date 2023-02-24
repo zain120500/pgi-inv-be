@@ -20,4 +20,9 @@ class BarangTipe extends Model
         return $this->hasMany('App\Model\BarangKeluar', 'id_tipe');
 	}
 
+    function stockBarang()
+    {
+        return $this->hasOne('App\Model\StokBarang', 'id_tipe', 'id');
+    }
+
 }

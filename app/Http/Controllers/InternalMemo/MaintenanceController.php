@@ -4,9 +4,12 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\BarangTipe;
+use App\Model\HistoryMemo;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
+use App\Model\KategoriPicFpp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -92,6 +95,7 @@ class MaintenanceController extends Controller
                 ]);
             }
             $this->whatsuppMessage($memos);
+            $this->accMemoByPic($memos);
         }
 
         if($imBarang){
@@ -101,6 +105,9 @@ class MaintenanceController extends Controller
         }
     }
 
+    /**
+     * Whatsupp Pesan Saat Membuat Tugas Maintenance
+     */
     public function whatsuppMessage($id)
     {
         $test[] = $id;
@@ -137,6 +144,77 @@ class MaintenanceController extends Controller
 
             curl_close($curl);
             return $response;
+        }
+    }
+
+    public function accMemoByPic($id){
+        $internalMemo[] = $id;
+
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        foreach ($internalMemo as $key => $value) {
+            $memo = InternalMemo::where('id', $value)->first();
+
+            if($pic->kategori_proses === 2) {
+                $internal = InternalMemo::where('id', $memo->id)->update([
+                    'flag' => 2
+                ]);
+
+                $create = HistoryMemo::create([
+                    "id_internal_memo" => $memo->id,
+                    "user_id" => auth()->user()->id,
+                    "status" => 2,
+                    "keterangan" => $this->getFlagStatus(2) . ' ' . auth()->user()->name
+                ]);
+            }
+        }
+
+        if($create){
+            return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function getFlagStatus($id)
+    {
+        if($id == 0){
+            return "Ditinjau Ulang";
+        } else if($id == 1){
+            return "Disetujui";
+        } else if($id == 2){
+            return "Diproses";
+        } else if($id == 3){
+            return "DiSelesaikan";
+        } else if($id == 4){
+            return "DiKonfirmasi";
+        } else if($id == 5){
+            return "Selesai";
+        } else if($id == 6){
+            return "Request Batal";
+        } else if($id == 7){
+            return "Batal";
+        } else if($id == 10){
+            return "DiHapus";
+        } else if($id == 11){
+            return "DiTolak";
+        }
+    }
+
+    public function getStockBarang()
+    {
+        $record = BarangTipe::orderBy('id', 'DESC')->paginate(20);
+
+        $record->map(function ($query){
+            $query->stockBarang;
+
+            return $query;
+        });
+
+        if($record){
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 }
