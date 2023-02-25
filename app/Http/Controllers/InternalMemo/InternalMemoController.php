@@ -522,16 +522,16 @@ class InternalMemoController extends Controller
         foreach ($internalMemo as $key => $value) {
             $memo = InternalMemo::where('id', $value)->first();
 
-            if($pic->kategori_proses === 2) {
+            if($pic->kategori_proses === 3) {
                 InternalMemo::where('id', $memo->id)->update([
-                    'flag' => 2
+                    'flag' => $pic->kategori_proses
                 ]);
 
                 $create = HistoryMemo::create([
                     "id_internal_memo" => $memo->id,
                     "user_id" => auth()->user()->id,
                     "status" => 2,
-                    "keterangan" => $this->getFlagStatus($memo->flag) . ' ' . auth()->user()->name
+                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
                 ]);
             }
         }
@@ -557,16 +557,16 @@ class InternalMemoController extends Controller
         /**
          * Cek Kategori Ku / Pic
          */
-        if($pic->kategori_proses == 0 || $pic->kategori_proses == 2){
+        if($pic->kategori_proses == 0 || $pic->kategori_proses == 4){
             InternalMemo::where('id', $id)->update([
-                'flag' => 3
+                'flag' => $pic->kategori_proses
             ]);
 
             HistoryMemo::create([
                 "id_internal_memo"=> $id,
                 "user_id"=> auth()->user()->id,
-                "status"=> 3,
-                "keterangan"=> $this->getFlagStatus(3).' '.auth()->user()->name
+                "status"=> $pic->kategori_proses,
+                "keterangan"=> $this->getFlagStatus($pic->kategori_proses).' '.auth()->user()->name
             ]);
 
             if(!empty($files)) {
@@ -614,10 +614,37 @@ class InternalMemoController extends Controller
         }
     }
 
-    public function pdfTesting()
+    public function pdfLetter($id)
     {
+        $query = InternalMemo::find($id);
+
+        $query->MemoFile->makeHidden(['created_at','updated_at']);
+        $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
+        $query->cabang;
+        $query->devisi->makeHidden(['created_at','updated_at']);
+        $query->kategoriJenis->makeHidden(['created_at','updated_at']);
+        $query->kategoriSub;
+        $query->listHistoryMemo;
+        $query->memoMaintenance;
+
+        return view('InternalMemo.internalMemoPdf', ['query' => $query, 'memo' => $query->MemoFile, 'history' => $query->listHistoryMemo]);
+    }
+
+    public function pdfTesting($id)
+    {
+        $query = InternalMemo::find($id);
+
+        $query->MemoFile->makeHidden(['created_at','updated_at']);
+        $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
+        $query->cabang;
+        $query->devisi->makeHidden(['created_at','updated_at']);
+        $query->kategoriJenis->makeHidden(['created_at','updated_at']);
+        $query->kategoriSub;
+        $query->listHistoryMemo;
+        $query->memoMaintenance;
+
         $customPaper = array(360,360,360,360);
-        $pdf = PDF::loadView('InternalMemo.internalMemoPdf')->setPaper('a4');
+        $pdf = PDF::loadView('InternalMemo.internalMemoPdf', ['query' => $query, 'memo' => $query->MemoFile, 'history' => $query->listHistoryMemo])->setPaper('a4');
         return $pdf->download('internal-memo');
     }
 
@@ -656,6 +683,31 @@ class InternalMemoController extends Controller
         }
     }
 
+    public function accMemoTesting($id){
+        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if($pic->kategori_proses == 1 || $pic->kategori_proses == 2 || $pic->kategori_proses == 3){
+            InternalMemo::where('id', $id)->update([
+                'flag' => $pic->kategori_proses
+            ]);
+        }
+
+        $create = HistoryMemo::create([
+            "id_internal_memo"=> $internalMemo->id,
+            "user_id"=> auth()->user()->id,
+            "status"=> $pic->kategori_proses,
+            "keterangan"=> $this->getFlagStatus($pic->kategori_proses).' '.auth()->user()->name
+        ]);
+
+        if($create){
+            return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus
     public function getFlagStatus($id)
     {
@@ -664,16 +716,18 @@ class InternalMemoController extends Controller
         } else if($id == 1){
             return "Disetujui";
         } else if($id == 2){
-            return "Diproses";
+            return "Disetujui";
         } else if($id == 3){
-            return "DiSelesaikan";
+            return "Diproses";
         } else if($id == 4){
-            return "DiKonfirmasi";
+            return "Diselesaikan";
         } else if($id == 5){
-            return "Selesai";
+            return "Dikonfirmasi";
         } else if($id == 6){
-            return "Request Batal";
+            return "Selesai";
         } else if($id == 7){
+            return "Request Batal";
+        } else if($id == 8){
             return "Batal";
         } else if($id == 10){
             return "DiHapus";

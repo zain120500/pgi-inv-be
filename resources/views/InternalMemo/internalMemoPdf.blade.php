@@ -14,7 +14,7 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-            <h3>Detail Persetujuan</h3>
+            <h4>Detail Persetujuan</h4>
             <div class="row">
 {{--                <div class="col-sm-6">--}}
 {{--                    <h6>Internal Memo Number</h6>--}}
@@ -27,58 +27,74 @@
                         <tbody>
                         <tr>
                             <td>No. Pengajuan</td>
-                            <td>123456789</td>
+                            <td>{{$query->im_number ?? "-"}}</td>
                         </tr>
                         <tr>
                             <td>Cabang</td>
-                            <td>Jakarta Barat</td>
+                            <td>{{$query->cabang->name ?? "-"}}</td>
                         </tr>
                         <tr>
                             <td>Divisi</td>
-                            <td>General Affair</td>
+                            <td>{{$query->devisi->nm_Divisi ?? "-"}}</td>
                         </tr>
                         <tr>
                             <td>Kategori</td>
-                            <td>Perbaikan Inventaris</td>
+                            <td>{{$query->kategori_jenis->name ?? "-"}}</td>
                         </tr>
                         <tr>
                             <td>Pengajuan</td>
-                            <td>Laptop</td>
+                            <td>{{$query->kategori_sub->name ?? "-"}}</td>
                         </tr>
                         <tr>
                             <td>Kuantitas</td>
-                            <td>-</td>
+                            <td>{{$query->qty ?? "-"}}</td>
                         </tr>
                         <tr>
                             <td>Catatan</td>
-                            <td>Perbaikan Laptop</td>
+                            <td>{{$query->catatan ?? "-"}}</td>
                         </tr>
                         <tr>
                             <td>Maintenance</td>
-                            <td>Aldi</td>
+                            <td>{{$query->memo_maintenance->id_user_maintenance ?? "-"}}</td>
                         </tr>
                         </tbody>
                     </table>
                     <div class="row">
                         <div class="col-sm-12">
-                            <img src="https://www.w3schools.com/bootstrap4/cinqueterre.jpg" class="img-thumbnail" alt="Cinque Terre" width="200" height="120">
-                            <img src="https://www.w3schools.com/bootstrap4/cinqueterre.jpg" class="img-thumbnail" alt="Cinque Terre" width="200" height="120">
+                            <h5>Bukti Foto</h5>
+                            <br />
+                            @foreach($memo as $memos)
+                                @if($memos->flag == "foto")
+                                    <img src="{{$memos->path}}" class="img-thumbnail" alt="Cinque Terre" width="150" height="60">
+                                @endif
+                            @endforeach
                         </div>
                     </div>
+                    <h5>Riwayat Pengajuan</h5>
                     <table class="table table-borderless">
+                        <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Keterangan</th>
+                        </tr>
+                        </thead>
                         <tbody>
-                        <tr>
-                            <td>Internal Memo Number</td>
-                            <td>123456789</td>
-                        </tr>
-                        <tr>
-                            <td>Status</td>
-                            <td><button class="btn btn-danger-sm">Proses</button></td>
-                        </tr>
-                        <tr>
-                            <td>Cabang</td>
-                            <td>Jakarta Barat</td>
-                        </tr>
+                        @foreach($history as $status)
+                            <tr>
+                                @if($status->status == 0)
+                                <td><button type="button" class="btn btn-secondary">Di Buat</button></td>
+                                @elseif($status->status == 1)
+                                <td><button type="button" class="btn btn-primary">Di Setujui</button></td>
+                                @elseif($status->status == 2)
+                                <td><button type="button" class="btn btn-primary">Di Setujui</button></td>
+                                @elseif($status->status == 3)
+                                <td><button type="button" class="btn btn-primary">Di Proses</button></td>
+                                @elseif($status->status == 4)
+                                <td><button type="button" class="btn btn-success">Di Selesaikan</button></td>
+                                @endif
+                                <td>{{$status->keterangan}}</td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
