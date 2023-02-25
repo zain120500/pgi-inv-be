@@ -17,6 +17,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/internalmemo', function () {
-    return view('InternalMemo.internalMemoPdf');
+Route::group([
+    'namespace' => 'InternalMemo'
+], function ($router) {
+    Route::get('/internalmemo/{id}', 'InternalMemoController@pdfLetter');
 });

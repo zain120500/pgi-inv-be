@@ -324,9 +324,10 @@ Route::group([
             /**
              * Testing Route
              */
-            Route::get('/pdfTesting', 'InternalMemoController@pdfTesting');
+            Route::get('/pdfTesting/{id}', 'InternalMemoController@pdfTesting');
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
             Route::get('/getStockBarang', 'MaintenanceController@getStockBarang');
+            Route::post('/acc/{id}', 'InternalMemoController@accMemoTesting');
 
             /**
              * Internal Memo

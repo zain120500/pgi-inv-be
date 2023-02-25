@@ -155,16 +155,16 @@ class MaintenanceController extends Controller
         foreach ($internalMemo as $key => $value) {
             $memo = InternalMemo::where('id', $value)->first();
 
-            if($pic->kategori_proses === 2) {
+            if($pic->kategori_proses === 3) {
                 $internal = InternalMemo::where('id', $memo->id)->update([
-                    'flag' => 2
+                    'flag' => $pic->kategori_proses
                 ]);
 
                 $create = HistoryMemo::create([
                     "id_internal_memo" => $memo->id,
                     "user_id" => auth()->user()->id,
-                    "status" => 2,
-                    "keterangan" => $this->getFlagStatus(2) . ' ' . auth()->user()->name
+                    "status" => $pic->kategori_proses,
+                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
                 ]);
             }
         }
@@ -183,16 +183,18 @@ class MaintenanceController extends Controller
         } else if($id == 1){
             return "Disetujui";
         } else if($id == 2){
-            return "Diproses";
+            return "Disetujui";
         } else if($id == 3){
-            return "DiSelesaikan";
+            return "Diproses";
         } else if($id == 4){
-            return "DiKonfirmasi";
+            return "Diselesaikan";
         } else if($id == 5){
-            return "Selesai";
+            return "Dikonfirmasi";
         } else if($id == 6){
-            return "Request Batal";
+            return "Selesai";
         } else if($id == 7){
+            return "Request Batal";
+        } else if($id == 8){
             return "Batal";
         } else if($id == 10){
             return "DiHapus";
