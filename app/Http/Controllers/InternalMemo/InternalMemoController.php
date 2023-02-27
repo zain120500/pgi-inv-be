@@ -21,7 +21,7 @@ class InternalMemoController extends Controller
 {
     public function index(Request $request)
     {
-        $internal = InternalMemo::where('flag', '!=', 3)->orderBy('created_at', 'DESC')->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->get();
         if($request->id_devisi){
             $internal = InternalMemo::orderBy('created_at', 'DESC')
                 ->where('id_devisi', $request->id_devisi)->get();
