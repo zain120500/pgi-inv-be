@@ -10,6 +10,8 @@ use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
 use App\Model\KategoriPicFpp;
+use App\Model\UserMaintenance;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -113,6 +115,11 @@ class MaintenanceController extends Controller
         $test[] = $id;
         foreach ($test as $key => $value){
             $memo = InternalMemo::where('id', $value)->first();
+            $maintenanceUser = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
+            foreach ($maintenanceUser as $key => $values) {
+                $user = UserMaintenance::where('id', $maintenanceUser->id_user_maintenance)->first();
+
+//                return $user;
             $token = "XHFEifo#nyT3A7UZf6c8";
             $curl = curl_init();
 
@@ -126,13 +133,13 @@ class MaintenanceController extends Controller
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => array(
-                    'target' => '089630132793',
+                    'target' => $user->no_telp,
                     'message' => "
                         No Memo : $memo->im_number
                         Status : PROSES
-                        Pekerja : Richard dan Aldi
+                        Pekerja : $maintenanceUser->id_user_maintenance
                         Nik : 123325346
-                        Tanggal Pekerjaan : 20-02-2015
+                        Tanggal Pekerjaan : $maintenanceUser->created_at
                         ",
                 ),
                 CURLOPT_HTTPHEADER => array(
@@ -144,6 +151,7 @@ class MaintenanceController extends Controller
 
             curl_close($curl);
             return $response;
+            }
         }
     }
 
