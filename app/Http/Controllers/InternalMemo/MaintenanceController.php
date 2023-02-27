@@ -10,7 +10,6 @@ use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
 use App\Model\KategoriPicFpp;
-use App\Model\UserMaintenance;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -116,41 +115,39 @@ class MaintenanceController extends Controller
         foreach ($test as $key => $value){
             $memo = InternalMemo::where('id', $value)->first();
             $maintenanceUser = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
-            foreach ($maintenanceUser as $key => $values) {
-                $user = UserMaintenance::where('id', $maintenanceUser->id_user_maintenance)->first();
+            foreach ($maintenanceUser as $keys => $values){
+                $user = User::where('id', $values)->first();
+                $token = "XHFEifo#nyT3A7UZf6c8";
+                $curl = curl_init();
 
-//                return $user;
-            $token = "XHFEifo#nyT3A7UZf6c8";
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.fonnte.com/send',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => array(
-                    'target' => $user->no_telp,
-                    'message' => "
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://api.fonnte.com/send',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => array(
+                        'target' => '089630132793,081350535566',
+                        'message' => "
                         No Memo : $memo->im_number
                         Status : PROSES
-                        Pekerja : $maintenanceUser->id_user_maintenance
+                        Pekerja : $user->name
                         Nik : 123325346
                         Tanggal Pekerjaan : $maintenanceUser->created_at
                         ",
-                ),
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: $token"
-                ),
-            ));
+                    ),
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: $token"
+                    ),
+                ));
 
-            $response = curl_exec($curl);
+                $response = curl_exec($curl);
 
-            curl_close($curl);
-            return $response;
+                curl_close($curl);
+                return $response;
             }
         }
     }
