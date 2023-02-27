@@ -328,6 +328,8 @@ Route::group([
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
             Route::get('/getStockBarang', 'MaintenanceController@getStockBarang');
             Route::post('/acc/{id}', 'InternalMemoController@accMemoTesting');
+            Route::post('/accMemoAll', 'InternalMemoController@accMemoAllTesting');
+            Route::post('/waTest', 'MaintenanceController@whatsuppMessage');
 
             /**
              * Internal Memo
