@@ -21,7 +21,7 @@ class InternalMemoController extends Controller
 {
     public function index(Request $request)
     {
-        $internal = InternalMemo::where('flag', '!=', 3)->orderBy('created_at', 'DESC')->get();
+        $internal = InternalMemo::orderBy('created_at', 'DESC')->get();
         if($request->id_devisi){
             $internal = InternalMemo::orderBy('created_at', 'DESC')
                 ->where('id_devisi', $request->id_devisi)->get();
@@ -394,7 +394,7 @@ class InternalMemoController extends Controller
 
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
-        if($pic->kategori_proses === 2){
+        if($pic->kategori_proses == 0|| $pic->kategori_proses == 4){
             $create = InternalMemoRating::create([
                 'id_internal_memo' => $internal->id,
                 'user_id' => auth()->user()->id,
@@ -403,7 +403,7 @@ class InternalMemoController extends Controller
                 'created_by' => auth()->user()->id,
             ]);
         }else{
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9000, 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9001, 403);
         }
 
         if($create){
@@ -604,7 +604,7 @@ class InternalMemoController extends Controller
                 }
             }
         }else{
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9000, 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9001, 403);
         }
 
         if($pic){
