@@ -63,7 +63,7 @@ class InternalMemo extends Model
 
     function memoMaintenance()
     {
-        return $this->hasOne('App\Model\InternalMemoMaintenance', 'id_internal_memo', 'id');
+        return $this->hasMany('App\Model\InternalMemoMaintenance', 'id_internal_memo', 'id');
     }
 
 //    function listHistoryMemoSum()

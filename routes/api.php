@@ -287,30 +287,19 @@ Route::group([
         Route::group([
             'prefix' => 'memo'
         ], function ($router) {
-            Route::post('/history/acc/all', 'InternalMemoController@accMemoAll');
-            Route::post('/history/acc/{id}', 'InternalMemoController@accMemo');
-            Route::post('/history/ignore/{id}', 'InternalMemoController@ignoreMemo');
-
-            Route::get('/', 'InternalMemoController@index');
-            Route::get('/create', 'InternalMemoController@create');
-            Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
-            Route::post('/addNewFile/{id}', 'InternalMemoController@addNewFile');
 
             /**
-             * PIC MEMO ROUTE
+             * INTERNAL MEMO ACC & DECLINE MEMO ROUTE
              */
+            Route::post('/acc/{id}', 'InternalMemoController@accMemo');
+            Route::post('/accMemoAll', 'InternalMemoController@accMemoAll');
+            Route::post('/history/ignore/{id}', 'InternalMemoController@ignoreMemo');
             Route::post('/uploadBuktiPic/{id}', 'InternalMemoController@uploadBuktiPic');
-            Route::post('/uploadBuktiPicTesting/{id}', 'InternalMemoController@uploadBuktiPicTesting');
 
             /**
              * INTERNAL MEMO MAINTENANCE
              */
             Route::get('/getMemoMaintenance/{id}', 'InternalMemoController@getMemoMaintenance');
-            Route::post('/createMemoMaintenance/{id}', 'InternalMemoController@createMemoMaintenance');
-
-            /**
-             * Testing Route For Internal Memo Maintenance
-             */
             Route::post('/internalUserMaintenance', 'MaintenanceController@internalUserMaintenance');
             Route::post('/internalBarangMaintenance', 'MaintenanceController@internalBarangMaintenance');
             Route::post('/internalMaintenance', 'MaintenanceController@internalMaintenance');
@@ -327,19 +316,21 @@ Route::group([
             Route::get('/pdfTesting/{id}', 'InternalMemoController@pdfTesting');
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
             Route::get('/getStockBarang', 'MaintenanceController@getStockBarang');
-            Route::post('/acc/{id}', 'InternalMemoController@accMemoTesting');
-            Route::post('/accMemoAll', 'InternalMemoController@accMemoAllTesting');
-            Route::post('/waTest', 'MaintenanceController@whatsuppMessage');
+            Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');
+            Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
 
             /**
              * Internal Memo
              */
+            Route::get('/', 'InternalMemoController@index');
+            Route::get('/create', 'InternalMemoController@create');
+            Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
+            Route::post('/addNewFile/{id}', 'InternalMemoController@addNewFile');
             Route::get('/all', 'InternalMemoController@all');
             Route::get('/{id}', 'InternalMemoController@show');
             Route::post('/', 'InternalMemoController@store');
             Route::post('/{id}', 'InternalMemoController@update');
             Route::delete('/delete/{id}', 'InternalMemoController@destroy');
-
 
         });
 
