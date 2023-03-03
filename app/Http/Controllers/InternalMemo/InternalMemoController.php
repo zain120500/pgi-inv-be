@@ -14,6 +14,7 @@ use App\Model\InternalMemo;
 use App\Model\InternalMemoFile;
 use App\Model\HistoryMemo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Storage;
 use Str;
 
@@ -152,7 +153,7 @@ class InternalMemoController extends Controller
 
     public function show($id)
     {
-        $query = InternalMemo::find($id);
+        $query = InternalMemo::find($id)->with('memoMaintenance.userMaintenance')->first();
 
         $query->MemoFile->makeHidden(['created_at','updated_at']);
         $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
@@ -161,7 +162,12 @@ class InternalMemoController extends Controller
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->listHistoryMemo;
-        $query->memoMaintenance;
+
+        $users = DB::table('internal_memo')->where('internal_memo.id', $id)
+            ->join('internal_memo_maintenance', 'internal_memo.id', '=', 'internal_memo_maintenance.id_internal_memo')
+            ->join('user_maintenance', 'internal_memo_maintenance.id_user_maintenance', '=', 'user_maintenance.id')
+            ->select('internal_memo.*', 'internal_memo_maintenance.*', 'user_maintenance.*')
+            ->get();
 
         if($query){
             return $this->successResponse($query,Constants::HTTP_MESSAGE_200, 200);

@@ -18,6 +18,6 @@ class InternalMemoMaintenance extends Model
 
     function userMaintenance()
     {
-        return $this->hasOne('App\Model\UserMaintenance', 'id', 'id_user_maintenance');
+        return $this->hasMany('App\Model\UserMaintenance', 'id', 'id_user_maintenance');
     }
 }
