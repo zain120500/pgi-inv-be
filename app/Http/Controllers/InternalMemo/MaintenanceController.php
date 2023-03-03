@@ -4,12 +4,17 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\BarangHistory;
+use App\Model\BarangKeluar;
 use App\Model\BarangTipe;
+use App\Model\Cabang;
 use App\Model\HistoryMemo;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
 use App\Model\KategoriPicFpp;
+use App\Model\StokBarang;
+use App\Model\UserMaintenance;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -85,6 +90,9 @@ class MaintenanceController extends Controller
                     'date' => Carbon::now(),
                     'created_by' => auth()->user()->id
                 ]);
+
+                $userMaintenance = UserMaintenance::where('id', $users)->first();
+                $userMaintenance->update(['flag' => 1]); //update pic sedang bertugas
             }
 
             foreach ($barang[0] as $ke => $barangs){
@@ -98,11 +106,39 @@ class MaintenanceController extends Controller
             $this->whatsuppMessage($memos);
             $this->accMemoByPic($memos);
         }
+        $this->createHistoryBarang($barang[0]);
 
         if($imBarang){
             return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function createHistoryBarang($id)
+    {
+        $barang[] = $id;
+
+        foreach ($barang[0] as $key => $value){
+            $tipe = StokBarang::where('id_tipe', $value)->first();
+
+            BarangHistory::create([
+                'id_barang_tipe' => $value
+            ]);
+
+            BarangKeluar::create([
+                'tanggal' => Carbon::now()->format('Y/m/d'),
+                'id_tipe' => $value,
+                'nomer_barang' => $tipe->nomer_barang,
+                'detail_barang' => $tipe->detail_barang,
+                'imei' => $tipe->imei,
+                'pic' => $tipe->pic,
+                'jumlah' => $tipe->jumlah_stok,
+                'satuan' => $tipe->satuan,
+                'total_harga' => 0,
+                'user_input' => $tipe->user_input,
+                'last_update' => Carbon::now()
+            ]);
         }
     }
 
@@ -112,44 +148,91 @@ class MaintenanceController extends Controller
     public function whatsuppMessage($id)
     {
         $test[] = $id;
+        $user = array();
         foreach ($test as $key => $value){
             $memo = InternalMemo::where('id', $value)->first();
-            $maintenanceUser = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
-            foreach ($maintenanceUser as $keys => $values){
-                $user = User::where('id', $values)->first();
-                $token = "XHFEifo#nyT3A7UZf6c8";
-                $curl = curl_init();
+            $cabang = Cabang::where('id', $memo->id_cabang)->first();
+            $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get()->pluck('id_user_maintenance');
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://api.fonnte.com/send',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => array(
-                        'target' => '089630132793,081350535566',
-                        'message' => "
-                        No Memo : $memo->im_number
-                        Status : PROSES
-                        Pekerja : $user->name
-                        Nik : 123325346
-                        Tanggal Pekerjaan : $maintenanceUser->created_at
-                        ",
-                    ),
-                    CURLOPT_HTTPHEADER => array(
-                        "Authorization: $token"
-                    ),
-                ));
-
-                $response = curl_exec($curl);
-
-                curl_close($curl);
-                return $response;
+            foreach ($maintenanceUser as $values){
+                $user = UserMaintenance::where('id', $values)->first();
+                $this->ProceesWaCabang($memo, $cabang, $user);
+                $this->ProceesWaMaintenance($memo, $cabang, $user);
             }
         }
+    }
+
+    public function  ProceesWaCabang($memo, $cabang, $user) {
+        $token = env("FONTE_TOKEN");
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $cabang->telepon,
+                'message' => "
+                    No Memo : $memo->im_number
+                    Status : PROSES
+                    Cabang : $cabang->name
+                    Alamat : $cabang->alamat
+                    Maintenance : $user->nama
+                    No Telp Maintenance : $user->no_telp
+                    Tanggal Pekerjaan : $user->created_at,
+                    ",
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
+
+    public function  ProceesWaMaintenance($memo, $cabang, $user) {
+        $token = env("FONTE_TOKEN");
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $user->no_telp,
+                'message' => "
+                    No Memo : $memo->im_number
+                    Status : PROSES
+                    Cabang : $cabang->name
+                    Alamat : $cabang->alamat
+                    No Telp Cabang : $cabang->telepon
+                    Maintenance : $user->nama
+                    No Telp Maintenance : $user->no_telp
+                    Tanggal Pekerjaan : $user->created_at,
+                    ",
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
     }
 
     public function accMemoByPic($id){
@@ -181,6 +264,23 @@ class MaintenanceController extends Controller
         }
     }
 
+    public function getStockBarang()
+    {
+        $record = BarangTipe::orderBy('id', 'DESC')->paginate(20);
+
+        $record->map(function ($query){
+            $query->stockBarang;
+
+            return $query;
+        });
+
+        if($record){
+            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function getFlagStatus($id)
     {
         if($id == 0){
@@ -205,23 +305,6 @@ class MaintenanceController extends Controller
             return "DiHapus";
         } else if($id == 11){
             return "DiTolak";
-        }
-    }
-
-    public function getStockBarang()
-    {
-        $record = BarangTipe::orderBy('id', 'DESC')->paginate(20);
-
-        $record->map(function ($query){
-            $query->stockBarang;
-
-            return $query;
-        });
-
-        if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
-        } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 }

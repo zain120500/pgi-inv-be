@@ -10,5 +10,10 @@ class Cabang extends Model
     protected $primaryKey = 'id';
     protected $guarded = [''];
 
-    
+    function kabupatenKota()
+    {
+        return $this->hasOne('App\Model\Kabupaten','id','kabupaten_kota_id');
+    }
+
+
 }
