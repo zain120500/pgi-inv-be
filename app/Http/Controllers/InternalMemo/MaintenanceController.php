@@ -80,7 +80,8 @@ class MaintenanceController extends Controller
     {
         $user[] = $request->id_user_maintenance;
         $iMemo[] = $request->id_memo;
-        $barang[] = $request->id_barang;
+        $barangs[] = $request->id_barang;
+        $quantity = $request->quantity;
 
         foreach ($iMemo[0] as $key => $memos){
             foreach ($user[0] as $keys => $users){
@@ -95,24 +96,35 @@ class MaintenanceController extends Controller
                 $userMaintenance->update(['flag' => 1]); //update pic sedang bertugas
             }
 
-            foreach ($barang[0] as $ke => $barangs){
+            foreach ($barangs[0] as $i => $barang){
                 $imBarang = InternalMemoBarang::create([
                     'id_internal_memo' => $memos,
                     'id_maintenance' => $imMaintenance->id,
-                    'id_barang' => $barangs,
+                    'id_barang' => $barang,
                     'created_by' => auth()->user()->id
+                ]);
+
+                InternalMemoBarang::where('id_barang', $barang)->update([
+                    'quantity' => $quantity[$i]
                 ]);
             }
             $this->whatsuppMessage($memos);
             $this->accMemoByPic($memos);
         }
-        $this->createHistoryBarang($barang[0]);
+        $this->createHistoryBarang($barangs[0]);
 
         if($imBarang){
             return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
+    }
+
+    public function quantity($id, $jumlah)
+    {
+            InternalMemoBarang::where('id_barang', $id)->update([
+                'quantity' => $jumlah
+            ]);
     }
 
     public function createHistoryBarang($id)
