@@ -313,6 +313,7 @@ Route::group([
             /**
              * Testing Route
              */
+            Route::get('/paginateKuKc', 'InternalMemoController@paginateKuKc');
             Route::get('/pdfTesting/{id}', 'InternalMemoController@pdfTesting');
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
             Route::get('/getStockBarang', 'MaintenanceController@getStockBarang');

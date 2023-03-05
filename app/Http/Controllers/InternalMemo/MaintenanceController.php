@@ -120,13 +120,6 @@ class MaintenanceController extends Controller
         }
     }
 
-    public function quantity($id, $jumlah)
-    {
-            InternalMemoBarang::where('id_barang', $id)->update([
-                'quantity' => $jumlah
-            ]);
-    }
-
     public function createHistoryBarang($id)
     {
         $barang[] = $id;

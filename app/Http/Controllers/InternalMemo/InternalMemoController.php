@@ -23,6 +23,7 @@ class InternalMemoController extends Controller
     public function index(Request $request)
     {
         $internal = InternalMemo::where('flag', '!=', 4)->orderBy('created_at', 'DESC')->get();
+
         if($request->id_devisi){
             $internal = InternalMemo::orderBy('created_at', 'DESC')
                 ->where('id_devisi', $request->id_devisi)->get();
@@ -505,20 +506,20 @@ class InternalMemoController extends Controller
 
     public function menuArchive(Request $request)
     {
-        $record = InternalMemo::where('flag', 3)->orderBy('id', 'DESC')->get();
+        $record = InternalMemo::where('flag', 3)->orderBy('created_at', 'DESC')->simplePaginate(15);
 
         if($request->im_number){
-            $record = InternalMemo::where('flag', 3)->where('im_number', $request->im_number)->orderBy('id', 'DESC')->get();
+            $record = InternalMemo::where('flag', 3)->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->simplePaginate(15);
         }elseif($request->id_kategori_fpp){
-            $record = InternalMemo::where('flag', 3)->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('id', 'DESC')->get();
+            $record = InternalMemo::where('flag', 3)->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->simplePaginate(15);
         }elseif($request->id_kategori_jenis_fpp){
-            $record = InternalMemo::where('flag', 3)->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('id', 'DESC')->get();
+            $record = InternalMemo::where('flag', 3)->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->simplePaginate(15);
         }elseif($request->id_kategori_sub_fpp){
-            $record = InternalMemo::where('flag', 3)->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('id', 'DESC')->get();
+            $record = InternalMemo::where('flag', 3)->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->simplePaginate(15);
         }elseif($request->id_devisi){
-            $record = InternalMemo::where('flag', 3)->where('id_devisi', $request->id_devisi)->orderBy('id', 'DESC')->get();
+            $record = InternalMemo::where('flag', 3)->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->simplePaginate(15);
         }elseif($request->id_cabang){
-            $record = InternalMemo::where('flag', 3)->where('id_cabang', $request->id_cabang)->orderBy('id', 'DESC')->get();
+            $record = InternalMemo::where('flag', 3)->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->simplePaginate(15);
         }
 
         $collect = $record->map(function ($query) {
@@ -590,6 +591,69 @@ class InternalMemoController extends Controller
 
         if($array){
             return $this->successResponse($array,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function paginateKuKc(Request $request)
+    {
+        $user = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if ($user->kategori_proses == 0 || $user->kategori_proses == 4){
+
+            $internal = InternalMemo::orderBy('created_at', 'DESC')->simplePaginate(15);
+
+            if($request->id_devisi){
+                $internal = InternalMemo::orderBy('created_at', 'DESC')
+                    ->where('id_devisi', $request->id_devisi)->simplePaginate(15);
+            }else if($request->id_kategori_fpp){
+                $internal = InternalMemo::orderBy('created_at', 'DESC')
+                    ->where('id_kategori_fpp', $request->id_kategori_fpp)->simplePaginate(15);
+            }else if($request->id_cabang){
+                $internal = InternalMemo::orderBy('created_at', 'DESC')
+                    ->where('id_cabang', $request->id_cabang)->simplePaginate(15);
+            }else if($request->id_kategori_jenis_fpp){
+                $internal = InternalMemo::orderBy('created_at', 'DESC')
+                    ->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->simplePaginate(15);
+            }else if($request->id_kategori_sub_fpp){
+                $internal = InternalMemo::orderBy('created_at', 'DESC')
+                    ->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->simplePaginate(15);
+            }else if($request->flag){
+                $internal = InternalMemo::orderBy('created_at', 'DESC')
+                    ->where('flag', $request->flag)->simplePaginate(15);
+            }else if($request->created_at){
+                $internal = InternalMemo::orderBy('created_at', $request->created_at)->get();
+            }else if($request->startDate && $request->endDate){
+                $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+                $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+
+                $internal = InternalMemo::whereBetween('created_at', [$startDate, $endDate])->simplePaginate(15);
+            }else if($request->id_cabang_multiple) {
+                $record = $request->id_cabang_multiple;
+                $internal = InternalMemo::orderBy('created_at', 'DESC')
+                    ->whereIn('id_cabang', $record)->simplePaginate(15);
+            }
+
+            $collect = $internal->map(function ($query) {
+                $query['flag_status'] = $this->getFlagStatus($query->flag);
+                $query->cabang->kabupatenKota;
+                $query->devisi;
+                $query->kategoriJenis;
+                $query->kategoriSub;
+
+                return $query;
+            });
+
+            if($request->kabupaten_kota_id) {
+                $internal = InternalMemo::with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
+                    $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
+                })->simplePaginate(15);
+            }
+        }
+
+        if($internal){
+            return $this->successResponse($internal,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
