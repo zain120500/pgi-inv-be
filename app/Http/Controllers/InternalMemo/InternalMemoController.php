@@ -532,6 +532,12 @@ class InternalMemoController extends Controller
             return $query;
         });
 
+        if($request->kabupaten_kota_id) {
+            $internal = InternalMemo::with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
+                $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
+            })->simplePaginate(15);
+        }
+
         if($record){
             return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
         } else {
