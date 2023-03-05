@@ -656,6 +656,8 @@ class InternalMemoController extends Controller
                     $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
                 })->simplePaginate(15);
             }
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9001, 403);
         }
 
         if($internal){
