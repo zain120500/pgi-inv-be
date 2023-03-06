@@ -57,6 +57,7 @@ class UserMaintenanceController extends Controller
             'pekerjaan' => $request->pekerjaan,
             'no_telp' => $request->no_telp,
             'keterangan' => $request->keterangan,
+            'flag' => 0,
             'created_by' => auth()->user()->id
         ]);
 
