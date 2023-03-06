@@ -174,6 +174,9 @@ class MaintenanceController extends Controller
                 'id_barang_tipe' => $value
             ]);
 
+            /**
+             * Dipindah Keatas
+             */
 //            BarangKeluar::create([
 //                'tanggal' => Carbon::now()->format('Y/m/d'),
 //                'id_tipe' => $value,
@@ -233,6 +236,7 @@ class MaintenanceController extends Controller
                     Maintenance : $user->nama
                     No Telp Maintenance : $user->no_telp
                     Tanggal Pekerjaan : $user->created_at,
+                    Maps : https://maps.google.com/?q=$cabang->latitude, $cabang->longitude
                     ",
             ),
             CURLOPT_HTTPHEADER => array(
@@ -270,6 +274,7 @@ class MaintenanceController extends Controller
                     Maintenance : $user->nama
                     No Telp Maintenance : $user->no_telp
                     Tanggal Pekerjaan : $user->created_at,
+                    Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
                     ",
             ),
             CURLOPT_HTTPHEADER => array(

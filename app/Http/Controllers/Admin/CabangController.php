@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -16,17 +17,18 @@ class CabangController extends Controller
         return response()->json([
             'status' =>'success',
             'data' => $cabang
-        ], 200); 
+        ], 200);
     }
 
     public function all()
     {
         $cabang = Cabang::select('id','name','alamat','hp','kode')->get();
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $cabang
-        ], 200); 
+        if($cabang){
+            return $this->successResponse($cabang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 
     public function create()
@@ -125,6 +127,6 @@ class CabangController extends Controller
         return response()->json([
             'status' =>'success',
             'data' => $query
-        ], 200); 
+        ], 200);
     }
 }
