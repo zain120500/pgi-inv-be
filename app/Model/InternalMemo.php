@@ -66,10 +66,4 @@ class InternalMemo extends Model
         return $this->hasMany('App\Model\InternalMemoMaintenance', 'id_internal_memo', 'id');
     }
 
-//    function listHistoryMemoSum()
-//    {
-//        return $this->hasMany('App\Model\HistoryMemo','id_internal_memo','id')->selectRaw('SUM(history_memo.status) as status');
-//    }
-
-
 }

@@ -9,6 +9,7 @@ class StokBarang extends Model
     protected $table = 'stok_barang';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+    public $timestamps = false;
 
     protected $hidden = array('created_at', 'updated_at');
 

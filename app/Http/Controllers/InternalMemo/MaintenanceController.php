@@ -13,6 +13,7 @@ use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
 use App\Model\KategoriPicFpp;
+use App\Model\Pemakaian;
 use App\Model\StokBarang;
 use App\Model\UserMaintenance;
 use App\User;
@@ -84,6 +85,9 @@ class MaintenanceController extends Controller
         $quantity = $request->quantity;
 
         foreach ($iMemo[0] as $key => $memos){
+            $internalMemo = InternalMemo::where('id', $memos)->first();
+            $cabang = Cabang::where('id', $internalMemo->id_cabang)->first();
+
             foreach ($user[0] as $keys => $users){
                 $imMaintenance = InternalMemoMaintenance::create([
                     'id_internal_memo' => $memos,
@@ -107,9 +111,48 @@ class MaintenanceController extends Controller
                 InternalMemoBarang::where('id_barang', $barang)->update([
                     'quantity' => $quantity[$i]
                 ]);
+
+                $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $cabang->kode)->first();
+
+                $pengurangan = ($stockBarang->jumlah_stok - $quantity[$i]);
+
+                BarangKeluar::create([
+                    'tanggal' => Carbon::now()->format('Y-m-d'),
+                    'id_tipe' => $stockBarang->id_tipe,
+                    'nomer_barang' => $stockBarang->nomer_barang,
+                    'detail_barang' => $stockBarang->detail_barang,
+                    'imei' => $stockBarang->imei,
+                    'pic' => $stockBarang->pic,
+                    'jumlah' => $quantity[$i],
+                    'satuan' => $stockBarang->satuan,
+                    'total_harga' => $stockBarang->total_asset,
+                    'user_input' => $stockBarang->user_input,
+                    'last_update' => $stockBarang->last_update
+                ]);
+
+                Pemakaian::create([
+                    'tanggal' => Carbon::now()->format('Y-m-d'),
+                    'pic' => $stockBarang->pic,
+                    'nomer_barang' => $stockBarang->nomer_barang,
+                    'id_tipe' => $stockBarang->id_tipe,
+                    'jumlah' => $quantity[$i],
+                    'satuan' => $stockBarang->satuan,
+                    'harga' => $stockBarang->total_asset,
+                    'total_harga' => $stockBarang->total_asset,
+                    'imei' => $stockBarang->imei,
+                    'detail_barang' => $stockBarang->detail_barang,
+                    'keperluan' => 'Kebutuhan Cabang',
+                    'pemakai' => 'Cabang',
+                    'user_input' => $stockBarang->user_input,
+                    'last_update' => $stockBarang->last_update
+                ]);
             }
             $this->whatsuppMessage($memos);
             $this->accMemoByPic($memos);
+
+            $stockBarang->update([
+                'jumlah_stok' => $pengurangan
+            ]);
         }
         $this->createHistoryBarang($barangs[0]);
 
@@ -131,19 +174,19 @@ class MaintenanceController extends Controller
                 'id_barang_tipe' => $value
             ]);
 
-            BarangKeluar::create([
-                'tanggal' => Carbon::now()->format('Y/m/d'),
-                'id_tipe' => $value,
-                'nomer_barang' => $tipe->nomer_barang,
-                'detail_barang' => $tipe->detail_barang,
-                'imei' => $tipe->imei,
-                'pic' => $tipe->pic,
-                'jumlah' => $tipe->jumlah_stok,
-                'satuan' => $tipe->satuan,
-                'total_harga' => 0,
-                'user_input' => $tipe->user_input,
-                'last_update' => Carbon::now()
-            ]);
+//            BarangKeluar::create([
+//                'tanggal' => Carbon::now()->format('Y/m/d'),
+//                'id_tipe' => $value,
+//                'nomer_barang' => $tipe->nomer_barang,
+//                'detail_barang' => $tipe->detail_barang,
+//                'imei' => $tipe->imei,
+//                'pic' => $tipe->pic,
+//                'jumlah' => $tipe->jumlah_stok,
+//                'satuan' => $tipe->satuan,
+//                'total_harga' => 0,
+//                'user_input' => $tipe->user_input,
+//                'last_update' => Carbon::now()
+//            ]);
         }
     }
 
