@@ -380,17 +380,6 @@ Route::group([
         });
 
         Route::group([
-            'prefix' => 'devisi-access'
-        ], function ($router) {
-            Route::get('/', 'DevisiAccessController@index');
-            Route::get('/all', 'DevisiAccessController@all');
-            Route::get('/{id}', 'DevisiAccessController@show');
-            Route::post('/', 'DevisiAccessController@store');
-            Route::post('/{id}', 'DevisiAccessController@update');
-            Route::delete('/delete/{id}', 'DevisiAccessController@destroy');
-        });
-
-        Route::group([
             'prefix' => 'user-maintenance'
         ], function ($router) {
             Route::get('/', [UserMaintenanceController::class, 'all']);
@@ -399,6 +388,17 @@ Route::group([
             Route::post('/', [UserMaintenanceController::class, 'store']);
             Route::post('/{id}', [UserMaintenanceController::class, 'update']);
             Route::delete('/delete/{id}', [UserMaintenanceController::class, 'destroy']);
+        });
+
+        Route::group([
+            'prefix' => 'devisi-access'
+        ], function ($router) {
+            Route::get('/', 'DevisiAccessController@index');
+            Route::get('/all', 'DevisiAccessController@all');
+            Route::get('/{id}', 'DevisiAccessController@show');
+            Route::post('/', 'DevisiAccessController@store');
+            Route::post('/{id}', 'DevisiAccessController@update');
+            Route::delete('/delete/{id}', 'DevisiAccessController@destroy');
         });
 
     });
