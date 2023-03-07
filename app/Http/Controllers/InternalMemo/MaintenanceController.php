@@ -173,23 +173,6 @@ class MaintenanceController extends Controller
             BarangHistory::create([
                 'id_barang_tipe' => $value
             ]);
-
-            /**
-             * Dipindah Keatas
-             */
-//            BarangKeluar::create([
-//                'tanggal' => Carbon::now()->format('Y/m/d'),
-//                'id_tipe' => $value,
-//                'nomer_barang' => $tipe->nomer_barang,
-//                'detail_barang' => $tipe->detail_barang,
-//                'imei' => $tipe->imei,
-//                'pic' => $tipe->pic,
-//                'jumlah' => $tipe->jumlah_stok,
-//                'satuan' => $tipe->satuan,
-//                'total_harga' => 0,
-//                'user_input' => $tipe->user_input,
-//                'last_update' => Carbon::now()
-//            ]);
         }
     }
 
