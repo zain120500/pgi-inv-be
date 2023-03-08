@@ -83,10 +83,10 @@ class MaintenanceController extends Controller
         $iMemo[] = $request->id_memo;
         $barangs[] = $request->id_barang;
         $quantity = $request->quantity;
+        $pic = $request->pic;
 
         foreach ($iMemo[0] as $key => $memos){
             $internalMemo = InternalMemo::where('id', $memos)->first();
-            $cabang = Cabang::where('id', $internalMemo->id_cabang)->first();
 
             foreach ($user[0] as $keys => $users){
                 $imMaintenance = InternalMemoMaintenance::create([
@@ -112,9 +112,13 @@ class MaintenanceController extends Controller
                     'quantity' => $quantity[$i]
                 ]);
 
-                $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $cabang->kode)->first();
+                BarangHistory::create([
+                    'id_barang_tipe' => $barang
+                ]);
 
-                $pengurangan = ($stockBarang->jumlah_stok - $quantity[$i]);
+                $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $pic[$i])->first();
+//
+//                $pengurangan = ($stockBarang->jumlah_stok - $quantity[$i]);
 
                 BarangKeluar::create([
                     'tanggal' => Carbon::now()->format('Y-m-d'),
@@ -122,7 +126,7 @@ class MaintenanceController extends Controller
                     'nomer_barang' => $stockBarang->nomer_barang,
                     'detail_barang' => $stockBarang->detail_barang,
                     'imei' => $stockBarang->imei,
-                    'pic' => $stockBarang->pic,
+                    'pic' => $pic[$i],
                     'jumlah' => $quantity[$i],
                     'satuan' => $stockBarang->satuan,
                     'total_harga' => $stockBarang->total_asset,
@@ -132,7 +136,7 @@ class MaintenanceController extends Controller
 
                 Pemakaian::create([
                     'tanggal' => Carbon::now()->format('Y-m-d'),
-                    'pic' => $stockBarang->pic,
+                    'pic' => $pic[$i],
                     'nomer_barang' => $stockBarang->nomer_barang,
                     'id_tipe' => $stockBarang->id_tipe,
                     'jumlah' => $quantity[$i],
@@ -150,11 +154,11 @@ class MaintenanceController extends Controller
             $this->whatsuppMessage($memos);
             $this->accMemoByPic($memos);
 
-            $stockBarang->update([
-                'jumlah_stok' => $pengurangan
-            ]);
+//            $stockBarang->update([
+//                'jumlah_stok' => $pengurangan
+//            ]);
         }
-        $this->createHistoryBarang($barangs[0]);
+//        $this->createHistoryBarang($barangs[0]);
 
         if($imBarang){
             return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);

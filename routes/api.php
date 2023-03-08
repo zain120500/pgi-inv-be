@@ -293,7 +293,8 @@ Route::group([
              */
             Route::post('/acc/{id}', 'InternalMemoController@accMemo');
             Route::post('/accMemoAll', 'InternalMemoController@accMemoAll');
-            Route::post('/history/ignore/{id}', 'InternalMemoController@ignoreMemo');
+            Route::post('/ignore/{id}', 'InternalMemoController@ignoreMemo');
+            Route::post('/ignore/all', 'InternalMemoController@ignoreMemoAll');
             Route::post('/uploadBuktiPic/{id}', 'InternalMemoController@uploadBuktiPic');
 
             /**
@@ -302,7 +303,7 @@ Route::group([
             Route::get('/getMemoMaintenance/{id}', 'InternalMemoController@getMemoMaintenance');
             Route::post('/internalUserMaintenance', 'MaintenanceController@internalUserMaintenance');
             Route::post('/internalBarangMaintenance', 'MaintenanceController@internalBarangMaintenance');
-            Route::post('/internalMaintenance', 'MaintenanceController@internalMaintenance');
+            Route::post('/internalMaintenance/test', 'MaintenanceController@internalMaintenance');
 
             /**
              * RATING MEMO
@@ -385,7 +386,7 @@ Route::group([
             Route::get('/', [UserMaintenanceController::class, 'all']);
             Route::get('/paginate', [UserMaintenanceController::class, 'paginate']);
             Route::get('/{id}', [UserMaintenanceController::class, 'show']);
-            Route::post('/', [UserMaintenanceController::class, 'store']);
+            Route::post('/test', [UserMaintenanceController::class, 'store']);
             Route::post('/{id}', [UserMaintenanceController::class, 'update']);
             Route::delete('/delete/{id}', [UserMaintenanceController::class, 'destroy']);
         });

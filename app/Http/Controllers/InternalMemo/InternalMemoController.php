@@ -311,7 +311,7 @@ class InternalMemoController extends Controller
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
         $internalMemo->update([
-            'flag' => 0
+            'flag' => 8
         ]);
 
         $create = HistoryMemo::create([
@@ -323,6 +323,38 @@ class InternalMemoController extends Controller
 
         if($create){
             return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function ignoreMemoAll(Request $request)
+    {
+        $ids[] =  $request->id;
+        $array = [];
+
+        foreach ($ids[0] as $key => $value){
+            $array[] = InternalMemo::where('id', $value)->first();
+
+            $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+            if($pic->kategori_proses == 1 || $pic->kategori_proses == 2){
+                InternalMemo::where('id', $value)->update([
+                    'flag' => 8
+                ]);
+            }
+
+            $create = HistoryMemo::create([
+                "id_internal_memo"=> $value,
+                "user_id"=> auth()->user()->id,
+                "status"=> 8,
+                "keterangan"=> $this->getFlagStatus(8).' '.auth()->user()->name
+            ]);
+
+        }
+
+        if($array){
+            return $this->successResponse($array,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
