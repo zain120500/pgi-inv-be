@@ -84,6 +84,7 @@ class MaintenanceController extends Controller
         $barangs[] = $request->id_barang;
         $quantity = $request->quantity;
         $pic = $request->pic;
+        $cabang = $request->cabang;
 
         foreach ($iMemo[0] as $key => $memos){
             $internalMemo = InternalMemo::where('id', $memos)->first();
@@ -108,31 +109,22 @@ class MaintenanceController extends Controller
                     'created_by' => auth()->user()->id
                 ]);
 
-                InternalMemoBarang::where('id_barang', $barang)->update([
-                    'quantity' => $quantity[$i]
-                ]);
+                if($cabang == !null){
+                    InternalMemoBarang::where('id_barang', $barang)->update([
+                        'quantity' => $quantity[$i],
+                        'cabang_id' => $cabang[$i]
+                    ]);
+                }else{
+                    InternalMemoBarang::where('id_barang', $barang)->update([
+                        'quantity' => $quantity[$i]
+                    ]);
+                }
 
                 BarangHistory::create([
                     'id_barang_tipe' => $barang
                 ]);
 
                 $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $pic[$i])->first();
-//
-//                $pengurangan = ($stockBarang->jumlah_stok - $quantity[$i]);
-
-                BarangKeluar::create([
-                    'tanggal' => Carbon::now()->format('Y-m-d'),
-                    'id_tipe' => $stockBarang->id_tipe,
-                    'nomer_barang' => $stockBarang->nomer_barang,
-                    'detail_barang' => $stockBarang->detail_barang,
-                    'imei' => $stockBarang->imei,
-                    'pic' => $pic[$i],
-                    'jumlah' => $quantity[$i],
-                    'satuan' => $stockBarang->satuan,
-                    'total_harga' => $stockBarang->total_asset,
-                    'user_input' => $stockBarang->user_input,
-                    'last_update' => $stockBarang->last_update
-                ]);
 
                 Pemakaian::create([
                     'tanggal' => Carbon::now()->format('Y-m-d'),
@@ -153,10 +145,6 @@ class MaintenanceController extends Controller
             }
             $this->whatsuppMessage($memos);
             $this->accMemoByPic($memos);
-
-//            $stockBarang->update([
-//                'jumlah_stok' => $pengurangan
-//            ]);
         }
 //        $this->createHistoryBarang($barangs[0]);
 
