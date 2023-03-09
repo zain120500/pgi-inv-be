@@ -6,6 +6,7 @@ use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\BarangHistory;
 use App\Model\BarangKeluar;
+use App\Model\BarangMerk;
 use App\Model\BarangTipe;
 use App\Model\Cabang;
 use App\Model\HistoryMemo;
@@ -211,7 +212,7 @@ class MaintenanceController extends Controller
                     Maintenance : $user->nama
                     No Telp Maintenance : $user->no_telp
                     Tanggal Pekerjaan : $user->created_at,
-                    Maps : https://maps.google.com/?q=$cabang->latitude, $cabang->longitude
+                    Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
                     ",
             ),
             CURLOPT_HTTPHEADER => array(
@@ -304,6 +305,58 @@ class MaintenanceController extends Controller
 
         if($record){
             return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function cabangByMemoId(Request $request)
+    {
+        $memo[] = $request->memo_id;
+
+        $cabang = [];
+        foreach ($memo[0] as $key => $value){
+            $im = InternalMemo::where('id', $value)->first();
+
+
+            $cabang[] = Cabang::where('id', $im->id_cabang)->get();
+        }
+
+        if($cabang){
+            return $this->successResponse($cabang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function getBarangMerk()
+    {
+        $bMerk = BarangMerk::orderBy('id', 'DESC')->get();
+
+        if($bMerk){
+            return $this->successResponse($bMerk,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function getBarangTipe(Request $request)
+    {
+        $bTipe = BarangTipe::where('id_merk', $request->id_merk)->get();
+
+        if($bTipe){
+            return $this->successResponse($bTipe,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function getBarangStock(Request $request)
+    {
+        $bStock = StokBarang::where('id_tipe', $request->id_tipe)->get();
+
+        if($bStock){
+            return $this->successResponse($bStock,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }

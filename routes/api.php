@@ -304,6 +304,10 @@ Route::group([
             Route::post('/internalUserMaintenance', 'MaintenanceController@internalUserMaintenance');
             Route::post('/internalBarangMaintenance', 'MaintenanceController@internalBarangMaintenance');
             Route::post('/internalMaintenance/test', 'MaintenanceController@internalMaintenance');
+            Route::get('/cabangByMemoId', 'MaintenanceController@cabangByMemoId');
+            Route::get('/barangMerk', 'MaintenanceController@getBarangMerk');
+            Route::get('/barangTipe', 'MaintenanceController@getBarangTipe');
+            Route::get('/barangStock', 'MaintenanceController@getBarangStock');
 
             /**
              * RATING MEMO

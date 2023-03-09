@@ -109,8 +109,8 @@ class PembelianController extends Controller
 
     public function storeDetail(Request $request)
     {
-        $barangTipe = BarangTipe::find($request->id_tipe);   
-        
+        $barangTipe = BarangTipe::find($request->id_tipe);
+
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
@@ -135,7 +135,7 @@ class PembelianController extends Controller
             } else {
                 $no_invoice = $request->no_invoice;
             }
-            
+
             $pembelian = Pembelian::where('no_invoice', $no_invoice)->first();
 
             if(empty($pembelian)) {
@@ -162,7 +162,7 @@ class PembelianController extends Controller
                     return $this->errorResponse('Data is Null', 403);
                 }
             }
-        }        
+        }
     }
 
     public function show($id)
@@ -212,8 +212,8 @@ class PembelianController extends Controller
 
     public function updateDetail(Request $request, $id)
     {
-        $barangTipe = BarangTipe::find($request->id_tipe);   
-        
+        $barangTipe = BarangTipe::find($request->id_tipe);
+
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
@@ -248,7 +248,7 @@ class PembelianController extends Controller
         if($flag == 0){  // request void pembelian
             PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 0]); //update barang jadi request void
         } else if($flag == 6){  // request void pembelian
-            
+
         } else if($flag == 2){ //terima barang
 
         } else if($flag == 3){ //terima barang
@@ -270,7 +270,7 @@ class PembelianController extends Controller
                 ]);
 
             }
-            
+
         } else if($flag == 4){ // Approve Void Pembelian
 
             $details = PembelianDetail::where('id_pembelian', $pembelian->id);
@@ -278,7 +278,7 @@ class PembelianController extends Controller
             foreach ($details->get() as $key => $detail) {
 
                 $detail->update(["status" => 2]); //update barang jadi void
-            
+
                 LogRefund::create([
                     "nomer_barang" => $detail->nomer_barang,
                     "id_tipe" => $detail->id_tipe,
