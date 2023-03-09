@@ -9,7 +9,9 @@ class PembelianDetail extends Model
     protected $table = 'pembelian_detail';
     protected $primaryKey = 'id';
     protected $guarded = [''];
-    
+
+    public $timestamps = false;
+
     function tipeBarang()
     {
         return $this->hasOne('App\Model\BarangTipe', 'id', 'id_tipe');
