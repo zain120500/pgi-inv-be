@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Transaksi;
 
+use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\TblCabang;
 use Illuminate\Http\Request;
 
 use App\User;
@@ -31,7 +33,6 @@ class PengirimanController extends Controller
         });
 
         return $this->successResponse($query->setCollection($collect),'Success', 200);
-
     }
 
     public function create()
@@ -71,8 +72,8 @@ class PengirimanController extends Controller
 
     public function storeDetail(Request $request)
     {
-        $barangTipe = BarangTipe::find($request->id_tipe);   
-        
+        $barangTipe = BarangTipe::find($request->id_tipe);
+
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
@@ -90,7 +91,7 @@ class PengirimanController extends Controller
                 "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
                 "status"=> 0
             ]);
-    
+
             if($query){
                 return $this->successResponse($query,'Success', 200);
             } else {
@@ -121,7 +122,7 @@ class PengirimanController extends Controller
             $details = PengirimanDetail::where('id_pengiriman', $query->id);
             $query['total_unit'] = $details->sum('jumlah');
             $query['total_pembelian'] = $details->sum('total_harga');
-            
+
             $query['detail'] = $pengiriman_detail;
 
             return $this->successResponse($query,'Success', 200);
@@ -154,8 +155,8 @@ class PengirimanController extends Controller
 
     public function updateDetail(Request $request, $id)
     {
-        $barangTipe = BarangTipe::find($request->id_tipe);   
-        
+        $barangTipe = BarangTipe::find($request->id_tipe);
+
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
@@ -294,6 +295,17 @@ class PengirimanController extends Controller
 
         $nik = "K".$tahun.$bulan.$tanggal.sprintf("%04s", $max_nik);
         return $nik;
+    }
+
+    public function getCabangByLokasi(Request $request)
+    {
+        $lokasi = TblCabang::where('lokasi', $request->lokasi)->get();
+
+        if($lokasi){
+            return $this->successResponse($lokasi,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 
     public function getCodeFlag($id)

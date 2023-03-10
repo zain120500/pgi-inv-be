@@ -84,11 +84,11 @@ class MaintenanceController extends Controller
         $iMemo[] = $request->id_memo;
         $barangs[] = $request->id_barang;
         $quantity = $request->quantity;
-        $pic = $request->pic;
         $cabang = $request->cabang;
 
         foreach ($iMemo[0] as $key => $memos){
-            $internalMemo = InternalMemo::where('id', $memos)->first();
+            $internalMemo = InternalMemo::where('id', $memos)->get()->pluck('id_cabang');
+            $cab = Cabang::where('id', $internalMemo)->get()->pluck('kode');
 
             foreach ($user[0] as $keys => $users){
                 $imMaintenance = InternalMemoMaintenance::create([
@@ -110,44 +110,70 @@ class MaintenanceController extends Controller
                     'created_by' => auth()->user()->id
                 ]);
 
+                BarangHistory::create([
+                    'id_barang_tipe' => $barang
+                ]);
+
                 if($cabang == !null){
                     InternalMemoBarang::where('id_barang', $barang)->update([
                         'quantity' => $quantity[$i],
                         'cabang_id' => $cabang[$i]
                     ]);
+
+                    $cabs = Cabang::where('id', $cabang[$i])->get()->pluck('kode');
+
+                    foreach ($cabs as $ca){
+                        $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+
+                        Pemakaian::create([
+                            'tanggal' => Carbon::now()->format('Y-m-d'),
+                            'pic' => $stockBarang->pic,
+                            'nomer_barang' => $stockBarang->nomer_barang,
+                            'id_tipe' => $stockBarang->id_tipe,
+                            'jumlah' => $quantity[$i],
+                            'satuan' => $stockBarang->satuan,
+                            'harga' => $stockBarang->total_asset,
+                            'total_harga' => $stockBarang->total_asset,
+                            'imei' => $stockBarang->imei,
+                            'detail_barang' => $stockBarang->detail_barang,
+                            'keperluan' => 'Kebutuhan Cabang',
+                            'pemakai' => 'Cabang',
+                            'user_input' => $stockBarang->user_input,
+                            'last_update' => $stockBarang->last_update
+                        ]);
+                    }
                 }else{
-                    InternalMemoBarang::where('id_barang', $barang)->update([
-                        'quantity' => $quantity[$i]
+                    foreach ($cab as $c){
+                        InternalMemoBarang::where('id_barang', $barang)->update([
+                            'quantity' => $quantity[$i],
+                            'cabang_id' => $c
+                        ]);
+                    }
+
+                    $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
+
+                    Pemakaian::create([
+                        'tanggal' => Carbon::now()->format('Y-m-d'),
+                        'pic' => $stockBarangs->pic,
+                        'nomer_barang' => $stockBarangs->nomer_barang,
+                        'id_tipe' => $stockBarangs->id_tipe,
+                        'jumlah' => $quantity[$i],
+                        'satuan' => $stockBarangs->satuan,
+                        'harga' => $stockBarangs->total_asset,
+                        'total_harga' => $stockBarangs->total_asset,
+                        'imei' => $stockBarangs->imei,
+                        'detail_barang' => $stockBarangs->detail_barang,
+                        'keperluan' => 'Kebutuhan Cabang',
+                        'pemakai' => 'Cabang',
+                        'user_input' => $stockBarangs->user_input,
+                        'last_update' => $stockBarangs->last_update
                     ]);
                 }
-
-                BarangHistory::create([
-                    'id_barang_tipe' => $barang
-                ]);
-
-                $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $pic[$i])->first();
-
-                Pemakaian::create([
-                    'tanggal' => Carbon::now()->format('Y-m-d'),
-                    'pic' => $pic[$i],
-                    'nomer_barang' => $stockBarang->nomer_barang,
-                    'id_tipe' => $stockBarang->id_tipe,
-                    'jumlah' => $quantity[$i],
-                    'satuan' => $stockBarang->satuan,
-                    'harga' => $stockBarang->total_asset,
-                    'total_harga' => $stockBarang->total_asset,
-                    'imei' => $stockBarang->imei,
-                    'detail_barang' => $stockBarang->detail_barang,
-                    'keperluan' => 'Kebutuhan Cabang',
-                    'pemakai' => 'Cabang',
-                    'user_input' => $stockBarang->user_input,
-                    'last_update' => $stockBarang->last_update
-                ]);
             }
             $this->whatsuppMessage($memos);
             $this->accMemoByPic($memos);
         }
-//        $this->createHistoryBarang($barangs[0]);
+        $this->createHistoryBarang($barangs[0]);
 
         if($imBarang){
             return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
@@ -318,8 +344,7 @@ class MaintenanceController extends Controller
         foreach ($memo[0] as $key => $value){
             $im = InternalMemo::where('id', $value)->first();
 
-
-            $cabang[] = Cabang::where('id', $im->id_cabang)->get();
+            $cabang[] = Cabang::where('id', $im->id_cabang)->first();
         }
 
         if($cabang){
@@ -353,7 +378,13 @@ class MaintenanceController extends Controller
 
     public function getBarangStock(Request $request)
     {
-        $bStock = StokBarang::where('id_tipe', $request->id_tipe)->get();
+        $cabang[] = $request->cabang_kode;
+        $id_tipe = $request->id_tipe;
+        foreach ($cabang[0] as $key => $value){
+            $val = Cabang::where('kode', $value)->first();
+
+            $bStock[] = StokBarang::where('id_tipe', $id_tipe)->where('pic', $val->kode)->first();
+        }
 
         if($bStock){
             return $this->successResponse($bStock,Constants::HTTP_MESSAGE_200, 200);

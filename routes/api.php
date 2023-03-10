@@ -244,6 +244,8 @@ Route::group([
         Route::group([
             'prefix' => 'pengiriman'
         ], function ($router) {
+            Route::get('/cabangByLokasi', 'PengirimanController@getCabangByLokasi');
+
             Route::get('/', 'PengirimanController@index');
             Route::get('/{id}', 'PengirimanController@show');
             Route::post('/', 'PengirimanController@store');
@@ -256,6 +258,8 @@ Route::group([
 
             Route::post('/{id}', 'PengirimanController@update');
             Route::post('/detail/{id}', 'PengirimanController@updateDetail');
+
+
         });
 
         Route::group([
