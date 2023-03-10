@@ -88,6 +88,7 @@ class MaintenanceController extends Controller
 
         foreach ($iMemo[0] as $key => $memos){
             $internalMemo = InternalMemo::where('id', $memos)->get()->pluck('id_cabang');
+
             $cab = Cabang::where('id', $internalMemo)->get()->pluck('kode');
 
             foreach ($user[0] as $keys => $users){
@@ -143,10 +144,12 @@ class MaintenanceController extends Controller
                         ]);
                     }
                 }else{
-                    foreach ($cab as $c){
+                    foreach ($cab as $val => $val1){
+                        $c = Cabang::where('kode', $cab)->first();
+
                         InternalMemoBarang::where('id_barang', $barang)->update([
                             'quantity' => $quantity[$i],
-                            'cabang_id' => $c
+                            'cabang_id' => $val1->id
                         ]);
                     }
 
@@ -365,9 +368,9 @@ class MaintenanceController extends Controller
         }
     }
 
-    public function getBarangTipe(Request $request)
+    public function getBarangTipe($id)
     {
-        $bTipe = BarangTipe::where('id_merk', $request->id_merk)->get();
+        $bTipe = BarangTipe::where('id_merk', $id)->get();
 
         if($bTipe){
             return $this->successResponse($bTipe,Constants::HTTP_MESSAGE_200, 200);
