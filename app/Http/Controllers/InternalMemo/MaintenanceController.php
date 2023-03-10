@@ -382,12 +382,22 @@ class MaintenanceController extends Controller
 
     public function getBarangStock(Request $request)
     {
-        $cabang[] = $request->cabang_kode;
-        $id_tipe = $request->id_tipe;
-        foreach ($cabang[0] as $key => $value){
-            $val = Cabang::where('id', $value)->first();
+//        $cabang[] = $request->cabang_kode;
+//        $id_tipe = $request->id_tipe;
+//        foreach ($cabang[0] as $key => $value){
+//            $val = Cabang::where('id', $value)->first();
+//
+//            $bStock[] = StokBarang::where('id_tipe', $id_tipe)->where('pic', $val->kode)->first();
+//        }
 
-            $bStock[] = StokBarang::where('id_tipe', $id_tipe)->where('pic', $val->kode)->first();
+        $cabang = $request->cabang_kode;
+        $id_tipe = $request->id_tipe;
+
+        $val = Cabang::where('id', $cabang)->first();
+        if($val == !null){
+            $bStock = StokBarang::where('id_tipe', $id_tipe)->where('pic', $val->kode)->first();
+        }else{
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
 
         if($bStock){
