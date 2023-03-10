@@ -88,6 +88,7 @@ class MaintenanceController extends Controller
 
         foreach ($iMemo[0] as $key => $memos){
             $internalMemo = InternalMemo::where('id', $memos)->get()->pluck('id_cabang');
+
             $cab = Cabang::where('id', $internalMemo)->get()->pluck('kode');
 
             foreach ($user[0] as $keys => $users){
@@ -143,12 +144,15 @@ class MaintenanceController extends Controller
                         ]);
                     }
                 }else{
-                    foreach ($cab as $c){
-                        InternalMemoBarang::where('id_barang', $barang)->update([
-                            'quantity' => $quantity[$i],
-                            'cabang_id' => $c
-                        ]);
-                    }
+                    $c = Cabang::where('id', $internalMemo)->first();
+
+                    InternalMemoBarang::where('id_barang', $barang)->update([
+                        'quantity' => $quantity[$i]
+                    ]);
+
+                    InternalMemoBarang::where('id_internal_memo', $memos)->update([
+                        'cabang_id' => $c->id
+                    ]);
 
                     $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
 
@@ -365,9 +369,9 @@ class MaintenanceController extends Controller
         }
     }
 
-    public function getBarangTipe(Request $request)
+    public function getBarangTipe($id)
     {
-        $bTipe = BarangTipe::where('id_merk', $request->id_merk)->get();
+        $bTipe = BarangTipe::where('id_merk', $id)->get();
 
         if($bTipe){
             return $this->successResponse($bTipe,Constants::HTTP_MESSAGE_200, 200);
@@ -381,7 +385,7 @@ class MaintenanceController extends Controller
         $cabang[] = $request->cabang_kode;
         $id_tipe = $request->id_tipe;
         foreach ($cabang[0] as $key => $value){
-            $val = Cabang::where('kode', $value)->first();
+            $val = Cabang::where('id', $value)->first();
 
             $bStock[] = StokBarang::where('id_tipe', $id_tipe)->where('pic', $val->kode)->first();
         }
