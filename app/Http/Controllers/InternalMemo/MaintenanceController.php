@@ -144,14 +144,15 @@ class MaintenanceController extends Controller
                         ]);
                     }
                 }else{
-                    foreach ($cab as $val => $val1){
-                        $c = Cabang::where('kode', $cab)->first();
+                    $c = Cabang::where('id', $internalMemo)->first();
 
-                        InternalMemoBarang::where('id_barang', $barang)->update([
-                            'quantity' => $quantity[$i],
-                            'cabang_id' => $val1->id
-                        ]);
-                    }
+                    InternalMemoBarang::where('id_barang', $barang)->update([
+                        'quantity' => $quantity[$i]
+                    ]);
+
+                    InternalMemoBarang::where('id_internal_memo', $memos)->update([
+                        'cabang_id' => $c->id
+                    ]);
 
                     $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
 
