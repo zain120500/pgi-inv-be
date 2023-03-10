@@ -381,7 +381,7 @@ class MaintenanceController extends Controller
         $cabang[] = $request->cabang_kode;
         $id_tipe = $request->id_tipe;
         foreach ($cabang[0] as $key => $value){
-            $val = Cabang::where('kode', $value)->first();
+            $val = Cabang::where('id', $value)->first();
 
             $bStock[] = StokBarang::where('id_tipe', $id_tipe)->where('pic', $val->kode)->first();
         }
