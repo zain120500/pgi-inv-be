@@ -116,62 +116,70 @@ class MaintenanceController extends Controller
                 ]);
 
                 if($cabang == !null){
-                    InternalMemoBarang::where('id_barang', $barang)->update([
-                        'quantity' => $quantity[$i],
-                        'cabang_id' => $cabang[$i]
-                    ]);
+                    if($quantity == !null) {
+                        InternalMemoBarang::where('id_barang', $barang)->update([
+                            'quantity' => $quantity[$i],
+                            'cabang_id' => $cabang[$i]
+                        ]);
 
-                    $cabs = Cabang::where('id', $cabang[$i])->get()->pluck('kode');
+                        $cabs = Cabang::where('id', $cabang[$i])->get()->pluck('kode');
 
-                    foreach ($cabs as $ca){
-                        $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+                        foreach ($cabs as $ca) {
+                            $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+
+                            Pemakaian::create([
+                                'tanggal' => Carbon::now()->format('Y-m-d'),
+                                'pic' => $stockBarang->pic,
+                                'nomer_barang' => $stockBarang->nomer_barang,
+                                'id_tipe' => $stockBarang->id_tipe,
+                                'jumlah' => $quantity[$i],
+                                'satuan' => $stockBarang->satuan,
+                                'harga' => $stockBarang->total_asset,
+                                'total_harga' => $stockBarang->total_asset,
+                                'imei' => $stockBarang->imei,
+                                'detail_barang' => $stockBarang->detail_barang,
+                                'keperluan' => 'Kebutuhan Cabang',
+                                'pemakai' => 'Cabang',
+                                'user_input' => $stockBarang->user_input,
+                                'last_update' => $stockBarang->last_update
+                            ]);
+                        }
+                    }else{
+                        return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
+                    }
+                }else{
+                    if($quantity == !null) {
+                        $c = Cabang::where('id', $internalMemo)->first();
+
+                        InternalMemoBarang::where('id_barang', $barang)->update([
+                            'quantity' => $quantity[$i]
+                        ]);
+
+                        InternalMemoBarang::where('id_internal_memo', $memos)->update([
+                            'cabang_id' => $c->id
+                        ]);
+
+                        $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
 
                         Pemakaian::create([
                             'tanggal' => Carbon::now()->format('Y-m-d'),
-                            'pic' => $stockBarang->pic,
-                            'nomer_barang' => $stockBarang->nomer_barang,
-                            'id_tipe' => $stockBarang->id_tipe,
+                            'pic' => $stockBarangs->pic,
+                            'nomer_barang' => $stockBarangs->nomer_barang,
+                            'id_tipe' => $stockBarangs->id_tipe,
                             'jumlah' => $quantity[$i],
-                            'satuan' => $stockBarang->satuan,
-                            'harga' => $stockBarang->total_asset,
-                            'total_harga' => $stockBarang->total_asset,
-                            'imei' => $stockBarang->imei,
-                            'detail_barang' => $stockBarang->detail_barang,
+                            'satuan' => $stockBarangs->satuan,
+                            'harga' => $stockBarangs->total_asset,
+                            'total_harga' => $stockBarangs->total_asset,
+                            'imei' => $stockBarangs->imei,
+                            'detail_barang' => $stockBarangs->detail_barang,
                             'keperluan' => 'Kebutuhan Cabang',
                             'pemakai' => 'Cabang',
-                            'user_input' => $stockBarang->user_input,
-                            'last_update' => $stockBarang->last_update
+                            'user_input' => $stockBarangs->user_input,
+                            'last_update' => $stockBarangs->last_update
                         ]);
+                    }else{
+                        return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
                     }
-                }else{
-                    $c = Cabang::where('id', $internalMemo)->first();
-
-                    InternalMemoBarang::where('id_barang', $barang)->update([
-                        'quantity' => $quantity[$i]
-                    ]);
-
-                    InternalMemoBarang::where('id_internal_memo', $memos)->update([
-                        'cabang_id' => $c->id
-                    ]);
-
-                    $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
-
-                    Pemakaian::create([
-                        'tanggal' => Carbon::now()->format('Y-m-d'),
-                        'pic' => $stockBarangs->pic,
-                        'nomer_barang' => $stockBarangs->nomer_barang,
-                        'id_tipe' => $stockBarangs->id_tipe,
-                        'jumlah' => $quantity[$i],
-                        'satuan' => $stockBarangs->satuan,
-                        'harga' => $stockBarangs->total_asset,
-                        'total_harga' => $stockBarangs->total_asset,
-                        'imei' => $stockBarangs->imei,
-                        'detail_barang' => $stockBarangs->detail_barang,
-                        'keperluan' => 'Kebutuhan Cabang',
-                        'pemakai' => 'Cabang',
-                        'user_input' => $stockBarangs->user_input,
-                        'last_update' => $stockBarangs->last_update
-                    ]);
                 }
             }
             $this->whatsuppMessage($memos);
@@ -219,6 +227,9 @@ class MaintenanceController extends Controller
         }
     }
 
+    /**
+     * Function untuk whatsupp
+     */
     public function  ProceesWaCabang($memo, $cabang, $user) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
@@ -256,6 +267,9 @@ class MaintenanceController extends Controller
         return $response;
     }
 
+    /**
+     * Function untuk whatsupp
+     */
     public function  ProceesWaMaintenance($memo, $cabang, $user) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
