@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Storage;
 use Str;
+use DateTime;
 
 class InternalMemoController extends Controller
 {
@@ -59,6 +60,7 @@ class InternalMemoController extends Controller
             $query['flag_status'] = $this->getFlagStatus($query->flag);
             $query->cabang->kabupatenKota;
             $query->devisi;
+            $query->kategori;
             $query->kategoriJenis;
             $query->kategoriSub;
 
@@ -155,15 +157,31 @@ class InternalMemoController extends Controller
     public function show($id)
     {
         $query = InternalMemo::where('id', $id)->with('memoMaintenance.userMaintenance')->first();
+        
+        $now = date('Y-m-d H:i:s', strtotime('now'));
 
         $query->MemoFile->makeHidden(['created_at','updated_at']);
         $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
         $query->cabang;
         $query->devisi->makeHidden(['created_at','updated_at']);
+        $query->kategori->makeHidden(['created_at','updated_at']);
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
-        $query->listHistoryMemo;
         $query->memoRating;
+        $listHistoryMemo = $query->listHistoryMemo;
+        $time_before = new DateTime($now);
+        foreach ($listHistoryMemo as $key => $value) {
+
+            if($key == 0){
+                $value['waktu_proses'] = "00:00";
+                $time_before = new DateTime($value->created_at);
+            } else {
+                $time_after = new DateTime($value->created_at);
+                $interval = $time_before->diff($time_after);
+                $value['waktu_proses'] = $interval->format('%H:%i');
+                $time_before = new DateTime($value->created_at);
+            }
+        }
 
         if($query){
             return $this->successResponse($query,Constants::HTTP_MESSAGE_200, 200);
