@@ -13,8 +13,8 @@ trait ApiResponser{
     protected function successResponse($data, $message = null, $code = 200)
 	{
 		return response()->json([
-			'status'=> 'Success', 
-			'message' => $message, 
+			'status'=> 'Success',
+			'message' => $message,
 			'data' => $data
 		], $code);
 	}

@@ -66,4 +66,9 @@ class InternalMemo extends Model
         return $this->hasMany('App\Model\InternalMemoMaintenance', 'id_internal_memo', 'id');
     }
 
+    function memoRating()
+    {
+        return $this->hasMany('App\Model\InternalMemoRating', 'id_internal_memo', 'id');
+    }
+
 }

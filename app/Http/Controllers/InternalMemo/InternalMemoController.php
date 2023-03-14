@@ -163,6 +163,7 @@ class InternalMemoController extends Controller
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->listHistoryMemo;
+        $query->memoRating;
 
         if($query){
             return $this->successResponse($query,Constants::HTTP_MESSAGE_200, 200);
