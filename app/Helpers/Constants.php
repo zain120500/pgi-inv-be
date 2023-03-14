@@ -8,4 +8,5 @@ class Constants
     const ERROR_MESSAGE_403 = 'Process Data error';
     const ERROR_MESSAGE_9000 = 'Anda Bukan Pic';
     const ERROR_MESSAGE_9001 = 'Anda Tidak Mendapatkan Hak Akses';
+    const ERROR_MESSAGE_9002 = 'Silahkan Input Quantity';
 }
