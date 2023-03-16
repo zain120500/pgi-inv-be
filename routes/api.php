@@ -244,7 +244,8 @@ Route::group([
         Route::group([
             'prefix' => 'pengiriman'
         ], function ($router) {
-            Route::get('/cabangByLokasi', 'PengirimanController@getCabangByLokasi');
+            Route::post('/cabang', 'PengirimanController@getCabang');
+            Route::post('/cabangPusat', 'PengirimanController@getCabangPusat');
 
             Route::get('/', 'PengirimanController@index');
             Route::get('/{id}', 'PengirimanController@show');
@@ -312,6 +313,8 @@ Route::group([
             Route::get('/barangMerk', 'MaintenanceController@getBarangMerk');
             Route::get('/barangTipe/{id}', 'MaintenanceController@getBarangTipe');
             Route::get('/barangStock', 'MaintenanceController@getBarangStock');
+            Route::get('/barangStock', 'MaintenanceController@getBarangStock');
+            Route::post('/updateMemoReschedule', 'MaintenanceController@updateMemoReschedule');
 
             /**
              * RATING MEMO
@@ -328,6 +331,8 @@ Route::group([
             Route::get('/getStockBarang', 'MaintenanceController@getStockBarang');
             Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');
             Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
+            Route::get('/testIndexMemo', 'InternalMemoController@testIndexMemo');
+            Route::post('/attendanceMaintenance/{id}', 'MaintenanceController@attendanceMaintenance');
 
             /**
              * Internal Memo
