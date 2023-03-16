@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Transaksi;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\Cabang;
 use App\Model\TblCabang;
 use Illuminate\Http\Request;
 
@@ -297,12 +298,35 @@ class PengirimanController extends Controller
         return $nik;
     }
 
-    public function getCabangByLokasi(Request $request)
+    public function getCabang(Request $request)
     {
-        $lokasi = TblCabang::where('lokasi', $request->lokasi)->get();
+        $userCabang = Cabang::where('kepala_unit_id', auth()->user()->id)
+                ->orWhere('kepala_cabang_id', auth()->user()->id)
+                ->orWhere('kepala_cabang_senior_id', auth()->user()->id)
+                ->orWhere('area_manager_id', auth()->user()->id)
+                ->first();
 
-        if($lokasi){
-            return $this->successResponse($lokasi,Constants::HTTP_MESSAGE_200, 200);
+        if($userCabang->kepala_cabang_id == !null){
+            $cabang = Cabang::where('kepala_cabang_id', $userCabang->kepala_cabang_id)->get();
+        } else if ($userCabang->kepala_cabang_senior_id == !null){
+            $cabang = Cabang::where('kepala_cabang_senior_id', $userCabang->kepala_cabang_senior_id)->get();
+        } else if ($userCabang->area_manager_id == !null){
+            $cabang = Cabang::where('area_manager_id', $userCabang->area_manager_id)->get();
+        }
+
+        if($cabang){
+            return $this->successResponse($cabang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function getCabangPusat(Request $request)
+    {
+        $cabang = Cabang::whereLike('name', $request->name)->get();
+
+        if($cabang){
+            return $this->successResponse($cabang,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }

@@ -20,6 +20,7 @@ use App\Model\UserMaintenance;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class MaintenanceController extends Controller
 {
@@ -96,6 +97,9 @@ class MaintenanceController extends Controller
                     'id_internal_memo' => $memos,
                     'id_user_maintenance' => $users,
                     'date' => Carbon::now(),
+                    'link' => (Str::random(5).$users),
+                    'kode' => (Str::random(5)),
+                    'flag' => 0,
                     'created_by' => auth()->user()->id
                 ]);
 
@@ -218,11 +222,12 @@ class MaintenanceController extends Controller
             $memo = InternalMemo::where('id', $value)->first();
             $cabang = Cabang::where('id', $memo->id_cabang)->first();
             $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get()->pluck('id_user_maintenance');
+            $imUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->first();
 
             foreach ($maintenanceUser as $values){
                 $user = UserMaintenance::where('id', $values)->first();
-                $this->ProceesWaCabang($memo, $cabang, $user);
-                $this->ProceesWaMaintenance($memo, $cabang, $user);
+                $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
+                $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
             }
         }
     }
@@ -230,7 +235,7 @@ class MaintenanceController extends Controller
     /**
      * Function untuk whatsupp
      */
-    public function  ProceesWaCabang($memo, $cabang, $user) {
+    public function  ProceesWaCabang($memo, $cabang, $user, $imUser) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
 
@@ -245,16 +250,16 @@ class MaintenanceController extends Controller
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => array(
                 'target' => $cabang->telepon,
-                'message' => "
-                    No Memo : $memo->im_number
-                    Status : PROSES
-                    Cabang : $cabang->name
-                    Alamat : $cabang->alamat
-                    Maintenance : $user->nama
-                    No Telp Maintenance : $user->no_telp
-                    Tanggal Pekerjaan : $user->created_at,
-                    Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
-                    ",
+'message' => "
+    No Memo : *$memo->im_number*
+    Status : *PROSES*
+    Cabang : *$cabang->name*
+    Alamat : *$cabang->alamat*
+    Maintenance : *$user->nama*
+    No Telp Maintenance : *$user->no_telp*
+    Tanggal Pekerjaan : *$user->created_at*
+    Kode Maintenance : *$imUser->kode*
+    ",
             ),
             CURLOPT_HTTPHEADER => array(
                 "Authorization: $token"
@@ -270,7 +275,7 @@ class MaintenanceController extends Controller
     /**
      * Function untuk whatsupp
      */
-    public function  ProceesWaMaintenance($memo, $cabang, $user) {
+    public function  ProceesWaMaintenance($memo, $cabang, $user, $imUser) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
 
@@ -286,16 +291,17 @@ class MaintenanceController extends Controller
             CURLOPT_POSTFIELDS => array(
                 'target' => $user->no_telp,
                 'message' => "
-                    No Memo : $memo->im_number
-                    Status : PROSES
-                    Cabang : $cabang->name
-                    Alamat : $cabang->alamat
-                    No Telp Cabang : $cabang->telepon
-                    Maintenance : $user->nama
-                    No Telp Maintenance : $user->no_telp
-                    Tanggal Pekerjaan : $user->created_at,
-                    Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
-                    ",
+No Memo : *$memo->im_number*
+Status : *PROSES*
+Cabang : *$cabang->name*
+Alamat : *$cabang->alamat*
+Telp Cabang : *$cabang->telepon*
+Maintenance : *$user->nama*
+No Telp Maintenance : *$user->no_telp*
+Tanggal Pekerjaan : *$user->created_at*
+Link : https://portal.pusatgadai.id/$imUser->link
+Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
+                ",
             ),
             CURLOPT_HTTPHEADER => array(
                 "Authorization: $token"
@@ -325,7 +331,9 @@ class MaintenanceController extends Controller
                     "id_internal_memo" => $memo->id,
                     "user_id" => auth()->user()->id,
                     "status" => $pic->kategori_proses,
-                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name,
+                    "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                    "waktu" => Carbon::now()->format('h')
                 ]);
             }
         }
@@ -416,6 +424,41 @@ class MaintenanceController extends Controller
 
         if($bStock){
             return $this->successResponse($bStock,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function attendanceMaintenance(Request $request, $id)
+    {
+        $memo = InternalMemoMaintenance::where('link', $id)->first();
+        if($memo->kode == $request->kode){
+            $memo->update([
+                'flag' => 1
+            ]);
+
+            if($memo){
+                return $this->successResponse($memo,Constants::HTTP_MESSAGE_200, 200);
+            } else {
+                return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            }
+        }else{
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9003, 403);
+        }
+    }
+
+    public function updateMemoReschedule(Request $request)
+    {
+        $user[] = $request->id_user_maintenance;
+            foreach ($user[0] as $key => $val) {
+                $imMaintenance[$key] = InternalMemoMaintenance::where('id_internal_memo', $request->id_memo)->create([
+                    'id_user_maintenance' => $val,
+                    'date' => Carbon::now()->format('Y-m-d')
+                ]);
+        }
+
+        if($imMaintenance){
+            return $this->successResponse($imMaintenance,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }

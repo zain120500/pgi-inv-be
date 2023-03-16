@@ -15,5 +15,14 @@ class Cabang extends Model
         return $this->hasOne('App\Model\Kabupaten','id','kabupaten_kota_id');
     }
 
+    public function scopeWhereLike($query, $column, $value)
+    {
+        return $query->where($column, 'like', '%'.$value.'%');
+    }
+
+    public function scopeOrWhereLike($query, $column, $value)
+    {
+        return $query->orWhere($column, 'like', '%'.$value.'%');
+    }
 
 }
