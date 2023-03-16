@@ -451,7 +451,7 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
     {
         $user[] = $request->id_user_maintenance;
             foreach ($user[0] as $key => $val) {
-                $imMaintenance[$key] = InternalMemoMaintenance::where('id_internal_memo', $request->id_memo)->create([
+                $imMaintenance[$key] = InternalMemoMaintenance::where('id_internal_memo', $request->id_memo)->update([
                     'id_user_maintenance' => $val,
                     'date' => Carbon::now()->format('Y-m-d')
                 ]);
