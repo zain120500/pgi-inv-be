@@ -451,14 +451,56 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
     public function updateMemoRescheduleV1(Request $request)
     {
         $user = $request->id_user_maintenance;
-        $imMaintenance = InternalMemoMaintenance::where('id_internal_memo', $request->id_memo)->get();
-        foreach ($user as $key => $val) {
-            foreach ($imMaintenance as $maintenance){
-                $maintenance->id_user_maintenance = $val;
-                $maintenance->date = Carbon::now()->format('Y-m-d');
-                $maintenance->save();
+        $memo = $request->id_memo;
+        foreach ($memo as $keys => $memos){
+            if(InternalMemoMaintenance::where('id_internal_memo', '=', $memos)->count() > 0){
+                InternalMemoMaintenance::where('id_internal_memo', $memos)->delete();
+            }
+            foreach ($user as $key => $val) {
+
+                $imMaintenance = InternalMemoMaintenance::create([
+                    'id_internal_memo' => $memos,
+                    'id_user_maintenance' => $val,
+                    'date' => Carbon::now()->format('Y-m-d'),
+                    'link' => (Str::random(5).$val),
+                    'kode' => (Str::random(5)),
+                    'flag' => 1,
+                    'created_by' => auth()->user()->id
+                ]);
             }
         }
+
+        if($imMaintenance){
+            return $this->successResponse($imMaintenance,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function updateMemoRescheduleV2(Request $request)
+    {
+        $user[] = $request->id_user_maintenance;
+        $iMemo[] = $request->id_memo;
+
+        $arr = [];
+
+        foreach ($iMemo[0] as $key => $memos){
+            $imMaintenance = InternalMemoMaintenance::where('id_internal_memo', $memos);
+
+            if(!empty($imMaintenance)) {
+                foreach ($user[0] as $keys => $users) {
+
+                    $imMaintenance->update([
+                        'id_user_maintenance' => $users,
+                        'date' => Carbon::now(),
+                        'created_by' => auth()->user()->id
+                    ]);
+//                    $arr[] = $imMaintenance->first();
+                }
+            }
+        }
+
+//        return $arr;
 
         if($imMaintenance){
             return $this->successResponse($imMaintenance,Constants::HTTP_MESSAGE_200, 200);
@@ -471,10 +513,11 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
     {
         $device = '089630132793';
         $sender = '089630132793';
-        $message = 'Pesan';
+        $message = 'test';
 
         function sendFonnte($device, $message)
         {
+            $token = env("FONTE_TOKEN");
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -492,7 +535,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                     'url' => 'http://localhost:8000/api/internal-memo/memo/webhookTest',
                 ),
                 CURLOPT_HTTPHEADER => array(
-                    "Authorization: TOKEN"
+                    "Authorization: $token"
                 ),
             ));
 
@@ -509,9 +552,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
             ];
         } else {
             $reply = [
-                "message" => "Sorry, i don't understand. Please use one of the following keyword :
-
-Test",
+                "message" => "Sorry, i don't understand. Please use one of the following keyword : Test",
             ];
         }
 

@@ -315,6 +315,7 @@ Route::group([
             Route::get('/barangStock', 'MaintenanceController@getBarangStock');
             Route::get('/barangStock', 'MaintenanceController@getBarangStock');
             Route::post('/updateMemoRescheduleV1', 'MaintenanceController@updateMemoRescheduleV1');
+            Route::post('/updateMemoRescheduleV2', 'MaintenanceController@updateMemoRescheduleV2');
             Route::post('/webhookTest', 'MaintenanceController@webhookTest');
 
             /**
