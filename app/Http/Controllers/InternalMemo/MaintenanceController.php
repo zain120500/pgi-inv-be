@@ -301,6 +301,7 @@ No Telp Maintenance : *$user->no_telp*
 Tanggal Pekerjaan : *$user->created_at*
 Link : https://portal.pusatgadai.id/$imUser->link
 Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
+url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 ",
             ),
             CURLOPT_HTTPHEADER => array(
@@ -447,14 +448,16 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         }
     }
 
-    public function updateMemoReschedule(Request $request)
+    public function updateMemoRescheduleV1(Request $request)
     {
-        $user[] = $request->id_user_maintenance;
-            foreach ($user[0] as $key => $val) {
-                $imMaintenance[$key] = InternalMemoMaintenance::where('id_internal_memo', $request->id_memo)->update([
-                    'id_user_maintenance' => $val,
-                    'date' => Carbon::now()->format('Y-m-d')
-                ]);
+        $user = $request->id_user_maintenance;
+        $imMaintenance = InternalMemoMaintenance::where('id_internal_memo', $request->id_memo)->get();
+        foreach ($user as $key => $val) {
+            foreach ($imMaintenance as $maintenance){
+                $maintenance->id_user_maintenance = $val;
+                $maintenance->date = Carbon::now()->format('Y-m-d');
+                $maintenance->save();
+            }
         }
 
         if($imMaintenance){
@@ -462,6 +465,57 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
+    }
+
+    public function webhookTest()
+    {
+        $device = '089630132793';
+        $sender = '089630132793';
+        $message = 'Pesan';
+
+        function sendFonnte($device, $message)
+        {
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.fonnte.com/send",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => array(
+                    'target' => $device,
+                    'message' => $message,
+                    'url' => 'http://localhost:8000/api/internal-memo/memo/webhookTest',
+                ),
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: TOKEN"
+                ),
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+
+            return $response;
+        }
+
+        if ($message == "test") {
+            $reply = [
+                "message" => "working great!",
+            ];
+        } else {
+            $reply = [
+                "message" => "Sorry, i don't understand. Please use one of the following keyword :
+
+Test",
+            ];
+        }
+
+        sendFonnte($sender, $reply);
     }
 
     public function getFlagStatus($id)
