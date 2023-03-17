@@ -314,7 +314,8 @@ Route::group([
             Route::get('/barangTipe/{id}', 'MaintenanceController@getBarangTipe');
             Route::get('/barangStock', 'MaintenanceController@getBarangStock');
             Route::get('/barangStock', 'MaintenanceController@getBarangStock');
-            Route::post('/updateMemoReschedule', 'MaintenanceController@updateMemoReschedule');
+            Route::post('/updateMemoRescheduleV1', 'MaintenanceController@updateMemoRescheduleV1');
+            Route::post('/webhookTest', 'MaintenanceController@webhookTest');
 
             /**
              * RATING MEMO
