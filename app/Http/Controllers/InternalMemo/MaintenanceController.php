@@ -495,15 +495,14 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                         'date' => Carbon::now(),
                         'created_by' => auth()->user()->id
                     ]);
-//                    $arr[] = $imMaintenance->first();
+                    $arr[] = $imMaintenance->first();
+
                 }
             }
         }
 
-//        return $arr;
-
-        if($imMaintenance){
-            return $this->successResponse($imMaintenance,Constants::HTTP_MESSAGE_200, 200);
+        if($arr){
+            return $this->successResponse($arr,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
