@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Model\InternalMemo;
+use App\Model\InternalMemoMaintenance;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
 class TestCron extends Command
 {
@@ -11,7 +14,7 @@ class TestCron extends Command
      *
      * @var string
      */
-    protected $signature = 'test:aldi';
+    protected $signature = 'test:cron';
 
     /**
      * The console command description.
@@ -44,7 +47,34 @@ class TestCron extends Command
            Write your database logic we bellow:
            User::create(['email'=>'send mail']);
         */
-        dd("Testing Cron is Running ... ");
+//        dd("Testing Cron is Running ... ");
+
+        $imMaintenance = InternalMemoMaintenance::get();
+
+        $arr = [];
+        $arrs = [];
+        foreach ($imMaintenance as $keys => $value){
+
+            if($value->date < Carbon::createFromFormat('Y-m-d H:i:s', $value->created_at)->addDays(1)->format('Y-m-d'))
+            {
+                $value->update([
+                    'flag' => 10,
+                ]);
+                $arr[] = $imMaintenance->first();
+            }else {
+                $arr[] = "Gagal";
+            }
+
+            $iMemo = InternalMemo::where('id', $value->id_internal_memo)->get();
+            if(!empty($iMemo)) {
+                foreach ($iMemo as $key => $memo) {
+                    $memo->update([
+                        'flag' => 10,
+                    ]);
+                    $arrs[] = $memo->first();
+                }
+            }
+        }
 
         $this->info('testing:cron Command Run Successfully !');
     }

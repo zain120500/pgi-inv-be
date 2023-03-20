@@ -298,8 +298,8 @@ Route::group([
              */
             Route::post('/acc/{id}', 'InternalMemoController@accMemo');
             Route::post('/accMemoAll', 'InternalMemoController@accMemoAll');
-            Route::post('/ignore/{id}', 'InternalMemoController@ignoreMemo');
             Route::post('/ignore/all', 'InternalMemoController@ignoreMemoAll');
+            Route::post('/ignore/{id}', 'InternalMemoController@ignoreMemo');
             Route::post('/uploadBuktiPic/{id}', 'InternalMemoController@uploadBuktiPic');
 
             /**
@@ -317,6 +317,7 @@ Route::group([
             Route::post('/updateMemoRescheduleV1', 'MaintenanceController@updateMemoRescheduleV1');
             Route::post('/updateMemoRescheduleV2', 'MaintenanceController@updateMemoRescheduleV2');
             Route::post('/webhookTest', 'MaintenanceController@webhookTest');
+            Route::post('/testCronJob', 'MaintenanceController@testCronJob');
 
             /**
              * RATING MEMO

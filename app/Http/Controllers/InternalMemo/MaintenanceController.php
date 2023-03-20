@@ -496,7 +496,6 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                         'created_by' => auth()->user()->id
                     ]);
                     $arr[] = $imMaintenance->first();
-
                 }
             }
         }
@@ -556,6 +555,36 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         }
 
         sendFonnte($sender, $reply);
+    }
+
+    public function testCronJob()
+    {
+        $imMaintenance = InternalMemoMaintenance::get();
+
+        $arr = [];
+        $arrs = [];
+        foreach ($imMaintenance as $keys => $value){
+
+            if($value->date < Carbon::createFromFormat('Y-m-d H:i:s', $value->created_at)->addDays(1)->format('Y-m-d'))
+            {
+                $value->update([
+                    'flag' => 10,
+                ]);
+                $arr[] = $imMaintenance->first();
+            }else {
+                $arr[] = "Gagal";
+            }
+
+            $iMemo = InternalMemo::where('id', $value->id_internal_memo)->get();
+            if(!empty($iMemo)) {
+                foreach ($iMemo as $key => $memo) {
+                    $memo->update([
+                        'flag' => 10,
+                    ]);
+                    $arrs[] = $memo->first();
+                }
+            }
+        }
     }
 
     public function getFlagStatus($id)
