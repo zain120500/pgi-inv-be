@@ -507,42 +507,127 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         }
     }
 
+    public function updateMemoRescheduleV3(Request $request)
+    {
+        $user[] = $request->id_user_maintenance;
+        $iMemo[] = $request->id_memo;
+        $barang[] = $request->id_barang;
+        $quantity = $request->quantity;
+        $cabang = $request->cabang;
+
+        $arr = [];
+
+        foreach ($iMemo[0] as $key => $memos){
+            $internalMemo = InternalMemo::where('id', $memos)->get()->pluck('id_cabang');
+            $cab = Cabang::where('id', $internalMemo)->get()->pluck('kode');
+            $imMaintenance = InternalMemoMaintenance::where('id_internal_memo', $memos);
+            $iBarang = InternalMemoBarang::where('id_internal_memo', $memos);
+
+            if(!empty($imMaintenance)) {
+                foreach ($user[0] as $keys => $users) {
+
+                    $imMaintenance->update([
+                        'id_user_maintenance' => $users,
+                        'date' => Carbon::now(),
+                        'created_by' => auth()->user()->id
+                    ]);
+                    $arr[] = $imMaintenance->first();
+                }
+            }
+
+            if(!empty($iBarang)) {
+                foreach ($barang[0] as $i => $barangs) {
+
+                    $iBarang->update([
+                        'id_barang' => $barangs,
+                        'created_by' => auth()->user()->id
+                    ]);
+                    $arr[] = $iBarang->first();
+
+                    if($cabang == !null){
+                        if($quantity == !null) {
+                            InternalMemoBarang::where('id_barang', $barang)->update([
+                                'quantity' => $quantity[$i],
+                                'cabang_id' => $cabang[$i]
+                            ]);
+
+                            $cabs = Cabang::where('id', $cabang[$i])->get()->pluck('kode');
+
+                            foreach ($cabs as $ca) {
+                                $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+
+                                Pemakaian::create([
+                                    'tanggal' => Carbon::now()->format('Y-m-d'),
+                                    'pic' => $stockBarang->pic,
+                                    'nomer_barang' => $stockBarang->nomer_barang,
+                                    'id_tipe' => $stockBarang->id_tipe,
+                                    'jumlah' => $quantity[$i],
+                                    'satuan' => $stockBarang->satuan,
+                                    'harga' => $stockBarang->total_asset,
+                                    'total_harga' => $stockBarang->total_asset,
+                                    'imei' => $stockBarang->imei,
+                                    'detail_barang' => $stockBarang->detail_barang,
+                                    'keperluan' => 'Kebutuhan Cabang',
+                                    'pemakai' => 'Cabang',
+                                    'user_input' => $stockBarang->user_input,
+                                    'last_update' => $stockBarang->last_update
+                                ]);
+                            }
+                        }else{
+                            return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
+                        }
+                    }else{
+                        if($quantity == !null) {
+                            $c = Cabang::where('id', $internalMemo)->first();
+
+                            InternalMemoBarang::where('id_barang', $barang)->update([
+                                'quantity' => $quantity[$i]
+                            ]);
+
+                            InternalMemoBarang::where('id_internal_memo', $memos)->update([
+                                'cabang_id' => $c->id
+                            ]);
+
+                            $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
+
+                            Pemakaian::create([
+                                'tanggal' => Carbon::now()->format('Y-m-d'),
+                                'pic' => $stockBarangs->pic,
+                                'nomer_barang' => $stockBarangs->nomer_barang,
+                                'id_tipe' => $stockBarangs->id_tipe,
+                                'jumlah' => $quantity[$i],
+                                'satuan' => $stockBarangs->satuan,
+                                'harga' => $stockBarangs->total_asset,
+                                'total_harga' => $stockBarangs->total_asset,
+                                'imei' => $stockBarangs->imei,
+                                'detail_barang' => $stockBarangs->detail_barang,
+                                'keperluan' => 'Kebutuhan Cabang',
+                                'pemakai' => 'Cabang',
+                                'user_input' => $stockBarangs->user_input,
+                                'last_update' => $stockBarangs->last_update
+                            ]);
+                        }else{
+                            return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
+                        }
+                    }
+                }
+            }
+        }
+
+        if($arr){
+            return $this->successResponse($arr,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function webhookTest()
     {
         $device = '089630132793';
-        $sender = '089630132793';
+        $sender = '081380363569';
         $message = 'test';
 
-        function sendFonnte($device, $message)
-        {
-            $token = env("FONTE_TOKEN");
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.fonnte.com/send",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => array(
-                    'target' => $device,
-                    'message' => $message,
-                    'url' => 'http://localhost:8000/api/internal-memo/memo/webhookTest',
-                ),
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: $token"
-                ),
-            ));
-
-            $response = curl_exec($curl);
-
-            curl_close($curl);
-
-            return $response;
-        }
+        $this->sendFonnte($device, $message);
 
         if ($message == "test") {
             $reply = [
@@ -554,7 +639,38 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
             ];
         }
 
-        sendFonnte($sender, $reply);
+        $this->sendFonnte($sender, $reply);
+    }
+
+    function sendFonnte($device, $message)
+    {
+        $token = env("FONTE_TOKEN");
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.fonnte.com/send",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => array(
+                'target' => $device,
+                'message' => $message,
+                'url' => 'http://localhost:8000/api/internal-memo/memo/webhookTest',
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+        return $response;
     }
 
     public function testCronJob()
