@@ -627,7 +627,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $sender = '081380363569';
         $message = 'uy test';
 
-        function sendFonnte($device, $message)
+        function sendFonnte($message)
         {
             $token = env("FONTE_TOKEN");
             $curl = curl_init();
@@ -642,7 +642,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "POST",
                 CURLOPT_POSTFIELDS => array(
-                    'target' => $device,
+                    'target' => '089630132793',
                     'message' => $message,
                     'url' => 'http://api.pusatgadai.id/api/webhookTest',
                 ),
@@ -664,7 +664,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
             $reply = "not working!";
         }
 
-        sendFonnte($sender, $reply);
+        sendFonnte($reply);
     }
 
     public function testCronJob()
