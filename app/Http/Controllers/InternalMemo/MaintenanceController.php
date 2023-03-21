@@ -655,7 +655,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
             CURLOPT_POSTFIELDS => array(
                 'target' => $device,
                 'message' => $message,
-                'url' => 'http://localhost:8000/api/internal-memo/memo/webhookTest',
+                'url' => 'http://api.pusatgadai.id/api/webhookTest',
             ),
             CURLOPT_HTTPHEADER => array(
                 "Authorization: $token"

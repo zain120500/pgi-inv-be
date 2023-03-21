@@ -13,6 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         '/api/*',
-        'http://api.pusatgadai.id/api/internal-memo/memo/webhookTest'
+        'http://api.pusatgadai.id/api/webhookTest'
     ];
 }
