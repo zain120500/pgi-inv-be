@@ -627,7 +627,36 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $sender = '081380363569';
         $message = 'uy test';
 
-        $this->sendFonnte($device, $message);
+        function sendFonnte($device, $message)
+        {
+            $token = env("FONTE_TOKEN");
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.fonnte.com/send",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => array(
+                    'target' => $device,
+                    'message' => $message,
+                    'url' => 'http://api.pusatgadai.id/api/webhookTest',
+                ),
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: $token"
+                ),
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+
+            return $response;
+        }
 
         if ($message == "test") {
                 $reply = "working great!";
@@ -635,38 +664,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
             $reply = "not working!";
         }
 
-        $this->sendFonnte($sender, $reply);
-    }
-
-    function sendFonnte($device, $message)
-    {
-        $token = env("FONTE_TOKEN");
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.fonnte.com/send",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => array(
-                'target' => $device,
-                'message' => $message,
-                'url' => 'http://api.pusatgadai.id/api/webhookTest',
-            ),
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: $token"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-
-        return $response;
+        sendFonnte($sender, $reply);
     }
 
     public function testCronJob()
