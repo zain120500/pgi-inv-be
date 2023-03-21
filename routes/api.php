@@ -27,6 +27,7 @@ Route::group([
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login')->name('login');
     Route::get('/user', 'AuthController@user');
+    Route::post('/webhookTest', 'MaintenanceController@webhookTest');
 });
 
 
@@ -317,7 +318,6 @@ Route::group([
             Route::post('/updateMemoRescheduleV1', 'MaintenanceController@updateMemoRescheduleV1');
             Route::post('/updateMemoRescheduleV2', 'MaintenanceController@updateMemoRescheduleV2');
             Route::post('/updateMemoRescheduleV3', 'MaintenanceController@updateMemoRescheduleV3');
-            Route::post('/webhookTest', 'MaintenanceController@webhookTest');
             Route::post('/testCronJob', 'MaintenanceController@testCronJob');
 
             /**
