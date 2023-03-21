@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
 
 Route::group([
     // 'namespace' => 'Profile',
@@ -27,7 +28,6 @@ Route::group([
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login')->name('login');
     Route::get('/user', 'AuthController@user');
-    Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
 });
 
 
