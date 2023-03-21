@@ -27,7 +27,7 @@ Route::group([
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login')->name('login');
     Route::get('/user', 'AuthController@user');
-    Route::post('/webhookTest', 'MaintenanceController@webhookTest');
+    Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
 });
 
 
