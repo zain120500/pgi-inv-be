@@ -625,17 +625,17 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
     {
         $device = '089630132793';
         $sender = '081380363569';
-        $message = 'test';
+        $message = 'uy test';
 
         $this->sendFonnte($device, $message);
 
         if ($message == "test") {
-                $message = "working great!";
+                $reply = "working great!";
         } else {
-            $message = "working great!";
+            $reply = "not working!";
         }
 
-        $this->sendFonnte($sender, $message);
+        $this->sendFonnte($sender, $reply);
     }
 
     function sendFonnte($device, $message)
