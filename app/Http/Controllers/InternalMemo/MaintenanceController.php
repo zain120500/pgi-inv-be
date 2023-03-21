@@ -630,16 +630,12 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $this->sendFonnte($device, $message);
 
         if ($message == "test") {
-            $reply = [
-                "message" => "working great!",
-            ];
+                $message = "working great!";
         } else {
-            $reply = [
-                "message" => "Sorry, i don't understand. Please use one of the following keyword : Test",
-            ];
+            $message = "working great!";
         }
 
-        $this->sendFonnte($sender, $reply);
+        $this->sendFonnte($sender, $message);
     }
 
     function sendFonnte($device, $message)
