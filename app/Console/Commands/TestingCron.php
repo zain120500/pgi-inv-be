@@ -58,7 +58,7 @@ class TestCron extends Command
             if($value->date < Carbon::createFromFormat('Y-m-d H:i:s', $value->created_at)->addDays(1)->format('Y-m-d'))
             {
                 $value->update([
-                    'flag' => 10,
+                    'flag' => 2,
                 ]);
                 $arr[] = $imMaintenance->first();
             }else {
@@ -69,7 +69,7 @@ class TestCron extends Command
             if(!empty($iMemo)) {
                 foreach ($iMemo as $key => $memo) {
                     $memo->update([
-                        'flag' => 10,
+                        'flag' => 12,
                     ]);
                     $arrs[] = $memo->first();
                 }
