@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
+Route::post('/testMessage', 'InternalMemo\MaintenanceController@testMessage');
 
 Route::group([
     // 'namespace' => 'Profile',
@@ -359,6 +360,7 @@ Route::group([
         ], function ($router) {
             Route::post('/internalMaintenanceV2', [MaintenanceControllerV2::class, 'internalMaintenance']);
             Route::post('/attendanceMaintenanceV2/{id}', [MaintenanceControllerV2::class, 'attendanceMaintenance']);
+            Route::post('/updateMemoRescheduleV2/{id}', [MaintenanceControllerV2::class, 'updateMemoRescheduleV2']);
 
             /**
              * SURAT TUGAS

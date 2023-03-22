@@ -393,12 +393,12 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
     public function updateMemoRescheduleV2(Request $request, $id)
     {
         $user[] = $request->id_user_maintenance;
-        $iMemo[] = $request->id_memo;
+        $ids[] = $id;
 
         $arr = [];
 
-        foreach ($iMemo[0] as $key => $memos){
-            $imMaintenance = InternalMemoMaintenance::where('id_internal_memo', $memos);
+        foreach ($ids as $key => $memos){
+            $imMaintenance = InternalMemoMaintenance::where('id_surat_tugas', $memos)->where('flag', 3);
 
             if(!empty($imMaintenance)) {
                 foreach ($user[0] as $keys => $users) {
