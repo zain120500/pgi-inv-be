@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
-Route::post('/attendanceMaintenance/{id}', 'MaintenanceController@attendanceMaintenance');
+Route::post('/attendanceMaintenance/{id}', 'InternalMemo\MaintenanceController@attendanceMaintenance');
 Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
 
 Route::group([
