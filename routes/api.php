@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InternalMemo\MaintenanceControllerV2;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
@@ -351,6 +352,19 @@ Route::group([
             Route::post('/{id}', 'InternalMemoController@update');
             Route::delete('/delete/{id}', 'InternalMemoController@destroy');
 
+        });
+
+        Route::group([
+            'prefix' => 'memoV2'
+        ], function ($router) {
+            Route::post('/internalMaintenanceV2', [MaintenanceControllerV2::class, 'internalMaintenance']);
+            Route::post('/attendanceMaintenanceV2/{id}', [MaintenanceControllerV2::class, 'attendanceMaintenance']);
+
+            /**
+             * SURAT TUGAS
+             */
+            Route::get('/getSuratTugasV2', [MaintenanceControllerV2::class, 'getSuratTugas']);
+            Route::get('/getSuratTugasByIdV2/{id}', [MaintenanceControllerV2::class, 'getSuratTugasById']);
         });
 
         Route::group([
