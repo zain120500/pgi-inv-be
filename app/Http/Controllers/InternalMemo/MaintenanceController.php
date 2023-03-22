@@ -657,9 +657,14 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
             return $response;
         }
+    }
+
+    public function testMessage()
+    {
+        $message = 'uy test';
 
         if ($message == "test") {
-                $reply = "working great!";
+            $reply = "working great!";
         } else {
             $reply = "not working!";
         }
