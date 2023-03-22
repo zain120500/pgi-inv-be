@@ -390,7 +390,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         }
     }
 
-    public function updateMemoRescheduleV2(Request $request)
+    public function updateMemoRescheduleV2(Request $request, $id)
     {
         $user[] = $request->id_user_maintenance;
         $iMemo[] = $request->id_memo;
