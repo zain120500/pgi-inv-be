@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+
+Route::post('/attendanceMaintenance/{id}', 'MaintenanceController@attendanceMaintenance');
 Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
 
 Route::group([
@@ -337,7 +339,6 @@ Route::group([
             Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');
             Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
             Route::get('/testIndexMemo', 'InternalMemoController@testIndexMemo');
-            Route::post('/attendanceMaintenance/{id}', 'MaintenanceController@attendanceMaintenance');
 
             /**
              * Internal Memo
