@@ -21,6 +21,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use stdClass;
 
 class MaintenanceController extends Controller
 {
@@ -623,53 +624,100 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
     public function webhookTest()
     {
-        $device = '089630132793';
-        $sender = '081380363569';
-        $message = 'uy test';
+header('Content-Type: application/json; charset=utf-8');
+        $myObj = new stdClass();
+        $myObj->device = "089630132793";
+        $myObj->sender = "081380363569";
+        $myObj->message = "New York";
+        $myObj->text = "New York";
+        $myObj->member = "New York";
+        $myObj->name = "New York";
+        $myObj->location = "New York";
+        $myObj->url = "www.pgi.com";
+        $myObj->filename = "New York";
+        $myObj->extension = "New York";
 
-        function sendFonnte($message)
-        {
-            $token = env("FONTE_TOKEN");
-            $curl = curl_init();
+        $myJSON = json_encode($myObj);
+$data = json_decode($myJSON, true);
+$device = $data['device'];
+$sender = $data['sender'];
+$message = $data['message'];
+$text= $data['text']; //button text
+$member= $data['member']; //group member who send the message
+$name = $data['name'];
+$location = $data['location'];
+$url =  $data['url'];
+$filename =  $data['filename'];
+$extension=  $data['extension'];
+//end
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.fonnte.com/send",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => array(
-                    'target' => '089630132793',
-                    'message' => $message,
-                    'url' => 'http://api.pusatgadai.id/api/webhookTest',
-                ),
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: $token"
-                ),
-            ));
+function sendFonnte($target, $data) {
+    $curl = curl_init();
 
-            $response = curl_exec($curl);
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://api.fonnte.com/send",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => array(
+            'target' => $target,
+            'message' => $data['message']
+        ),
+        CURLOPT_HTTPHEADER => array(
+            "Authorization: TOKEN"
+        ),
+    ));
 
-            curl_close($curl);
+    $response = curl_exec($curl);
 
-            return $response;
-        }
-    }
+    curl_close($curl);
 
-    public function testMessage()
-    {
-        $message = 'uy test';
+    return $response;
+}
 
-        if ($message == "test") {
-            $reply = "working great!";
-        } else {
-            $reply = "not working!";
-        }
+if ( $message == "test" ) {
+    $reply = [
+        "message" => "working great!",
+    ];
+} elseif ( $message == "image" ) {
+    $reply = [
+        "message" => "image message",
+        "url" => "https://filesamples.com/samples/image/jpg/sample_640%C3%97426.jpg",
+    ];
+} elseif ( $message == "audio" ) {
+    $reply = [
+        "message" => "audio message",
+        "url" => "https://filesamples.com/samples/audio/mp3/sample3.mp3",
+        "filename" => "music",
+    ];
+} elseif ( $message == "video" ) {
+    $reply = [
+        "message" => "video message",
+        "url" => "https://filesamples.com/samples/video/mp4/sample_640x360.mp4",
+    ];
+} elseif ( $message == "file" ) {
+    $reply = [
+        "message" => "file message",
+        "url" => "https://filesamples.com/samples/document/docx/sample3.docx",
+        "filename" => "document",
+    ];
+} else {
+    $reply = [
+        "message" => "Sorry, i don't understand. Please use one of the following keyword :
 
-        sendFonnte($reply);
+Test
+Audio
+Video
+Image
+File",
+    ];
+}
+
+sendFonnte($sender, $reply);
     }
 
     public function testCronJob()

@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
-Route::post('/testMessage', 'InternalMemo\MaintenanceController@testMessage');
 
 Route::group([
     // 'namespace' => 'Profile',
