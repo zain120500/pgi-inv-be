@@ -665,7 +665,9 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 CURLOPT_CUSTOMREQUEST => "POST",
                 CURLOPT_POSTFIELDS => array(
                     'target' => $target,
-                    'message' => $data['message']
+                    'message' => $data['message'],
+                    'url' => 'ww.pgi.com',
+                    'filename' => 'test',
                 ),
                 CURLOPT_HTTPHEADER => array(
                     "Authorization: TOKEN"
