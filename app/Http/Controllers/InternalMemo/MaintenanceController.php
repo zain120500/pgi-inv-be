@@ -97,7 +97,7 @@ class MaintenanceController extends Controller
                 $imMaintenance = InternalMemoMaintenance::create([
                     'id_internal_memo' => $memos,
                     'id_user_maintenance' => $users,
-                    'date' => Carbon::now(),
+                    'date' => $request->date,
                     'link' => (Str::random(5).$users),
                     'kode' => (Str::random(5)),
                     'flag' => 0,
@@ -431,9 +431,21 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         }
     }
 
+    public function getPusatStock(Request $request)
+    {
+        $bStock = StokBarang::where('pic', $request->pic)->get();
+
+        if($bStock){
+            return $this->successResponse($bStock,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function attendanceMaintenance(Request $request, $id)
     {
         $memo = InternalMemoMaintenance::where('link', $id)->first();
+
         if($memo->kode == $request->kode){
             $memo->update([
                 'flag' => 1
@@ -622,6 +634,242 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         }
     }
 
+    public function updateMemoMaintenance(Request $request)
+    {
+//        $iMemo = $request->id_memo;
+//
+//        foreach ($iMemo as $keys => $value){
+//            $memo = InternalMemo::where('id', $value)->first();
+//            $barang = InternalMemoBarang::where('id_internal_memo', $value)->get()->pluck('id_barang');
+//            $cabang = Cabang::where('id', $memo->id_cabang)->first();
+//
+//            $stock = Pemakaian::where(['id_tipe' => [$barang], 'pic' => $cabang->kode])->get();
+//
+//        }
+//        return $stock;
+
+        $iBarang = $request->id_barang;
+        $iMaintenance = $request->id_maintenance;
+        $quantity = $request->quantity;
+        $cabang = $request->cabang;
+
+        $barang = InternalMemoBarang::where('id_internal_memo', $request->id_memo);
+        $maintenance = InternalMemoMaintenance::where('id_internal_memo', $request->id_memo);
+
+        $arr = [];
+        $arrs = [];
+        if(!empty($barang)) {
+            foreach ($iBarang as $keys => $values) {
+
+                $barang->update([
+                    'id_barang' => $values,
+                    'quantity' => $quantity[$keys],
+                    'cabang_id' => $cabang[$keys]
+                ]);
+                $arr[] = $barang->first();
+            }
+        }
+
+        if(!empty($maintenance)) {
+            foreach ($iMaintenance as $key => $value) {
+
+                $maintenance->update([
+                    'id_user_maintenance' => $value,
+                ]);
+                $arrs[] = $maintenance->first();
+            }
+        }
+
+        if($barang){
+            return $this->successResponse($barang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function credelMemoMaintenance(Request $request)
+    {
+        $cIdMemo = $request->id_memo_create;
+        $cIdUserMaintenance = $request->id_user_maintenance_create;
+        $dIdMemo = $request->id_memo_del;
+        $dIdUserMaintenance = $request->id_user_maintenance_del;
+
+        $cIdBarang = $request->id_barang_create;
+        $cCabang = $request->cabang_create;
+        $dIdBarang = $request->id_barang_del;
+        $dCabang = $request->cabang_del;
+        $quantity = $request->quantity;
+
+//        if(!empty($cIdMemo) && !empty($cIdUserMaintenance)) {
+//            foreach ($cIdMemo as $keys => $values) {
+//                foreach ($cIdUserMaintenance as $key => $value) {
+//                    $user = InternalMemoMaintenance::where('id_internal_memo', $values)->where('id_user_maintenance', $value)->get()->pluck('id');
+//                    $userDel = InternalMemoMaintenance::find($user);
+//                    $userDel->each->delete();
+//                }
+//            }
+//        }else{
+//            return "Gagal";
+//        }
+//
+//        if(!empty($dIdMemo) && !empty($dIdUserMaintenance)) {
+//            foreach ($dIdMemo as $i => $val) {
+//                foreach ($dIdUserMaintenance as $v => $vals) {
+//                    InternalMemoMaintenance::create([
+//                        'id_internal_memo' => $val,
+//                        'id_user_maintenance' => $vals,
+//                        'date' => Carbon::now(),
+//                        'link' => 'asd',
+//                        'kode' => 'asd',
+//                        'flag' => 0,
+//                        'created_by' => auth()->user()->id
+//                    ]);
+//                }
+//            }
+//        }else{
+//            return "Gagal";
+//        }
+//
+//        if(!empty($dIdBarang) && !empty($dCabang)) {
+//            foreach ($dIdBarang as $keys => $values) {
+//                foreach ($dCabang as $key => $value) {
+//                    $barang = InternalMemoBarang::where('id_barang', $dIdBarang)->where('cabang_id', $value)->get()->pluck('id');
+//                    $barangDel = InternalMemoBarang::find($barang);
+//                    $barangDel->each->delete();
+//                }
+//            }
+//        }else{
+//            return "Gagal";
+//        }
+
+        if(!empty($cIdBarang) && !empty($cCabang)) {
+            foreach ($cIdBarang as $is => $val) {
+                foreach ($cCabang as $iv => $vals) {
+                    InternalMemoBarang::create([
+                        'id_internal_memo' => 9,
+                        'id_barang' => $val,
+                        'quantity' => $quantity[$iv],
+                        'cabang_id' => $vals,
+                        'created_by' => auth()->user()->id
+                    ]);
+                }
+            }
+        }else{
+            return "Gagal";
+        }
+
+        return "Success";
+    }
+
+    public function createUserMaitenance(Request $request)
+    {
+        $user = $request->id_user_maintenance;
+        $memo = $request->id_memo;
+
+        foreach ($memo as $key => $value){
+            foreach ($user as $keys => $values){
+                InternalMemoMaintenance::create([
+                    'id_internal_memo' => $value,
+                    'id_user_maintenance' => $values,
+                    'date' => $request->date,
+                    'link' => (Str::random(5).$values),
+                    'kode' => (Str::random(5)),
+                    'flag' => 0,
+                    'created_by' => auth()->user()->id
+                ]);
+            }
+        }
+    }
+
+    public function deleteUserMaintenance(Request $request)
+    {
+        $memo = $request->id_memo;
+        $user = $request->id_user_maintenance;
+
+        if(!empty($memo) && !empty($user)) {
+            foreach ($memo as $keys => $values) {
+                foreach ($user as $key => $value) {
+                    $user = InternalMemoMaintenance::where('id_internal_memo', $values)->where('id_user_maintenance', $value)->get()->pluck('id');
+                    $userDel = InternalMemoMaintenance::find($user);
+                    $userDel->each->delete();
+                }
+            }
+        }else{
+            return "Gagal";
+        }
+    }
+
+    public function createBarangMaintenance(Request $request)
+    {
+        $memo = $request->id_memo;
+        $barang = $request->id_barang;
+        $quantity = $request->quantity;
+        $kode = $request->cabang_kode;
+
+        foreach ($memo as $key => $value){
+            foreach ($barang as $keys => $values){
+                InternalMemoBarang::create([
+                    'id_internal_memo' => $value,
+                    'id_barang' => $values,
+                    'quantity' => $quantity[$keys],
+                    'cabang_id' => $kode[$keys],
+                    'created_by' => auth()->user()->id
+                ]);
+
+                $stockBarangs = StokBarang::where('id_tipe', $values)->where('pic', $kode[$keys])->first();
+
+                Pemakaian::create([
+                    'tanggal' => Carbon::now()->format('Y-m-d'),
+                    'pic' => $kode[$keys],
+                    'nomer_barang' => $stockBarangs->nomer_barang,
+                    'id_tipe' => $stockBarangs->id_tipe,
+                    'jumlah' => $quantity[$keys],
+                    'satuan' => $stockBarangs->satuan,
+                    'harga' => $stockBarangs->total_asset,
+                    'total_harga' => $stockBarangs->total_asset,
+                    'imei' => $stockBarangs->imei,
+                    'detail_barang' => $stockBarangs->detail_barang,
+                    'keperluan' => 'Kebutuhan Cabang',
+                    'pemakai' => 'Cabang',
+                    'user_input' => $stockBarangs->user_input,
+                    'last_update' => $stockBarangs->last_update
+                ]);
+            }
+        }
+    }
+
+    public function deleteBarangMaintenance(Request $request)
+    {
+        $memo = $request->id_memo;
+        $barang = $request->id_barang;
+        $cabang = $request->cabang_kode;
+
+        if(!empty($memo) && !empty($barang)) {
+            foreach ($memo as $keys => $values) {
+                foreach ($barang as $key => $value) {
+                    $iBarang = InternalMemoBarang::where('id_internal_memo', $values)->where('id_barang', $value)->get()->pluck('id');
+                    $barangDel = InternalMemoBarang::find($iBarang);
+                    $barangDel->each->delete();
+                }
+            }
+        }else{
+            return "Gagal";
+        }
+
+        if(!empty($barang) && !empty($cabang)) {
+            foreach ($barang as $keys => $values) {
+                foreach ($cabang as $key => $value) {
+                    $cab = Cabang::where('kode', $value)->get()->pluck('kode');
+                    $iBarang = Pemakaian::where('id_tipe', $values)->where('pic', $cab)->get()->pluck('id');
+                    $barangDel = Pemakaian::find($iBarang);
+                    $barangDel->each->delete();
+                }
+            }
+        }else{
+            return "Gagal";
+        }
+    }
+
     public function webhookTest()
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -651,7 +899,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $extension=  $data['extension'];
         //end
 
-        function sendFonnte($target, $data) {
+        function sendFonnte($data) {
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -664,7 +912,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "POST",
                 CURLOPT_POSTFIELDS => array(
-                    'target' => $target,
+                    'target' => '089630132793',
                     'message' => $data['message'],
                     'url' => 'ww.pgi.com',
                     'filename' => 'test',
@@ -719,7 +967,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
             ];
         }
 
-        sendFonnte($sender, $reply);
+        sendFonnte($reply);
     }
 
     public function testCronJob()
