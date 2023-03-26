@@ -31,6 +31,7 @@ Route::group([
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login')->name('login');
     Route::get('/user', 'AuthController@user');
+    Route::post('/logout', 'AuthController@logout');
 });
 
 
@@ -322,6 +323,16 @@ Route::group([
             Route::post('/updateMemoRescheduleV2', 'MaintenanceController@updateMemoRescheduleV2');
             Route::post('/updateMemoRescheduleV3', 'MaintenanceController@updateMemoRescheduleV3');
             Route::post('/testCronJob', 'MaintenanceController@testCronJob');
+
+
+            Route::get('/getPusatStock', 'MaintenanceController@getPusatStock');
+            Route::post('/updateMemoMaintenance', 'MaintenanceController@updateMemoMaintenance');
+            Route::post('/credelMemoMaintenance', 'MaintenanceController@credelMemoMaintenance');
+
+            Route::post('/createUserMaitenance', 'MaintenanceController@createUserMaitenance');
+            Route::post('/deleteUserMaintenance', 'MaintenanceController@deleteUserMaintenance');
+            Route::post('/createBarangMaintenance', 'MaintenanceController@createBarangMaintenance');
+            Route::post('/deleteBarangMaintenance', 'MaintenanceController@deleteBarangMaintenance');
 
             /**
              * RATING MEMO

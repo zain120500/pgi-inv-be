@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Constants;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidateUserRegistration;
@@ -58,11 +59,11 @@ class AuthController extends Controller
 
         $cabang = "";
         if ($user->role_id == 3) {         //Jika Kepala Unit (3)
-            $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
+            $cabang = Cabang::select('id','name', 'kode')->where('kepala_unit_id', $user->id)->first();
         } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
-            $cabang = Cabang::select('id','name')->where('kepala_cabang_id', $user->id)->get();
+            $cabang = Cabang::select('id','name', 'kode')->where('kepala_cabang_id', $user->id)->first();
         } elseif ($user->role_id == 5) {        //Jika Kepala Cabang Senior (5)
-            $cabang = Cabang::select('id','name')->where('kepala_cabang_senior_id', $user->id)->get();
+            $cabang = Cabang::select('id','name', 'kode')->where('kepala_cabang_senior_id', $user->id)->first();
         }
 
         $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
@@ -91,5 +92,16 @@ class AuthController extends Controller
         return $user;
         // return auth()->user();
        //return new UserResource(auth()->user());
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+        auth()->invalidate(true);
+
+        return response()->json([
+            'code' => 200,
+            'status' => Constants::HTTP_MESSAGE_200
+        ]);
     }
 }
