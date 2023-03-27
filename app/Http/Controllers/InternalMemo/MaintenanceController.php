@@ -20,6 +20,7 @@ use App\Model\UserMaintenance;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use stdClass;
 
@@ -868,6 +869,22 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         }else{
             return "Gagal";
         }
+    }
+
+    public function getStockBarangV2(Request $request)
+    {
+        $cabang = Cabang::where('id', $request->id_cabang)->first();
+
+        $stockBarang = StokBarang::where('pic', $cabang->kode)->get();
+
+        return $stockBarang;
+    }
+
+    public function getListMaintenance()
+    {
+        $listMaintenance = UserMaintenance::withCount('internalMemoMaintenance')->get();
+
+        return $listMaintenance;
     }
 
     public function webhookTest()
