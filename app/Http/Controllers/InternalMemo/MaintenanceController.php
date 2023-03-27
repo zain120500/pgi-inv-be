@@ -902,11 +902,12 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $stockBarang = StokBarang::where('pic', $cabang->kode)->get();
         $barangTipe = [];
         foreach ($stockBarang as $key => $value){
-            $barangTipe[] = BarangTipe::where('id', $value->id_tipe)->with('stockBarang')->first();
+            $barangTipe = BarangTipe::where('id', $value->id_tipe)->with('stockBarang')->first();
         }
+        $test = $barangTipe->paginate(10);
 
-        if($barangTipe){
-            return $this->successResponse($barangTipe,Constants::HTTP_MESSAGE_200, 200);
+        if($test){
+            return $this->successResponse($test,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
