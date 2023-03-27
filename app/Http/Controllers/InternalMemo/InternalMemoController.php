@@ -552,30 +552,30 @@ class InternalMemoController extends Controller
 
     public function menuArchive(Request $request)
     {
-        $record = InternalMemo::where('flag', 4)->orderBy('created_at', 'DESC')->paginate(15);
+        $record = InternalMemo::where('flag', 4)->where('flag', 3)->orderBy('created_at', 'DESC')->paginate(15);
 
         if($request->im_number){
-            $record = InternalMemo::where('flag', 4)->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_fpp){
-            $record = InternalMemo::where('flag', 4)->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_jenis_fpp){
-            $record = InternalMemo::where('flag', 4)->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_sub_fpp){
-            $record = InternalMemo::where('flag', 4)->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_devisi){
-            $record = InternalMemo::where('flag', 4)->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_cabang){
-            $record = InternalMemo::where('flag', 4)->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->paginate(15);
         }else if($request->created_at){
-            $record = InternalMemo::where('flag', 4)->orderBy('created_at', $request->created_at)->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->orderBy('created_at', $request->created_at)->paginate(15);
         }else if($request->startDate && $request->endDate){
             $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
             $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
-            $record = InternalMemo::where('flag', 4)->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
         }else if($request->id_cabang_multiple) {
             $id_cabang_multiple = $request->id_cabang_multiple;
-            $record = InternalMemo::where('flag', 4)->orderBy('created_at', 'DESC')
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->orderBy('created_at', 'DESC')
                 ->whereIn('id_cabang', $id_cabang_multiple)->paginate(15);
         }
 
@@ -590,7 +590,7 @@ class InternalMemoController extends Controller
         });
 
         if($request->kabupaten_kota_id) {
-            $record = InternalMemo::where('flag', 4)->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
                 $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
             })->paginate(15);
         }
