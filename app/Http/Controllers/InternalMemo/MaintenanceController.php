@@ -769,7 +769,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
         foreach ($memo as $key => $value){
             foreach ($user as $keys => $values){
-                InternalMemoMaintenance::create([
+                $imMainteance = InternalMemoMaintenance::create([
                     'id_internal_memo' => $value,
                     'id_user_maintenance' => $values,
                     'date' => $request->date,
@@ -779,6 +779,12 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                     'created_by' => auth()->user()->id
                 ]);
             }
+        }
+
+        if($imMainteance){
+            return $this->successResponse($imMainteance,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -796,7 +802,13 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 }
             }
         }else{
-            return "Gagal";
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+
+        if($user){
+            return $this->successResponse($user,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -809,7 +821,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
         foreach ($memo as $key => $value){
             foreach ($barang as $keys => $values){
-                InternalMemoBarang::create([
+                $imBarang = InternalMemoBarang::create([
                     'id_internal_memo' => $value,
                     'id_barang' => $values,
                     'quantity' => $quantity[$keys],
@@ -837,6 +849,12 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 ]);
             }
         }
+
+        if($imBarang){
+            return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 
     public function deleteBarangMaintenance(Request $request)
@@ -854,7 +872,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 }
             }
         }else{
-            return "Gagal";
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
 
         if(!empty($barang) && !empty($cabang)) {
@@ -867,7 +885,13 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 }
             }
         }else{
-            return "Gagal";
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+
+        if($iBarang){
+            return $this->successResponse($iBarang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -876,15 +900,27 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $cabang = Cabang::where('id', $request->id_cabang)->first();
 
         $stockBarang = StokBarang::where('pic', $cabang->kode)->get();
+        $barangTipe = [];
+        foreach ($stockBarang as $key => $value){
+            $barangTipe[] = BarangTipe::where('id', $value->id_tipe)->with('stockBarang')->first();
+        }
 
-        return $stockBarang;
+        if($barangTipe){
+            return $this->successResponse($barangTipe,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 
     public function getListMaintenance()
     {
         $listMaintenance = UserMaintenance::withCount('internalMemoMaintenance')->get();
 
-        return $listMaintenance;
+        if($listMaintenance){
+            return $this->successResponse($listMaintenance,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 
     public function webhookTest()
