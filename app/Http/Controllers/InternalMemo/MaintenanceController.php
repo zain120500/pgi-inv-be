@@ -907,10 +907,9 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 //        $test = $barangTipe->paginate(10);
 
         $barangTipe = BarangTipe::with('stockBarang')->orderBy('id', 'DESC')->paginate(10);
-        return $barangTipe;
 
-        if($test){
-            return $this->successResponse($test,Constants::HTTP_MESSAGE_200, 200);
+        if($barangTipe){
+            return $this->successResponse($barangTipe,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
