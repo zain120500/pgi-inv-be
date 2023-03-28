@@ -14,4 +14,8 @@ class UserMaintenance extends Model
     {
         return $this->hasMany('App\Model\InternalMemoMaintenance', 'id_user_maintenance', 'id');
     }
+
+    public function resultJob() {
+        return $this->internalMemoMaintenance()->where('flag','=', 0);
+    }
 }

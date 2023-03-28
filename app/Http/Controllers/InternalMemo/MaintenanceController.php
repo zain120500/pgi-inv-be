@@ -918,7 +918,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
     public function getListMaintenance()
     {
-        $listMaintenance = UserMaintenance::withCount('internalMemoMaintenance')->get();
+        $listMaintenance = UserMaintenance::withCount('resultJob')->get();
 
         if($listMaintenance){
             return $this->successResponse($listMaintenance,Constants::HTTP_MESSAGE_200, 200);
