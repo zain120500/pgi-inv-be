@@ -897,14 +897,17 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
     public function getStockBarangV2(Request $request)
     {
-        $cabang = Cabang::where('id', $request->id_cabang)->first();
+//        $cabang = Cabang::where('id', $request->id_cabang)->first();
+//
+//        $stockBarang = StokBarang::where('pic', $cabang->kode)->get();
+//        $barangTipe = [];
+//        foreach ($stockBarang as $key => $value){
+//            $barangTipe = BarangTipe::where('id', $value->id_tipe)->with('stockBarang')->first();
+//        }
+//        $test = $barangTipe->paginate(10);
 
-        $stockBarang = StokBarang::where('pic', $cabang->kode)->get();
-        $barangTipe = [];
-        foreach ($stockBarang as $key => $value){
-            $barangTipe = BarangTipe::where('id', $value->id_tipe)->with('stockBarang')->first();
-        }
-        $test = $barangTipe->paginate(10);
+        $barangTipe = BarangTipe::with('stockBarang')->orderBy('id', 'DESC')->paginate(10);
+        return $barangTipe;
 
         if($test){
             return $this->successResponse($test,Constants::HTTP_MESSAGE_200, 200);
