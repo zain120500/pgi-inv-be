@@ -13,4 +13,9 @@ class StokBarang extends Model
 
     protected $hidden = array('created_at', 'updated_at');
 
+    function barangTipe()
+    {
+        return $this->hasOne('App\Model\BarangTipe', 'id', 'id_tipe');
+    }
+
 }
