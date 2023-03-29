@@ -767,7 +767,16 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $user = $request->id_user_maintenance;
         $memo = $request->id_memo;
 
+        $arr = [];
         foreach ($memo as $key => $value){
+            $update = InternalMemoMaintenance::where('id_internal_memo', $value);
+
+            $update->update([
+                'date' => $request->date,
+                'created_by' => auth()->user()->id
+            ]);
+            $arr[] = $update->first();
+
             foreach ($user as $keys => $values){
                 $imMainteance = InternalMemoMaintenance::create([
                     'id_internal_memo' => $value,
