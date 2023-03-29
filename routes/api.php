@@ -336,6 +336,7 @@ Route::group([
             Route::get('/getStockBarangV2', 'MaintenanceController@getStockBarangV2');
             Route::get('/getListMaintenance', 'MaintenanceController@getListMaintenance');
             Route::post('/newInternalMaintenance/test', 'MaintenanceController@newInternalMaintenance');
+            Route::get('/getDetailBarang', 'MaintenanceController@getDetailBarang');
 
             /**
              * RATING MEMO

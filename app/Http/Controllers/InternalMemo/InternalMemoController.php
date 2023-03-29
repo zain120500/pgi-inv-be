@@ -6,6 +6,7 @@ use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
+use App\Model\StokBarang;
 use App\Model\UserMaintenance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -168,7 +169,10 @@ class InternalMemoController extends Controller
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->memoRating;
-        $query->internalMemoBarang;
+        $internalMemoBarang = $query->internalMemoBarang;
+        foreach ($internalMemoBarang as $keys => $values){
+            StokBarang::where('id_tipe', $values->id_barang)->get();
+        }
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
         foreach ($listHistoryMemo as $key => $value) {
