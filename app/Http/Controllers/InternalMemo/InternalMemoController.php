@@ -810,10 +810,12 @@ class InternalMemoController extends Controller
             return "Request Batal";
         } else if($id == 8){
             return "Batal";
+        }else if($id == 9){
+            return "Dihapus";
         } else if($id == 10){
-            return "DiHapus";
+            return "Ditolak";
         } else if($id == 11){
-            return "DiTolak";
+            return "Reschedule";
         }
     }
 
