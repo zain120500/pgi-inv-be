@@ -830,11 +830,12 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
         foreach ($memo as $key => $value){
             foreach ($barang as $keys => $values){
+                $cabang = Cabang::where('kode', $kode[$keys])->first();
                 $imBarang = InternalMemoBarang::create([
                     'id_internal_memo' => $value,
                     'id_barang' => $values,
                     'quantity' => $quantity[$keys],
-                    'cabang_id' => $kode[$keys],
+                    'cabang_id' => $cabang->id,
                     'created_by' => auth()->user()->id
                 ]);
 
@@ -1016,6 +1017,24 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
 
         if($imBarang){
             return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function getDetailBarang(Request $request)
+    {
+        $barang = $request->id_barang;
+        $cabang = $request->cabang_id;
+
+        $stock = [];
+        foreach ($cabang as $key => $value){
+            $cab = Cabang::where('id', $value)->get()->pluck('kode');
+            $stock[] = StokBarang::where('id_tipe', $barang[$key])->where('pic', $cab)->with('barangTipe')->first();
+        }
+
+        if($stock){
+            return $this->successResponse($stock,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
