@@ -4,6 +4,7 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\Cabang;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
 use App\Model\StokBarang;
@@ -170,9 +171,10 @@ class InternalMemoController extends Controller
         $query->kategoriSub;
         $query->memoRating;
         $internalMemoBarang = $query->internalMemoBarang;
-        foreach ($internalMemoBarang as $keys => $values){
-            StokBarang::where('id_tipe', $values->id_barang)->get();
-        }
+//        foreach ($internalMemoBarang as $keys => $values){
+//            $cabs = Cabang::where('id', $query->cabang->id)->first();
+//            $query->arr = StokBarang::where('id_tipe', $values->id_barang)->where('pic', $cabs->kode)->get();
+//        }
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
         foreach ($listHistoryMemo as $key => $value) {
@@ -335,14 +337,14 @@ class InternalMemoController extends Controller
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
         $internalMemo->update([
-            'flag' => 8
+            'flag' => 10
         ]);
 
         $create = HistoryMemo::create([
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
-            "status"=> 11,
-            "keterangan"=> $this->getFlagStatus(11).' '.auth()->user()->name
+            "status"=> 10,
+            "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name
         ]);
 
         if($create){
@@ -364,15 +366,15 @@ class InternalMemoController extends Controller
 
             if($pic->kategori_proses == 1 || $pic->kategori_proses == 2){
                 InternalMemo::where('id', $value)->update([
-                    'flag' => 8
+                    'flag' => 10
                 ]);
             }
 
             $create = HistoryMemo::create([
                 "id_internal_memo"=> $value,
                 "user_id"=> auth()->user()->id,
-                "status"=> 8,
-                "keterangan"=> $this->getFlagStatus(8).' '.auth()->user()->name
+                "status"=> 10,
+                "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name
             ]);
 
         }
