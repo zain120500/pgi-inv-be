@@ -1069,7 +1069,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
         $extension=  $data['extension'];
         //end
 
-        function sendFonnte($data) {
+        function sendFonnte($target, $data) {
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -1082,10 +1082,8 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "POST",
                 CURLOPT_POSTFIELDS => array(
-                    'target' => '089630132793',
+                    'target' => $target,
                     'message' => $data['message'],
-                    'url' => 'ww.pgi.com',
-                    'filename' => 'test',
                 ),
                 CURLOPT_HTTPHEADER => array(
                     "Authorization: TOKEN"
@@ -1137,7 +1135,7 @@ url : http://localhost:8000/api/internal-memo/memo/webhookTest
             ];
         }
 
-        sendFonnte($reply);
+        sendFonnte($sender, $reply);
     }
 
     public function testCronJob()
