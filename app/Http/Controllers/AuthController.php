@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Constants;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidateUserRegistration;
@@ -98,5 +99,16 @@ class AuthController extends Controller
         return $user;
         // return auth()->user();
        //return new UserResource(auth()->user());
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+        auth()->invalidate(true);
+
+        return response()->json([
+            'code' => 200,
+            'status' => Constants::HTTP_MESSAGE_200
+        ]);
     }
 }

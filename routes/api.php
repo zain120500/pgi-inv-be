@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InternalMemo\MaintenanceControllerV2;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
+Route::post('/attendanceMaintenance/{id}', 'InternalMemo\MaintenanceController@attendanceMaintenance');
+Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
+
 Route::group([
     // 'namespace' => 'Profile',
     'prefix' => 'auth'
@@ -27,6 +31,7 @@ Route::group([
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login')->name('login');
     Route::get('/user', 'AuthController@user');
+    Route::post('/logout', 'AuthController@logout');
 });
 
 
@@ -331,8 +336,22 @@ Route::group([
             Route::get('/barangStock', 'MaintenanceController@getBarangStock');
             Route::post('/updateMemoRescheduleV1', 'MaintenanceController@updateMemoRescheduleV1');
             Route::post('/updateMemoRescheduleV2', 'MaintenanceController@updateMemoRescheduleV2');
-            Route::post('/webhookTest', 'MaintenanceController@webhookTest');
+            Route::post('/updateMemoRescheduleV3', 'MaintenanceController@updateMemoRescheduleV3');
             Route::post('/testCronJob', 'MaintenanceController@testCronJob');
+
+
+            Route::get('/getPusatStock', 'MaintenanceController@getPusatStock');
+            Route::post('/updateMemoMaintenance', 'MaintenanceController@updateMemoMaintenance');
+            Route::post('/credelMemoMaintenance', 'MaintenanceController@credelMemoMaintenance');
+
+            Route::post('/createUserMaitenance', 'MaintenanceController@createUserMaitenance');
+            Route::post('/deleteUserMaintenance', 'MaintenanceController@deleteUserMaintenance');
+            Route::post('/createBarangMaintenance', 'MaintenanceController@createBarangMaintenance');
+            Route::post('/deleteBarangMaintenance', 'MaintenanceController@deleteBarangMaintenance');
+            Route::get('/getStockBarangV2', 'MaintenanceController@getStockBarangV2');
+            Route::get('/getListMaintenance', 'MaintenanceController@getListMaintenance');
+            Route::post('/newInternalMaintenance/test', 'MaintenanceController@newInternalMaintenance');
+            Route::get('/getDetailBarang', 'MaintenanceController@getDetailBarang');
 
             /**
              * RATING MEMO
@@ -350,7 +369,6 @@ Route::group([
             Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');
             Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
             Route::get('/testIndexMemo', 'InternalMemoController@testIndexMemo');
-            Route::post('/attendanceMaintenance/{id}', 'MaintenanceController@attendanceMaintenance');
 
             /**
              * Internal Memo
@@ -365,6 +383,20 @@ Route::group([
             Route::post('/{id}', 'InternalMemoController@update');
             Route::delete('/delete/{id}', 'InternalMemoController@destroy');
 
+        });
+
+        Route::group([
+            'prefix' => 'memoV2'
+        ], function ($router) {
+            Route::post('/internalMaintenanceV2', [MaintenanceControllerV2::class, 'internalMaintenance']);
+            Route::post('/attendanceMaintenanceV2/{id}', [MaintenanceControllerV2::class, 'attendanceMaintenance']);
+            Route::post('/updateMemoRescheduleV2/{id}', [MaintenanceControllerV2::class, 'updateMemoRescheduleV2']);
+
+            /**
+             * SURAT TUGAS
+             */
+            Route::get('/getSuratTugasV2', [MaintenanceControllerV2::class, 'getSuratTugas']);
+            Route::get('/getSuratTugasByIdV2/{id}', [MaintenanceControllerV2::class, 'getSuratTugasById']);
         });
 
         Route::group([

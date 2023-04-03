@@ -4,8 +4,10 @@ namespace App\Http\Controllers\InternalMemo;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\Cabang;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
+use App\Model\StokBarang;
 use App\Model\UserMaintenance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -168,6 +170,11 @@ class InternalMemoController extends Controller
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->memoRating;
+        $internalMemoBarang = $query->internalMemoBarang;
+//        foreach ($internalMemoBarang as $keys => $values){
+//            $cabs = Cabang::where('id', $query->cabang->id)->first();
+//            $query->arr = StokBarang::where('id_tipe', $values->id_barang)->where('pic', $cabs->kode)->get();
+//        }
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
         foreach ($listHistoryMemo as $key => $value) {
@@ -330,14 +337,14 @@ class InternalMemoController extends Controller
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
         $internalMemo->update([
-            'flag' => 8
+            'flag' => 10
         ]);
 
         $create = HistoryMemo::create([
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
-            "status"=> 11,
-            "keterangan"=> $this->getFlagStatus(11).' '.auth()->user()->name
+            "status"=> 10,
+            "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name
         ]);
 
         if($create){
@@ -359,15 +366,15 @@ class InternalMemoController extends Controller
 
             if($pic->kategori_proses == 1 || $pic->kategori_proses == 2){
                 InternalMemo::where('id', $value)->update([
-                    'flag' => 8
+                    'flag' => 10
                 ]);
             }
 
             $create = HistoryMemo::create([
                 "id_internal_memo"=> $value,
                 "user_id"=> auth()->user()->id,
-                "status"=> 8,
-                "keterangan"=> $this->getFlagStatus(8).' '.auth()->user()->name
+                "status"=> 10,
+                "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name
             ]);
 
         }
@@ -551,30 +558,30 @@ class InternalMemoController extends Controller
 
     public function menuArchive(Request $request)
     {
-        $record = InternalMemo::where('flag', 4)->orderBy('created_at', 'DESC')->paginate(15);
+        $record = InternalMemo::whereIn('flag', [4, 3, 10])->orderBy('created_at', 'DESC')->paginate(15);
 
         if($request->im_number){
-            $record = InternalMemo::where('flag', 4)->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_fpp){
-            $record = InternalMemo::where('flag', 4)->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_jenis_fpp){
-            $record = InternalMemo::where('flag', 4)->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_sub_fpp){
-            $record = InternalMemo::where('flag', 4)->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_devisi){
-            $record = InternalMemo::where('flag', 4)->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_cabang){
-            $record = InternalMemo::where('flag', 4)->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->paginate(15);
         }else if($request->created_at){
-            $record = InternalMemo::where('flag', 4)->orderBy('created_at', $request->created_at)->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->orderBy('created_at', $request->created_at)->paginate(15);
         }else if($request->startDate && $request->endDate){
             $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
             $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
-            $record = InternalMemo::where('flag', 4)->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
+            $record = InternalMemo::where('flag', 4)->where('flag', 3)->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
         }else if($request->id_cabang_multiple) {
             $id_cabang_multiple = $request->id_cabang_multiple;
-            $record = InternalMemo::where('flag', 4)->orderBy('created_at', 'DESC')
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->orderBy('created_at', 'DESC')
                 ->whereIn('id_cabang', $id_cabang_multiple)->paginate(15);
         }
 
@@ -589,7 +596,7 @@ class InternalMemoController extends Controller
         });
 
         if($request->kabupaten_kota_id) {
-            $record = InternalMemo::where('flag', 4)->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
+            $record = InternalMemo::whereIn('flag', [4, 3, 10])->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
                 $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
             })->paginate(15);
         }
@@ -803,10 +810,12 @@ class InternalMemoController extends Controller
             return "Request Batal";
         } else if($id == 8){
             return "Batal";
+        }else if($id == 9){
+            return "Dihapus";
         } else if($id == 10){
-            return "DiHapus";
+            return "Ditolak";
         } else if($id == 11){
-            return "DiTolak";
+            return "Reschedule";
         }
     }
 

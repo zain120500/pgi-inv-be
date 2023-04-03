@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        '/api/*',
+        'http://api.pusatgadai.id/api/webhookTest'
     ];
 }
