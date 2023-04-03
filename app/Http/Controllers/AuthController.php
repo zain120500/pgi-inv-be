@@ -58,7 +58,7 @@ class AuthController extends Controller
             }
         }
 
-        $cabang = "";
+        // $cabang = "";
         // if ($user->role_id == 3) {         //Jika Kepala Unit (3)
         //     $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
         // } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
@@ -67,7 +67,7 @@ class AuthController extends Controller
         //     $cabang = Cabang::select('id','name')->where('kepala_cabang_senior_id', $user->id)->get();
         // }
 
-        $cabang = UserStaffCabang::select('cabang.id','cabang.name')
+        $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
             ->where('user_staff_id', auth()->user()->id)
             
             ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')

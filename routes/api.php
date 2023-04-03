@@ -139,6 +139,7 @@ Route::group([
         'prefix' => 'cabang-user'
     ], function ($router) {
         Route::get('/', 'CabangUserController@index');
+        Route::post('/list', 'CabangUserController@getCabangUser');
         Route::post('/{id}', 'CabangUserController@update');
         Route::get('/user-kcs', 'CabangUserController@getUserKCS');
         Route::get('/user-kc', 'CabangUserController@getUserKC');
@@ -146,8 +147,6 @@ Route::group([
         // Route::get('/{id}', 'CabangUserController@show');
 
         Route::post('/update', 'CabangUserController@userCabangUpdate');
-        Route::get('/user/{id}', 'CabangUserController@getCabangUser');
-
         
         
         // Route::post('/', 'CabangUserController@store');
