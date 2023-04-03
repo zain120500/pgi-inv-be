@@ -9,6 +9,7 @@ class Role extends Model
     protected $table = 'role';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+    protected $hidden = array('created_at', 'updated_at', 'updated_by_id','created_by_id','old_id');
 
 
     public function user()

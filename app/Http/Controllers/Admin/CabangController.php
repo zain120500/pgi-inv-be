@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Model\Cabang;
+use App\Model\UserStaffCabang;
+
 
 class CabangController extends Controller
 {
@@ -73,12 +75,18 @@ class CabangController extends Controller
     public function show($id)
     {
         $cabang = Cabang::find($id);
+        $userCabang = UserStaffCabang::where('cabang_id',$cabang->id)->get();
 
-        if(!empty($cabang)){
-            return $this->successResponse($cabang,'Success', 200);
-        } else {
-            return $this->errorResponse('Data is Null', 403);
-        }
+        $userCabang->map(function ($q) {
+            $q->user;
+            $q->role;
+        });
+
+        return response()->json([
+            'type' =>'success',
+            'cabang' => $cabang,
+            'userCabang' => $userCabang
+        ]);
     }
 
     public function edit($id)

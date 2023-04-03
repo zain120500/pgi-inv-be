@@ -8,6 +8,7 @@ use App\Model\Cabang;
 use App\Model\RoleMenu;
 use App\Model\Role;
 use App\User;
+use App\Model\UserStaffCabang;
 
 class CabangUserController extends Controller
 {
@@ -52,28 +53,48 @@ class CabangUserController extends Controller
         }
     }
 
-    public function create()
-    {
-        //
+    public function getCabangUser($id){
+        
+        $query = UserStaffCabang::where('user_staff_id', $id)->get();
+        $user = User::find($id);
+        $role = Role::select('id','name','level')->where('id',$user->role_id)->first();
+
+        foreach ($query as $key => $q) {
+            $cabang[] = Cabang::select('id','name')->where('id',$q->cabang_id)->first();
+        }
+
+        return response()->json([
+            'type' =>'success',
+            'user' => $user,
+            'cabang' => $cabang,
+        ]);
+
     }
 
-    public function store(Request $request)
+    public function update(Request $request)
     {
-        //
+        $cabangs = $request->cabang_id;
+
+        $querys = UserStaffCabang::where('user_staff_id', $request->user_staff_id)->delete();
+
+        $user = User::find($request->user_staff_id);
+
+        foreach ($cabangs as $key => $cabang) {
+            $query = UserStaffCabang::create([
+                "user_staff_id"=> $request->user_staff_id,
+                "cabang_id"=> $cabang,
+                "role_id"=> $user->role_id,
+            ]);
+        }
+
+        if(!empty($query)){
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data update Error', 403);
+        }
     }
 
-    public function show($id)
-    {
-        //
-    }
-
-    public function edit($id)
-    {
-        //
-    }
-
-    public function update(Request $request, $id)
-    {        
+    public function userCabangUpdate(){
         $cabang = Cabang::where('id', $id)->update([
             "kepala_cabang_id"=> $request->kepala_cabang_id,
             "kepala_cabang_senior_id"=> $request->kepala_cabang_senior_id,

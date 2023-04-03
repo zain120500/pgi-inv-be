@@ -16,6 +16,8 @@ use App\Model\PengirimanKategori;
 use App\Model\InternalMemoPengiriman;
 use App\Model\BarangTipe;
 use App\Model\BarangKeluar;
+use App\Model\UserStaffCabang;
+
 use DB;
 
 class PengirimanController extends Controller
