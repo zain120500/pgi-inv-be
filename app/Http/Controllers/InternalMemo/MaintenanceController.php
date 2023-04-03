@@ -216,21 +216,29 @@ class MaintenanceController extends Controller
     /**
      * Whatsupp Pesan Saat Membuat Tugas Maintenance
      */
-    public function whatsuppMessage($id)
+    public function whatsuppMessage(Request $request)
     {
-        $test[] = $id;
+        $test[] = $request->id;
         $user = array();
+//        foreach ($test as $key => $value){
+//            $memo = InternalMemo::where('id', $value)->first();
+//            $cabang = Cabang::where('id', $memo->id_cabang)->first();
+//            $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get()->pluck('id_user_maintenance');
+//
+//            foreach ($maintenanceUser as $values){
+//                $imUser = InternalMemoMaintenance::where('id_user_maintenance',  $values)->first();
+//                $user = UserMaintenance::where('id', $values)->first();
+//                $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
+//                $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
+//            }
+//        }
         foreach ($test as $key => $value){
             $memo = InternalMemo::where('id', $value)->first();
             $cabang = Cabang::where('id', $memo->id_cabang)->first();
-            $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get()->pluck('id_user_maintenance');
-            $imUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->first();
-
-            foreach ($maintenanceUser as $values){
-                $user = UserMaintenance::where('id', $values)->first();
-                $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
-                $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
-            }
+            $imUser = InternalMemoMaintenance::where('id_internal_memo',  $memo->id)->first();
+            $user = UserMaintenance::where('id', $imUser->id_user_maintenance)->first();
+            $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
+            $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
         }
     }
 
@@ -259,7 +267,7 @@ class MaintenanceController extends Controller
     Alamat : *$cabang->alamat*
     Maintenance : *$user->nama*
     No Telp Maintenance : *$user->no_telp*
-    Tanggal Pekerjaan : *$user->created_at*
+    Tanggal Pekerjaan : *$imUser->date*
     Kode Maintenance : *$imUser->kode*
     ",
             ),
@@ -299,11 +307,9 @@ Cabang : *$cabang->name*
 Alamat : *$cabang->alamat*
 Telp Cabang : *$cabang->telepon*
 Maintenance : *$user->nama*
-No Telp Maintenance : *$user->no_telp*
-Tanggal Pekerjaan : *$user->created_at*
-Link : https://portal.pusatgadai.id/$imUser->link
+Tanggal Pekerjaan : *$imUser->date*
+Link : https://portal.pusatgadai.id/konfirmasi-kehadiran/$imUser->link
 Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
-url : http://localhost:8000/api/internal-memo/memo/webhookTest
                 ",
             ),
             CURLOPT_HTTPHEADER => array(
