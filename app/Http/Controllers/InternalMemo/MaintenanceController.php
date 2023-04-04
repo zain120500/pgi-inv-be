@@ -916,9 +916,13 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
     public function getStockBarangV2(Request $request)
     {
         $value = $request->tipe;
-        $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value) {
-            $q->where('tipe', '=', $value);
-        })->paginate(10);
+        if(!empty($request->tipe)){
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value) {
+                $q->where('tipe', 'like', $value);
+            })->paginate(10);
+        }else{
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->paginate(10);
+        }
 
         if($stockBarang){
             return $this->successResponse($stockBarang,Constants::HTTP_MESSAGE_200, 200);
