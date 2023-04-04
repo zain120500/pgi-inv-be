@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ValidateUserRegistration;
 use App\Http\Requests\ValidateUserLogin;
 use App\User;
+use App\Model\UserStaffCabang;
 use App\Model\RoleMenu;
 use App\Model\Role;
 use App\Model\Menu;
@@ -58,6 +59,7 @@ class AuthController extends Controller
         }
 
         $cabang = "";
+<<<<<<< HEAD
         if ($user->role_id == 3) {         //Jika Kepala Unit (3)
             $cabang = Cabang::select('id','name', 'kode')->where('kepala_unit_id', $user->id)->first();
         } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
@@ -65,6 +67,21 @@ class AuthController extends Controller
         } elseif ($user->role_id == 5) {        //Jika Kepala Cabang Senior (5)
             $cabang = Cabang::select('id','name', 'kode')->where('kepala_cabang_senior_id', $user->id)->first();
         }
+=======
+        // if ($user->role_id == 3) {         //Jika Kepala Unit (3)
+        //     $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
+        // } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
+        //     $cabang = Cabang::select('id','name')->where('kepala_cabang_id', $user->id)->get();
+        // } elseif ($user->role_id == 5) {        //Jika Kepala Cabang Senior (5)
+        //     $cabang = Cabang::select('id','name')->where('kepala_cabang_senior_id', $user->id)->get();
+        // }
+
+        $cabang = UserStaffCabang::select('cabang.id','cabang.name')
+            ->where('user_staff_id', auth()->user()->id)
+            
+            ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
+            ->get();
+>>>>>>> 1c31e73 (update Cabang)
 
         $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
 

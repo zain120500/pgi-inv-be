@@ -143,7 +143,13 @@ Route::group([
         Route::get('/user-kcs', 'CabangUserController@getUserKCS');
         Route::get('/user-kc', 'CabangUserController@getUserKC');
         Route::get('/user-ku', 'CabangUserController@getUserKU');
-        Route::get('/{id}', 'CabangUserController@show');
+        // Route::get('/{id}', 'CabangUserController@show');
+
+        Route::post('/update', 'CabangUserController@userCabangUpdate');
+        Route::get('/user/{id}', 'CabangUserController@getCabangUser');
+
+        
+        
         // Route::post('/', 'CabangUserController@store');
         // Route::delete('/delete/{id}', 'CabangUserController@destroy');
     });
@@ -249,6 +255,15 @@ Route::group([
         Route::group([
             'prefix' => 'pengiriman'
         ], function ($router) {
+
+            Route::group([
+                'prefix' => 'cabang'
+            ], function ($router) {
+                Route::get('/pengirim', 'PengirimanController@cabangPengirim');
+
+            });
+
+
             Route::post('/cabang', 'PengirimanController@getCabang');
             Route::post('/cabangPusat', 'PengirimanController@getCabangPusat');
 
