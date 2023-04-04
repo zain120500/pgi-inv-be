@@ -57,21 +57,7 @@ class AuthController extends Controller
                 }
             }
         }
-
-<<<<<<< HEAD
-        $cabang = "";
-<<<<<<< HEAD
-        if ($user->role_id == 3) {         //Jika Kepala Unit (3)
-            $cabang = Cabang::select('id','name', 'kode')->where('kepala_unit_id', $user->id)->first();
-        } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
-            $cabang = Cabang::select('id','name', 'kode')->where('kepala_cabang_id', $user->id)->first();
-        } elseif ($user->role_id == 5) {        //Jika Kepala Cabang Senior (5)
-            $cabang = Cabang::select('id','name', 'kode')->where('kepala_cabang_senior_id', $user->id)->first();
-        }
-=======
-=======
         // $cabang = "";
->>>>>>> 5abdd5b (cabang user list)
         // if ($user->role_id == 3) {         //Jika Kepala Unit (3)
         //     $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
         // } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
@@ -85,7 +71,6 @@ class AuthController extends Controller
             
             ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
             ->get();
->>>>>>> 1c31e73 (update Cabang)
 
         $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
 
