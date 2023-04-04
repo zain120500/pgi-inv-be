@@ -68,7 +68,7 @@ class AuthController extends Controller
 
         $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
             ->where('user_staff_id', auth()->user()->id)
-            
+
             ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
             ->get();
 
