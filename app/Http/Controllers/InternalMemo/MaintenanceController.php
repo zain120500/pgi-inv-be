@@ -216,36 +216,38 @@ class MaintenanceController extends Controller
     /**
      * Whatsupp Pesan Saat Membuat Tugas Maintenance
      */
-    public function whatsuppMessage(Request $request)
+    public function whatsuppMessage($memos)
     {
-        $test[] = $request->id;
+        $test[] = $memos;
         $user = array();
-//        foreach ($test as $key => $value){
-//            $memo = InternalMemo::where('id', $value)->first();
-//            $cabang = Cabang::where('id', $memo->id_cabang)->first();
-//            $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get()->pluck('id_user_maintenance');
-//
-//            foreach ($maintenanceUser as $values){
-//                $imUser = InternalMemoMaintenance::where('id_user_maintenance',  $values)->first();
-//                $user = UserMaintenance::where('id', $values)->first();
-//                $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
-//                $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
-//            }
-//        }
         foreach ($test as $key => $value){
             $memo = InternalMemo::where('id', $value)->first();
             $cabang = Cabang::where('id', $memo->id_cabang)->first();
-            $imUser = InternalMemoMaintenance::where('id_internal_memo',  $memo->id)->first();
-            $user = UserMaintenance::where('id', $imUser->id_user_maintenance)->first();
-            $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
-            $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
+            $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get();
+
+            foreach ($maintenanceUser as $keys => $values){
+
+                $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
+                $this->ProceesWaCabang($memo, $cabang, $user, $values);
+                $this->ProceesWaMaintenance($memo, $cabang, $user, $values);
+            }
+
+
         }
+//        foreach ($test as $key => $value){
+//            $memo = InternalMemo::where('id', $value)->first();
+//            $cabang = Cabang::where('id', $memo->id_cabang)->first();
+//            $imUser = InternalMemoMaintenance::where('id_internal_memo',  $memo->id)->first();
+//            $user = UserMaintenance::where('id', $imUser->id_user_maintenance)->first();
+//            $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
+//            $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
+//        }
     }
 
     /**
      * Function untuk whatsupp
      */
-    public function  ProceesWaCabang($memo, $cabang, $user, $imUser) {
+    public function  ProceesWaCabang($memo, $cabang, $user, $values) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
 
@@ -267,8 +269,8 @@ class MaintenanceController extends Controller
     Alamat : *$cabang->alamat*
     Maintenance : *$user->nama*
     No Telp Maintenance : *$user->no_telp*
-    Tanggal Pekerjaan : *$imUser->date*
-    Kode Maintenance : *$imUser->kode*
+    Tanggal Pekerjaan : *$values->date*
+    Kode Maintenance : *$values->kode*
     ",
             ),
             CURLOPT_HTTPHEADER => array(
@@ -285,7 +287,7 @@ class MaintenanceController extends Controller
     /**
      * Function untuk whatsupp
      */
-    public function  ProceesWaMaintenance($memo, $cabang, $user, $imUser) {
+    public function  ProceesWaMaintenance($memo, $cabang, $user, $values) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
 
@@ -307,8 +309,8 @@ Cabang : *$cabang->name*
 Alamat : *$cabang->alamat*
 Telp Cabang : *$cabang->telepon*
 Maintenance : *$user->nama*
-Tanggal Pekerjaan : *$imUser->date*
-Link : https://portal.pusatgadai.id/konfirmasi-kehadiran/$imUser->link
+Tanggal Pekerjaan : *$values->date*
+Link : https://portal.pusatgadai.id/konfirmasi-kehadiran/$values->link
 Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
                 ",
             ),
@@ -913,17 +915,10 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
 
     public function getStockBarangV2(Request $request)
     {
-//        $cabang = Cabang::where('id', $request->id_cabang)->first();
-//
-//        $stockBarang = StokBarang::where('pic', $cabang->kode)->get();
-//        $barangTipe = [];
-//        foreach ($stockBarang as $key => $value){
-//            $barangTipe = BarangTipe::where('id', $value->id_tipe)->with('stockBarang')->first();
-//        }
-//        $test = $barangTipe->paginate(10);
-
-//        $barangTipe = BarangTipe::with('stockBarang')->orderBy('id', 'DESC')->paginate(10);
-        $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->paginate(10);
+        $value = $request->tipe;
+        $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value) {
+            $q->where('tipe', '=', $value);
+        })->paginate(10);
 
         if($stockBarang){
             return $this->successResponse($stockBarang,Constants::HTTP_MESSAGE_200, 200);
