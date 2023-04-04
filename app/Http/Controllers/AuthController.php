@@ -57,7 +57,6 @@ class AuthController extends Controller
                 }
             }
         }
-
         // $cabang = "";
         // if ($user->role_id == 3) {         //Jika Kepala Unit (3)
         //     $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
