@@ -53,22 +53,27 @@ class CabangUserController extends Controller
         }
     }
 
-    public function getCabangUser($id){
-        
-        $query = UserStaffCabang::where('user_staff_id', $id)->get();
-        $user = User::find($id);
-        $role = Role::select('id','name','level')->where('id',$user->role_id)->first();
-
-        foreach ($query as $key => $q) {
-            $cabang[] = Cabang::select('id','name')->where('id',$q->cabang_id)->first();
+    public function getCabangUser(Request $request)
+    {
+        $query = UserStaffCabang::query();
+        if(!empty($request->user)){
+            $query =  $query->where('user_staff_id', $request->user);
+        }if(!empty($request->cabang)){
+            $query =  $query->where('cabang_id', $request->cabang);
+        }if(!empty($request->role)){
+            $query =  $query->where('role_id', $request->role);
         }
 
-        return response()->json([
-            'type' =>'success',
-            'user' => $user,
-            'cabang' => $cabang,
-        ]);
+        $result = $query->get();
 
+        $result->map(function ($q) {
+            $q->user;
+            $q->role;
+            $q->cabang;
+            return $q;
+        });
+
+        return $result;
     }
 
     public function update(Request $request)
