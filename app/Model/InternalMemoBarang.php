@@ -9,6 +9,9 @@ class InternalMemoBarang extends Model
     protected $table = 'internal_memo_barang';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+    protected $casts = [
+        'quantity' => 'integer'
+    ];
 
     function internalMemoBarang()
     {

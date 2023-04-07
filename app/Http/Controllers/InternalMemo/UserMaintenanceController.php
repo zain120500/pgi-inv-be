@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Model\InternalMemo;
 use App\Model\UserMaintenance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UserMaintenanceController extends Controller
 {
@@ -52,14 +54,38 @@ class UserMaintenanceController extends Controller
 
     public function store(Request $request)
     {
-        $record = UserMaintenance::create([
-            'nama' => $request->nama,
-            'pekerjaan' => $request->pekerjaan,
-            'no_telp' => $request->no_telp,
-            'keterangan' => $request->keterangan,
-            'flag' => 0,
-            'created_by' => auth()->user()->id
-        ]);
+        $files = $request['files'];
+
+        if(!empty($files)) {
+            foreach ($files as $key => $file) {
+                $image_64 = $file; //your base64 encoded data
+                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                $image = str_replace($replace, '', $image_64);
+                $image = str_replace(' ', '+', $image);
+                $imageName = Str::random(10).'.'.$extension;
+                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                $record = UserMaintenance::create([
+                    'nama' => $request->nama,
+                    'pekerjaan' => $request->pekerjaan,
+                    'no_telp' => $request->no_telp,
+                    'foto' => $imageName,
+                    'keterangan' => $request->keterangan,
+                    'flag' => 0,
+                    'created_by' => auth()->user()->id
+                ]);
+            }
+        }else{
+            $record = UserMaintenance::create([
+                'nama' => $request->nama,
+                'pekerjaan' => $request->pekerjaan,
+                'no_telp' => $request->no_telp,
+                'keterangan' => $request->keterangan,
+                'flag' => 0,
+                'created_by' => auth()->user()->id
+            ]);
+        }
 
         if($record){
             return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
@@ -70,17 +96,38 @@ class UserMaintenanceController extends Controller
 
     public function update(Request $request, $id)
     {
+        $files = $request['files'];
         $record = UserMaintenance::find($id);
 
-        $update = UserMaintenance::where('id', $record->id)->update([
-            'nama' => $request->nama,
-            'pekerjaan' => $request->pekerjaan,
-            'no_telp' => $request->no_telp,
-            'keterangan' => $request->keterangan,
-        ]);
+        if(empty($files)){
+            $update = UserMaintenance::where('id', $record->id)->update([
+                'nama' => $request->nama,
+                'pekerjaan' => $request->pekerjaan,
+                'no_telp' => $request->no_telp,
+                'keterangan' => $request->keterangan,
+            ]);
+        }else{
+            foreach ($files as $key => $file) {
+                $image_64 = $file; //your base64 encoded data
+                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                $image = str_replace($replace, '', $image_64);
+                $image = str_replace(' ', '+', $image);
+                $imageName = Str::random(10).'.'.$extension;
+                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
 
-        if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+                $update = UserMaintenance::where('id', $record->id)->update([
+                    'nama' => $request->nama,
+                    'pekerjaan' => $request->pekerjaan,
+                    'foto' => $imageName,
+                    'no_telp' => $request->no_telp,
+                    'keterangan' => $request->keterangan,
+                ]);
+            }
+        }
+
+        if($update){
+            return $this->successResponse($update,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }

@@ -13,6 +13,7 @@ use App\Model\HistoryMemo;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
+use App\Model\KategoriJenisFpp;
 use App\Model\KategoriPicFpp;
 use App\Model\Pemakaian;
 use App\Model\StokBarang;
@@ -222,32 +223,24 @@ class MaintenanceController extends Controller
         $user = array();
         foreach ($test as $key => $value){
             $memo = InternalMemo::where('id', $value)->first();
+            $kjFpp = KategoriJenisFpp::where('id', $memo->id_kategori_jenis_fpp)->first();
             $cabang = Cabang::where('id', $memo->id_cabang)->first();
             $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get();
 
             foreach ($maintenanceUser as $keys => $values){
-
                 $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
-                $this->ProceesWaCabang($memo, $cabang, $user, $values);
+                $this->ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp);
                 $this->ProceesWaMaintenance($memo, $cabang, $user, $values);
             }
 
 
         }
-//        foreach ($test as $key => $value){
-//            $memo = InternalMemo::where('id', $value)->first();
-//            $cabang = Cabang::where('id', $memo->id_cabang)->first();
-//            $imUser = InternalMemoMaintenance::where('id_internal_memo',  $memo->id)->first();
-//            $user = UserMaintenance::where('id', $imUser->id_user_maintenance)->first();
-//            $this->ProceesWaCabang($memo, $cabang, $user, $imUser);
-//            $this->ProceesWaMaintenance($memo, $cabang, $user, $imUser);
-//        }
     }
 
     /**
-     * Function untuk whatsupp
+     * Function untuk whatsupp cabang
      */
-    public function  ProceesWaCabang($memo, $cabang, $user, $values) {
+    public function  ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
 
@@ -264,6 +257,7 @@ class MaintenanceController extends Controller
                 'target' => $cabang->telepon,
 'message' => "
     No Memo : *$memo->im_number*
+    Kategori : *$kjFpp->name*
     Status : *PROSES*
     Cabang : *$cabang->name*
     Alamat : *$cabang->alamat*
@@ -285,7 +279,7 @@ class MaintenanceController extends Controller
     }
 
     /**
-     * Function untuk whatsupp
+     * Function untuk whatsupp maintenance
      */
     public function  ProceesWaMaintenance($memo, $cabang, $user, $values) {
         $token = env("FONTE_TOKEN");
@@ -839,17 +833,31 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         foreach ($memo as $key => $value){
             foreach ($barang as $keys => $values){
                 $cabang = Cabang::where('kode', $kode[$keys])->first();
-                $imBarang = InternalMemoBarang::create([
-                    'id_internal_memo' => $value,
-                    'id_barang' => $values,
-                    'quantity' => $quantity[$keys],
-                    'cabang_id' => $cabang->id,
-                    'created_by' => auth()->user()->id
-                ]);
+                $iBarang = InternalMemoBarang::where('id_barang', $values)->first();
+
+                if(empty($iBarang)) {
+                    InternalMemoBarang::create([
+                        'id_internal_memo' => $value,
+                        'id_barang' => $values,
+                        'quantity' => $quantity[$keys],
+                        'cabang_id' => $cabang->id,
+                        'created_by' => auth()->user()->id
+                    ]);
+                }else{
+                    $vBarang = ($iBarang->quantity)+$quantity[$keys];
+                    $iBarang->update([
+                        'id_internal_memo' => $value,
+                        'id_barang' => $values,
+                        'quantity' => $vBarang,
+                        'cabang_id' => $cabang->id,
+                        'created_by' => auth()->user()->id
+                    ]);
+                    $arr[] = $iBarang->first();
+                }
 
                 $stockBarangs = StokBarang::where('id_tipe', $values)->where('pic', $kode[$keys])->first();
 
-                Pemakaian::create([
+                $pemakaian = Pemakaian::create([
                     'tanggal' => Carbon::now()->format('Y-m-d'),
                     'pic' => $kode[$keys],
                     'nomer_barang' => $stockBarangs->nomer_barang,
@@ -868,8 +876,8 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
             }
         }
 
-        if($imBarang){
-            return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
+        if($pemakaian){
+            return $this->successResponse($pemakaian,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
@@ -918,7 +926,7 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         $value = $request->tipe;
         if(!empty($request->tipe)){
             $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value) {
-                $q->where('tipe', 'like', $value);
+                $q->where('tipe', 'like', '%' . $value . '%');
             })->paginate(10);
         }else{
             $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->paginate(10);

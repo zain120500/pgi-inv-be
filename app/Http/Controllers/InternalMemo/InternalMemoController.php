@@ -333,18 +333,31 @@ class InternalMemoController extends Controller
         }
     }
 
-    public function ignoreMemo($id){
+    public function ignoreMemo(Request $request,$id){
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        $internalMemo->update([
-            'flag' => 10
-        ]);
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if($pic->kategori_proses == 1 || $pic->kategori_proses == 2){
+            if(!empty($request->catatan_tolak)){
+                $internalMemo->update([
+                    'catatan_tolak' => $request->catatan_tolak,
+                    'flag' => 10
+                ]);
+            }else{
+                $internalMemo->update([
+                    'flag' => 10
+                ]);
+            }
+        }
 
         $create = HistoryMemo::create([
             "id_internal_memo"=> $internalMemo->id,
             "user_id"=> auth()->user()->id,
             "status"=> 10,
-            "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name
+            "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name,
+            "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+            "waktu" => Carbon::now()->format('h')
         ]);
 
         if($create){
@@ -365,16 +378,25 @@ class InternalMemoController extends Controller
             $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
             if($pic->kategori_proses == 1 || $pic->kategori_proses == 2){
-                InternalMemo::where('id', $value)->update([
-                    'flag' => 10
-                ]);
+                if(!empty($request->catatan_tolak)){
+                    InternalMemo::where('id', $value)->update([
+                        'catatan_tolak' => $request->catatan_tolak,
+                        'flag' => 10
+                    ]);
+                }else{
+                    InternalMemo::where('id', $value)->update([
+                        'flag' => 10
+                    ]);
+                }
             }
 
             $create = HistoryMemo::create([
                 "id_internal_memo"=> $value,
                 "user_id"=> auth()->user()->id,
                 "status"=> 10,
-                "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name
+                "keterangan"=> $this->getFlagStatus(10).' '.auth()->user()->name,
+                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                "waktu" => Carbon::now()->format('h')
             ]);
 
         }
