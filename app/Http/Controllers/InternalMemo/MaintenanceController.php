@@ -833,7 +833,7 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         foreach ($memo as $key => $value){
             foreach ($barang as $keys => $values){
                 $cabang = Cabang::where('kode', $kode[$keys])->first();
-                $iBarang = InternalMemoBarang::where('id_barang', $values)->first();
+                $iBarang = InternalMemoBarang::where('id_barang', $values)->where('id_internal_memo', $value)->first();
 
                 if(empty($iBarang)) {
                     InternalMemoBarang::create([
