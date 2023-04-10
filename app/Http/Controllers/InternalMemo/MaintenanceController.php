@@ -910,6 +910,10 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
                     $iBarang = Pemakaian::where('id_tipe', $values)->where('pic', $cab)->get()->pluck('id');
                     $barangDel = Pemakaian::find($iBarang);
                     $barangDel->each->delete();
+
+                    $ibKeluar = BarangKeluar::where('id_tipe', $values)->where('pic', $cab)->get()->pluck('id');
+                    $bkDel = BarangKeluar::find($ibKeluar);
+                    $bkDel->each->delete();
                 }
             }
         }else{
