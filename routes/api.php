@@ -147,8 +147,8 @@ Route::group([
         // Route::get('/{id}', 'CabangUserController@show');
 
         Route::post('/update', 'CabangUserController@userCabangUpdate');
-        
-        
+
+
         // Route::post('/', 'CabangUserController@store');
         // Route::delete('/delete/{id}', 'CabangUserController@destroy');
     });
@@ -382,20 +382,6 @@ Route::group([
             Route::post('/{id}', 'InternalMemoController@update');
             Route::delete('/delete/{id}', 'InternalMemoController@destroy');
 
-        });
-
-        Route::group([
-            'prefix' => 'memoV2'
-        ], function ($router) {
-            Route::post('/internalMaintenanceV2', [MaintenanceControllerV2::class, 'internalMaintenance']);
-            Route::post('/attendanceMaintenanceV2/{id}', [MaintenanceControllerV2::class, 'attendanceMaintenance']);
-            Route::post('/updateMemoRescheduleV2/{id}', [MaintenanceControllerV2::class, 'updateMemoRescheduleV2']);
-
-            /**
-             * SURAT TUGAS
-             */
-            Route::get('/getSuratTugasV2', [MaintenanceControllerV2::class, 'getSuratTugas']);
-            Route::get('/getSuratTugasByIdV2/{id}', [MaintenanceControllerV2::class, 'getSuratTugasById']);
         });
 
         Route::group([
