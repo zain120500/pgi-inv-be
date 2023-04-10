@@ -771,29 +771,31 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
 
         $arr = [];
         foreach ($memo as $key => $value){
-            $update = InternalMemoMaintenance::where('id_internal_memo', $value);
-
-            $update->update([
-                'date' => $request->date,
-                'created_by' => auth()->user()->id
-            ]);
-            $arr[] = $update->first();
-
             foreach ($user as $keys => $values){
-                $imMainteance = InternalMemoMaintenance::create([
-                    'id_internal_memo' => $value,
-                    'id_user_maintenance' => $values,
-                    'date' => $request->date,
-                    'link' => (Str::random(5).$values),
-                    'kode' => (Str::random(5)),
-                    'flag' => 0,
-                    'created_by' => auth()->user()->id
-                ]);
+                $update = InternalMemoMaintenance::where('id_user_maintenance', $values)->where('id_internal_memo', $value)->first();
+
+                if(empty($update)){
+                    $imMainteance = InternalMemoMaintenance::create([
+                        'id_internal_memo' => $value,
+                        'id_user_maintenance' => $values,
+                        'date' => $request->date,
+                        'link' => (Str::random(5).$values),
+                        'kode' => (Str::random(5)),
+                        'flag' => 0,
+                        'created_by' => auth()->user()->id
+                    ]);
+                }else{
+                    $update->update([
+                        'date' => $request->date,
+                        'created_by' => auth()->user()->id
+                    ]);
+                    $arr[] = $update->first();
+                }
             }
         }
 
-        if($imMainteance){
-            return $this->successResponse($imMainteance,Constants::HTTP_MESSAGE_200, 200);
+        if($update){
+            return $this->successResponse($update,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
