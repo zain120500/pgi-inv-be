@@ -325,9 +325,6 @@ Route::group([
              * INTERNAL MEMO MAINTENANCE
              */
             Route::get('/getMemoMaintenance/{id}', 'InternalMemoController@getMemoMaintenance');
-            Route::post('/internalUserMaintenance', 'MaintenanceController@internalUserMaintenance');
-            Route::post('/internalBarangMaintenance', 'MaintenanceController@internalBarangMaintenance');
-            Route::post('/internalMaintenance/test', 'MaintenanceController@internalMaintenance');
             Route::get('/cabangByMemoId', 'MaintenanceController@cabangByMemoId');
             Route::get('/barangMerk', 'MaintenanceController@getBarangMerk');
             Route::get('/barangTipe/{id}', 'MaintenanceController@getBarangTipe');
@@ -336,12 +333,10 @@ Route::group([
             Route::post('/updateMemoRescheduleV1', 'MaintenanceController@updateMemoRescheduleV1');
             Route::post('/updateMemoRescheduleV2', 'MaintenanceController@updateMemoRescheduleV2');
             Route::post('/updateMemoRescheduleV3', 'MaintenanceController@updateMemoRescheduleV3');
-            Route::post('/testCronJob', 'MaintenanceController@testCronJob');
 
 
             Route::get('/getPusatStock', 'MaintenanceController@getPusatStock');
             Route::post('/updateMemoMaintenance', 'MaintenanceController@updateMemoMaintenance');
-            Route::post('/credelMemoMaintenance', 'MaintenanceController@credelMemoMaintenance');
 
             Route::post('/createUserMaitenance', 'MaintenanceController@createUserMaitenance');
             Route::post('/deleteUserMaintenance', 'MaintenanceController@deleteUserMaintenance');
@@ -362,9 +357,8 @@ Route::group([
              * Testing Route
              */
             Route::get('/paginateKuKc', 'InternalMemoController@paginateKuKc');
-            Route::get('/pdfTesting/{id}', 'InternalMemoController@pdfTesting');
+            Route::get('/pdfMemo/{id}', 'InternalMemoController@pdfMemo');
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
-            Route::get('/getStockBarang', 'MaintenanceController@getStockBarang');
             Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');
             Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
             Route::get('/testIndexMemo', 'InternalMemoController@testIndexMemo');

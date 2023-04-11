@@ -560,7 +560,7 @@ class InternalMemoController extends Controller
         return view('InternalMemo.internalMemoPdf', ['query' => $query, 'memo' => $query->MemoFile, 'history' => $query->listHistoryMemo]);
     }
 
-    public function pdfTesting($id)
+    public function pdfMemo($id)
     {
         $query = InternalMemo::find($id);
 
