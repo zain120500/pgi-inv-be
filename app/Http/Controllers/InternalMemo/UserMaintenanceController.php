@@ -30,9 +30,18 @@ class UserMaintenanceController extends Controller
         }
     }
 
-    public function paginate()
+    public function paginate(Request $request)
     {
         $record = UserMaintenance::orderBy('id', 'DESC')->paginate(15);
+
+        if($request->nama){
+            $record = UserMaintenance::where('nama', 'like', '%' . $request->nama . '%')->orderBy('id', 'DESC')->paginate(15);
+        }else if($request->no_telp){
+            $record = UserMaintenance::where('no_telp', 'like', '%' . $request->no_telp . '%')->orderBy('id', 'DESC')->paginate(15);
+        }
+        else if($request->flag){
+            $record = UserMaintenance::where('flag', 'like', '%' . $request->flag . '%')->orderBy('id', 'DESC')->paginate(15);
+        }
 
         if($record){
             return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
