@@ -776,6 +776,9 @@ class InternalMemoController extends Controller
                 ->where('flag', $request->flag)->get();
         }else if($request->created_at){
             $internal = InternalMemo::orderBy('created_at', $request->created_at)->get();
+        }else if($request->flag) {
+            $internal = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('flag', $request->flag)->get();
         }else if($request->startDate && $request->endDate){
             $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
             $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
