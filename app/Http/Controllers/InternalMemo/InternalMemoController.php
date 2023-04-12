@@ -601,6 +601,9 @@ class InternalMemoController extends Controller
             $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
             $record = InternalMemo::where('flag', 4)->where('flag', 3)->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
+        }else if($request->flag) {
+            $record = InternalMemo::orderBy('created_at', 'DESC')
+                ->where('flag', $request->flag)->get();
         }else if($request->id_cabang_multiple) {
             $id_cabang_multiple = $request->id_cabang_multiple;
             $record = InternalMemo::whereIn('flag', [4, 3, 10])->orderBy('created_at', 'DESC')
