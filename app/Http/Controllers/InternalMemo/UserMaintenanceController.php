@@ -77,7 +77,9 @@ class UserMaintenanceController extends Controller
 
                 $record = UserMaintenance::create([
                     'nama' => $request->nama,
+                    'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
+                    'status' => $request->status,
                     'no_telp' => $request->no_telp,
                     'foto' => $imageName,
                     'keterangan' => $request->keterangan,
@@ -88,7 +90,9 @@ class UserMaintenanceController extends Controller
         }else{
             $record = UserMaintenance::create([
                 'nama' => $request->nama,
+                'wilayah' => $request->wilayah,
                 'pekerjaan' => $request->pekerjaan,
+                'status' => $request->status,
                 'no_telp' => $request->no_telp,
                 'keterangan' => $request->keterangan,
                 'flag' => 0,
