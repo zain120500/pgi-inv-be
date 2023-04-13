@@ -509,7 +509,23 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
             foreach ($user as $keys => $values){
                 $update = InternalMemoMaintenance::where('id_user_maintenance', $values)->where('id_internal_memo', $value)->first();
 
-                if(empty($update)){
+                if(empty($request->date)){
+                    $imMainteance = InternalMemoMaintenance::create([
+                        'id_internal_memo' => $value,
+                        'id_user_maintenance' => $values,
+                        'date' => Carbon::now(),
+                        'link' => (Str::random(5).$values),
+                        'kode' => (Str::random(5)),
+                        'flag' => 0,
+                        'created_by' => auth()->user()->id
+                    ]);
+
+                    if($imMainteance){
+                        return $this->successResponse($imMainteance,Constants::HTTP_MESSAGE_200, 200);
+                    } else {
+                        return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+                    }
+                }else if(empty($update)){
                     $imMainteance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $value,
                         'id_user_maintenance' => $values,
@@ -519,20 +535,26 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
                         'flag' => 0,
                         'created_by' => auth()->user()->id
                     ]);
-                }else{
+
+                    if($imMainteance){
+                        return $this->successResponse($imMainteance,Constants::HTTP_MESSAGE_200, 200);
+                    } else {
+                        return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+                    }
+                }else if(!empty($update)){
                     $update->update([
                         'date' => $request->date,
                         'created_by' => auth()->user()->id
                     ]);
                     $arr[] = $update->first();
+
+                    if($update){
+                        return $this->successResponse($update,Constants::HTTP_MESSAGE_200, 200);
+                    } else {
+                        return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+                    }
                 }
             }
-        }
-
-        if($update){
-            return $this->successResponse($update,Constants::HTTP_MESSAGE_200, 200);
-        } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
