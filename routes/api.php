@@ -320,6 +320,7 @@ Route::group([
             Route::post('/ignore/all', 'InternalMemoController@ignoreMemoAll');
             Route::post('/ignore/{id}', 'InternalMemoController@ignoreMemo');
             Route::post('/uploadBuktiPic/{id}', 'InternalMemoController@uploadBuktiPic');
+            Route::post('/cancel/{id}', 'InternalMemoController@cancelMemo');
 
             /**
              * INTERNAL MEMO MAINTENANCE

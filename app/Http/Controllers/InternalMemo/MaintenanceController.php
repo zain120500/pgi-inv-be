@@ -27,6 +27,91 @@ use stdClass;
 
 class MaintenanceController extends Controller
 {
+    public function newInternalMaintenance(Request $request)
+    {
+        $user[] = $request->id_user_maintenance;
+        $iMemo[] = $request->id_memo;
+        $barangs[] = $request->id_barang;
+        $quantity = $request->quantity;
+        $pic = $request->pic;
+
+        foreach ($iMemo[0] as $key => $memos){
+            foreach ($user[0] as $keys => $users){
+                $imMaintenance = InternalMemoMaintenance::create([
+                    'id_internal_memo' => $memos,
+                    'id_user_maintenance' => $users,
+                    'date' => $request->date,
+                    'link' => $this->generateRandomString(4),
+                    'kode' => $this->generateRandomString(4),
+                    'flag' => 0,
+                    'created_by' => auth()->user()->id
+                ]);
+
+                $userMaintenance = UserMaintenance::where('id', $users)->first();
+                $userMaintenance->update(['flag' => 1]); //update pic sedang bertugas
+            }
+
+            foreach ($barangs[0] as $i => $barang){
+                $imBarang = InternalMemoBarang::create([
+                    'id_internal_memo' => $memos,
+                    'id_maintenance' => $imMaintenance->id,
+                    'id_barang' => $barang,
+                    'created_by' => auth()->user()->id
+                ]);
+
+                BarangHistory::create([
+                    'id_barang_tipe' => $barang
+                ]);
+
+                if($pic == !null){
+                    if($quantity == !null) {
+                        $cab1 = Cabang::where('kode', $pic[$i])->get()->pluck('id');
+                        foreach ($cab1 as $cab2){
+                            InternalMemoBarang::where('id_barang', $barang)->update([
+                                'quantity' => $quantity[$i],
+                                'cabang_id' => $cab2
+                            ]);
+                        }
+
+                        $cabs = Cabang::where('kode', $pic[$i])->get()->pluck('kode');
+
+                        foreach ($cabs as $ca) {
+                            $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+
+                            Pemakaian::create([
+                                'tanggal' => Carbon::now()->format('Y-m-d'),
+                                'pic' => $stockBarang->pic,
+                                'nomer_barang' => $stockBarang->nomer_barang,
+                                'id_tipe' => $stockBarang->id_tipe,
+                                'jumlah' => $quantity[$i],
+                                'satuan' => $stockBarang->satuan,
+                                'harga' => $stockBarang->total_asset,
+                                'total_harga' => $stockBarang->total_asset,
+                                'imei' => $stockBarang->imei,
+                                'detail_barang' => $stockBarang->detail_barang,
+                                'keperluan' => 'Kebutuhan Cabang',
+                                'pemakai' => 'Cabang',
+                                'user_input' => $stockBarang->user_input,
+                                'last_update' => $stockBarang->last_update
+                            ]);
+                        }
+                    }else{
+                        return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
+                    }
+                }
+            }
+            $this->whatsuppMessage($memos);
+            $this->accMemoByPic($memos);
+        }
+        $this->createHistoryBarang($barangs[0]);
+
+        if($imBarang){
+            return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function createHistoryBarang($id)
     {
         $barang[] = $id;
@@ -130,7 +215,7 @@ Alamat : *$cabang->alamat*
 Telp Cabang : *$cabang->telepon*
 Maintenance : *$user->nama*
 Tanggal Pekerjaan : *$values->date*
-Link : https://portal.pusatgadai.id/konfirmasi-kehadiran/$values->link
+Link : http://portal.pusatgadai.id/konfirmasi-kehadiran/$values->link
 Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
                 ",
             ),
@@ -713,91 +798,6 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         }
     }
 
-    public function newInternalMaintenance(Request $request)
-    {
-        $user[] = $request->id_user_maintenance;
-        $iMemo[] = $request->id_memo;
-        $barangs[] = $request->id_barang;
-        $quantity = $request->quantity;
-        $pic = $request->pic;
-
-        foreach ($iMemo[0] as $key => $memos){
-            foreach ($user[0] as $keys => $users){
-                $imMaintenance = InternalMemoMaintenance::create([
-                    'id_internal_memo' => $memos,
-                    'id_user_maintenance' => $users,
-                    'date' => $request->date,
-                    'link' => (Str::random(5).$users),
-                    'kode' => (Str::random(5)),
-                    'flag' => 0,
-                    'created_by' => auth()->user()->id
-                ]);
-
-                $userMaintenance = UserMaintenance::where('id', $users)->first();
-                $userMaintenance->update(['flag' => 1]); //update pic sedang bertugas
-            }
-
-            foreach ($barangs[0] as $i => $barang){
-                $imBarang = InternalMemoBarang::create([
-                    'id_internal_memo' => $memos,
-                    'id_maintenance' => $imMaintenance->id,
-                    'id_barang' => $barang,
-                    'created_by' => auth()->user()->id
-                ]);
-
-                BarangHistory::create([
-                    'id_barang_tipe' => $barang
-                ]);
-
-                if($pic == !null){
-                    if($quantity == !null) {
-                        $cab1 = Cabang::where('kode', $pic[$i])->get()->pluck('id');
-                        foreach ($cab1 as $cab2){
-                            InternalMemoBarang::where('id_barang', $barang)->update([
-                                'quantity' => $quantity[$i],
-                                'cabang_id' => $cab2
-                            ]);
-                        }
-
-                        $cabs = Cabang::where('kode', $pic[$i])->get()->pluck('kode');
-
-                        foreach ($cabs as $ca) {
-                            $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
-
-                            Pemakaian::create([
-                                'tanggal' => Carbon::now()->format('Y-m-d'),
-                                'pic' => $stockBarang->pic,
-                                'nomer_barang' => $stockBarang->nomer_barang,
-                                'id_tipe' => $stockBarang->id_tipe,
-                                'jumlah' => $quantity[$i],
-                                'satuan' => $stockBarang->satuan,
-                                'harga' => $stockBarang->total_asset,
-                                'total_harga' => $stockBarang->total_asset,
-                                'imei' => $stockBarang->imei,
-                                'detail_barang' => $stockBarang->detail_barang,
-                                'keperluan' => 'Kebutuhan Cabang',
-                                'pemakai' => 'Cabang',
-                                'user_input' => $stockBarang->user_input,
-                                'last_update' => $stockBarang->last_update
-                            ]);
-                        }
-                    }else{
-                        return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
-                    }
-                }
-            }
-            $this->whatsuppMessage($memos);
-            $this->accMemoByPic($memos);
-        }
-        $this->createHistoryBarang($barangs[0]);
-
-        if($imBarang){
-            return $this->successResponse($imBarang,Constants::HTTP_MESSAGE_200, 200);
-        } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-        }
-    }
-
     public function getDetailBarang(Request $request)
     {
         $barang = $request->id_barang;
@@ -912,6 +912,16 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         }
 
         sendFonnte($sender, $reply);
+    }
+
+    function generateRandomString($length = 10) {
+        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 
     public function getFlagStatus($id)

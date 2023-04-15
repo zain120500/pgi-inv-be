@@ -755,6 +755,41 @@ class InternalMemoController extends Controller
         }
     }
 
+    public function cancelMemo(Request $request, $id)
+    {
+        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if($pic->kategori_proses == 4 || $pic->kategori_proses == 0){
+            if(!empty($request->catatan_tolak)){
+                $internalMemo->update([
+                    'catatan_tolak' => $request->catatan_tolak,
+                    'flag' => 8
+                ]);
+            }else{
+                $internalMemo->update([
+                    'flag' => 8
+                ]);
+            }
+        }
+
+        $create = HistoryMemo::create([
+            "id_internal_memo"=> $internalMemo->id,
+            "user_id"=> auth()->user()->id,
+            "status"=> 8,
+            "keterangan"=> $this->getFlagStatus(8).' '.auth()->user()->name,
+            "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+            "waktu" => Carbon::now()->format('h')
+        ]);
+
+        if($create){
+            return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function testIndexMemo(Request $request)
     {
         $internal = InternalMemo::where('flag', '!=', 4)->orderBy('created_at', 'DESC')->get();
