@@ -11,6 +11,7 @@ use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoFile;
 use App\Model\InternalMemoMaintenance;
+use App\Model\KategoriJenisFpp;
 use App\Model\KategoriPicFpp;
 use App\Model\Pemakaian;
 use App\Model\StokBarang;
@@ -479,4 +480,109 @@ class OldFunctionController extends Controller
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
+    /**
+     * Whatsupp Pesan Saat Membuat Tugas Maintenance
+     */
+    public function whatsuppMessage($memos)
+    {
+        $test[] = $memos;
+        $user = array();
+        foreach ($test as $key => $value){
+            $memo = InternalMemo::where('id', $value)->first();
+            $kjFpp = KategoriJenisFpp::where('id', $memo->id_kategori_jenis_fpp)->first();
+            $cabang = Cabang::where('id', $memo->id_cabang)->first();
+            $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get();
+
+            foreach ($maintenanceUser as $keys => $values){
+                $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
+                $this->ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp);
+                $this->ProceesWaMaintenance($memo, $cabang, $user, $values);
+            }
+
+
+        }
+    }
+
+    /**
+     * Function untuk whatsupp cabang
+     */
+    public function  ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp) {
+        $token = env("FONTE_TOKEN");
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $cabang->telepon,
+                'message' => "
+    No Memo : *$memo->im_number*
+    Kategori : *$kjFpp->name*
+    Status : *PROSES*
+    Cabang : *$cabang->name*
+    Alamat : *$cabang->alamat*
+    Maintenance : *$user->nama*
+    No Telp Maintenance : *$user->no_telp*
+    Tanggal Pekerjaan : *$values->date*
+    Kode Maintenance : *$values->kode*
+    ",
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
+
+    /**
+     * Function untuk whatsupp maintenance
+     */
+    public function  ProceesWaMaintenance($memo, $cabang, $user, $values) {
+        $token = env("FONTE_TOKEN");
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $user->no_telp,
+                'message' => "
+No Memo : *$memo->im_number*
+Status : *PROSES*
+Cabang : *$cabang->name*
+Alamat : *$cabang->alamat*
+Telp Cabang : *$cabang->telepon*
+Maintenance : *$user->nama*
+Tanggal Pekerjaan : *$values->date*
+Link : http://portal.pusatgadai.id/konfirmasi-kehadiran/$values->link
+Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
+                ",
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
+
 }
