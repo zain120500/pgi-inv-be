@@ -217,6 +217,7 @@ Maintenance : *$user->nama*
 Tanggal Pekerjaan : *$values->date*
 Link : http://portal.pusatgadai.id/konfirmasi-kehadiran/$values->link
 Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
+Link Login : http://portal.pusatgadai.id
                 ",
             ),
             CURLOPT_HTTPHEADER => array(
@@ -923,7 +924,7 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
     }
 
     function generateRandomString($length = 10) {
-        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $characters = '123456789';
         $charactersLength = strlen($characters);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
