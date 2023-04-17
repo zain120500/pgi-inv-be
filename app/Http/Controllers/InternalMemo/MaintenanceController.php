@@ -347,14 +347,12 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
             $memo->update([
                 'flag' => 1
             ]);
+        }
 
-            if($memo){
-                return $this->successResponse($memo,Constants::HTTP_MESSAGE_200, 200);
-            } else {
-                return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-            }
-        }else{
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9003, 403);
+        if($memo){
+            return $this->successResponse($memo,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
@@ -922,6 +920,30 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
         return $randomString;
+    }
+
+    public function listMemoByMaintenanceLogin()
+    {
+        $uMaintenance = UserMaintenance::where('user_id', auth()->user()->id)->first();
+        $iMemoMaintenance = InternalMemoMaintenance::where('id_user_maintenance', $uMaintenance->id)->get()->pluck('id_internal_memo');
+        $iMemo = InternalMemo::whereIn('id', $iMemoMaintenance)->orderBy('created_at', 'DESC')->get();
+
+        $collect = $iMemo->map(function ($query) {
+            $query['flag_status'] = $this->getFlagStatus($query->flag);
+            $query->cabang->kabupatenKota;
+            $query->devisi;
+            $query->kategori;
+            $query->kategoriJenis;
+            $query->kategoriSub;
+
+            return $query;
+        });
+
+        if($iMemo){
+            return $this->successResponse($iMemo,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 
     public function getFlagStatus($id)

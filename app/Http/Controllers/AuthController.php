@@ -22,6 +22,7 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login','register']]);
     }
+
     public function register(ValidateUserRegistration $request){
         $user = User::create([
             'name' => $request->name,
