@@ -6,6 +6,7 @@ use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\InternalMemo;
 use App\Model\UserMaintenance;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -86,6 +87,18 @@ class UserMaintenanceController extends Controller
                     'flag' => 0,
                     'created_by' => auth()->user()->id
                 ]);
+
+                $user = User::create([
+                    'name' => $request->nama,
+                    'email' => strtolower($request->nama).'@gmail.com',
+                    'password' => bcrypt(123456789),
+                    'role_id' => 1
+                ]);
+
+                $uM = UserMaintenance::where('id', $record->id)->first();
+                $uM->update([
+                    'user_id' => $user->id
+                ]);
             }
         }else{
             $record = UserMaintenance::create([
@@ -101,7 +114,7 @@ class UserMaintenanceController extends Controller
         }
 
         if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+            return $this->successResponse([$record, $user],Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
