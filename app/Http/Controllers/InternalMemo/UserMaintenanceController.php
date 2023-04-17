@@ -64,17 +64,33 @@ class UserMaintenanceController extends Controller
 
     public function store(Request $request)
     {
-        $files = $request['files'];
+        $files = $request['foto'];
+        $ktp = $request['ktp'];
 
         if(!empty($files)) {
-            foreach ($files as $key => $file) {
-                $image_64 = $file; //your base64 encoded data
-                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
-                $image = str_replace($replace, '', $image_64);
-                $image = str_replace(' ', '+', $image);
-                $imageName = Str::random(10).'.'.$extension;
-                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+            $image_64 = $files; //your base64 encoded data
+            $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+            $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+            $image = str_replace($replace, '', $image_64);
+            $image = str_replace(' ', '+', $image);
+            $foto = Str::random(10).'.'.$extension;
+            Storage::disk('sftp')->put($foto, base64_decode(($image), 'r+'));
+
+            $image = $ktp; //your base64 encoded data
+            $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
+            $replace = substr($image, 0, strpos($image, ',')+1);
+            $images = str_replace($replace, '', $image_64);
+            $images = str_replace(' ', '+', $images);
+            $ktp = Str::random(10).'.'.$extension;
+            Storage::disk('sftp')->put($ktp, base64_decode(($images), 'r+'));
+
+            try {
+                $user = User::create([
+                    'name' => $request->nama,
+                    'email' => $request->email,
+                    'password' => bcrypt($request->password),
+                    'role_id' => 1
+                ]);
 
                 $record = UserMaintenance::create([
                     'nama' => $request->nama,
@@ -82,24 +98,20 @@ class UserMaintenanceController extends Controller
                     'pekerjaan' => $request->pekerjaan,
                     'status' => $request->status,
                     'no_telp' => $request->no_telp,
-                    'foto' => $imageName,
+                    'foto' => $foto,
+                    'ktp' => $ktp,
                     'keterangan' => $request->keterangan,
                     'flag' => 0,
                     'created_by' => auth()->user()->id
                 ]);
-
-                $user = User::create([
-                    'name' => $request->nama,
-                    'email' => strtolower($request->nama).'@gmail.com',
-                    'password' => bcrypt(123456789),
-                    'role_id' => 1
-                ]);
-
-                $uM = UserMaintenance::where('id', $record->id)->first();
-                $uM->update([
-                    'user_id' => $user->id
-                ]);
+            } catch (\Exception $e) {
+                return $e->getMessage();
             }
+
+            $uM = UserMaintenance::where('id', $record->id)->first();
+            $uM->update([
+                'user_id' => $user->id
+            ]);
         }else{
             $record = UserMaintenance::create([
                 'nama' => $request->nama,
