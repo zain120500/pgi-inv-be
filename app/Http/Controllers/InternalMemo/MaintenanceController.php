@@ -342,15 +342,25 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
     public function attendanceMaintenance(Request $request, $id)
     {
         $memo = InternalMemoMaintenance::where('link', $id)->first();
+        $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
 
         if($memo->kode == $request->kode){
             $memo->update([
                 'flag' => 1
             ]);
+
+            $hM = HistoryMemo::create([
+                'id_internal_memo' => $memo->id_internal_memo,
+                'user_id' => $uM->user_id,
+                'status' => 12,
+                'keterangan' => 'Maintenance Sudah Selesai',
+                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                "waktu" => Carbon::now()->format('h')
+            ]);
         }
 
-        if($memo){
-            return $this->successResponse($memo,Constants::HTTP_MESSAGE_200, 200);
+        if($memo && $hM){
+            return $this->successResponse(['memo' => $memo, 'history' => $hM],Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
