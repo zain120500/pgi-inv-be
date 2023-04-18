@@ -949,6 +949,26 @@ Link Login : http://portal.pusatgadai.id
         }
     }
 
+    public function konfirmasiSelesai(Request $request)
+    {
+        $uMaintenance = UserMaintenance::where('user_id', auth()->user()->id)->first();
+        $iMemoMaintenance = InternalMemoMaintenance::where('id_internal_memo', $request->id_internal_memo)->where('id_user_maintenance', $uMaintenance->id)->first();
+
+        try {
+            $iMemoMaintenance->update([
+                'flag' => 3
+            ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        if($iMemoMaintenance){
+            return $this->successResponse($iMemoMaintenance,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function getFlagStatus($id)
     {
         if($id == 0){
