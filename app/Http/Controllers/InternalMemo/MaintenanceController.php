@@ -141,7 +141,7 @@ class MaintenanceController extends Controller
             foreach ($maintenanceUser as $keys => $values){
                 $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
                 $this->ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp);
-                $this->ProceesWaMaintenance($memo, $cabang, $user, $values);
+                $this->ProceesWaMaintenance($memo, $user);
             }
 
 
@@ -170,8 +170,6 @@ class MaintenanceController extends Controller
     No Memo : *$memo->im_number*
     Kategori : *$kjFpp->name*
     Status : *PROSES*
-    Cabang : *$cabang->name*
-    Alamat : *$cabang->alamat*
     Maintenance : *$user->nama*
     No Telp Maintenance : *$user->no_telp*
     Tanggal Pekerjaan : *$values->date*
@@ -192,7 +190,7 @@ class MaintenanceController extends Controller
     /**
      * Function untuk whatsupp maintenance
      */
-    public function  ProceesWaMaintenance($memo, $cabang, $user, $values) {
+    public function  ProceesWaMaintenance($memo, $user) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
 
@@ -210,13 +208,7 @@ class MaintenanceController extends Controller
                 'message' => "
 No Memo : *$memo->im_number*
 Status : *PROSES*
-Cabang : *$cabang->name*
-Alamat : *$cabang->alamat*
-Telp Cabang : *$cabang->telepon*
-Maintenance : *$user->nama*
-Tanggal Pekerjaan : *$values->date*
-Link : http://portal.pusatgadai.id/konfirmasi-kehadiran/$values->link
-Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
+Info Lebih Lanjut Silahkan Klik Link Dibawah Ini
 Link Login : http://portal.pusatgadai.id
                 ",
             ),
