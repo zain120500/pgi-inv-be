@@ -335,6 +335,7 @@ Route::group([
             Route::post('/updateMemoRescheduleV2', 'MaintenanceController@updateMemoRescheduleV2');
             Route::post('/updateMemoRescheduleV3', 'MaintenanceController@updateMemoRescheduleV3');
             Route::get('/list-memo-maintenance', 'MaintenanceController@listMemoByMaintenanceLogin');
+            Route::post('/konfirmasi-selesai', 'MaintenanceController@konfirmasiSelesai');
 
 
             Route::get('/getPusatStock', 'MaintenanceController@getPusatStock');
