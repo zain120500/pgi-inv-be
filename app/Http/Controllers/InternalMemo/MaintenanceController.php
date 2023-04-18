@@ -929,7 +929,7 @@ Link Login : http://portal.pusatgadai.id
     {
         $uMaintenance = UserMaintenance::where('user_id', auth()->user()->id)->first();
         $iMemoMaintenance = InternalMemoMaintenance::where('id_user_maintenance', $uMaintenance->id)->get()->pluck('id_internal_memo');
-        $iMemo = InternalMemo::whereIn('id', $iMemoMaintenance)->orderBy('created_at', 'DESC')->get();
+        $iMemo = InternalMemo::whereIn('id', $iMemoMaintenance)->orderBy('created_at', 'DESC')->paginate(15);
 
         $collect = $iMemo->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
