@@ -33,15 +33,15 @@ class UserMaintenanceController extends Controller
 
     public function paginate(Request $request)
     {
-        $record = UserMaintenance::orderBy('id', 'DESC')->paginate(15);
+        $record = UserMaintenance::with('user')->orderBy('id', 'DESC')->paginate(15);
 
         if($request->nama){
-            $record = UserMaintenance::where('nama', 'like', '%' . $request->nama . '%')->orderBy('id', 'DESC')->paginate(15);
+            $record = UserMaintenance::where('nama', 'like', '%' . $request->nama . '%')->with('user')->orderBy('id', 'DESC')->paginate(15);
         }else if($request->no_telp){
-            $record = UserMaintenance::where('no_telp', 'like', '%' . $request->no_telp . '%')->orderBy('id', 'DESC')->paginate(15);
+            $record = UserMaintenance::where('no_telp', 'like', '%' . $request->no_telp . '%')->with('user')->orderBy('id', 'DESC')->paginate(15);
         }
         else if($request->flag){
-            $record = UserMaintenance::where('flag', 'like', '%' . $request->flag . '%')->orderBy('id', 'DESC')->paginate(15);
+            $record = UserMaintenance::where('flag', 'like', '%' . $request->flag . '%')->with('user')->orderBy('id', 'DESC')->paginate(15);
         }
 
         if($record){
@@ -67,7 +67,7 @@ class UserMaintenanceController extends Controller
         $files = $request['foto'];
         $ktp = $request['ktp'];
 
-        if(!empty($files)) {
+        if(!empty($files) && !empty($ktp)) {
             $image_64 = $files; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
             $replace = substr($image_64, 0, strpos($image_64, ',')+1);
@@ -79,7 +79,7 @@ class UserMaintenanceController extends Controller
             $image = $ktp; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
             $replace = substr($image, 0, strpos($image, ',')+1);
-            $images = str_replace($replace, '', $image_64);
+            $images = str_replace($replace, '', $image);
             $images = str_replace(' ', '+', $images);
             $ktp = Str::random(10).'.'.$extension;
             Storage::disk('sftp')->put($ktp, base64_decode(($images), 'r+'));
@@ -89,11 +89,12 @@ class UserMaintenanceController extends Controller
                     'name' => $request->nama,
                     'email' => $request->email,
                     'password' => bcrypt($request->password),
-                    'role_id' => 1
+                    'role_id' => $request->role_id
                 ]);
 
                 $record = UserMaintenance::create([
                     'nama' => $request->nama,
+                    'user_id' => $user->id,
                     'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
                     'status' => $request->status,
@@ -107,11 +108,6 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-
-            $uM = UserMaintenance::where('id', $record->id)->first();
-            $uM->update([
-                'user_id' => $user->id
-            ]);
         }else{
             $record = UserMaintenance::create([
                 'nama' => $request->nama,
@@ -134,34 +130,55 @@ class UserMaintenanceController extends Controller
 
     public function update(Request $request, $id)
     {
-        $files = $request['files'];
+        $files = $request['foto'];
+        $ktp = $request['ktp'];
         $record = UserMaintenance::find($id);
+        $users = User::where('id', $record->user_id)->first();
 
-        if(empty($files)){
+        if(!empty($files) || !empty($ktp)) {
+            $image_64 = $files; //your base64 encoded data
+            $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+            $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+            $image = str_replace($replace, '', $image_64);
+            $image = str_replace(' ', '+', $image);
+            $foto = Str::random(10).'.'.$extension;
+            Storage::disk('sftp')->put($foto, base64_decode(($image), 'r+'));
+
+            $image = $ktp; //your base64 encoded data
+            $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
+            $replace = substr($image, 0, strpos($image, ',')+1);
+            $images = str_replace($replace, '', $image);
+            $images = str_replace(' ', '+', $images);
+            $ktp = Str::random(10).'.'.$extension;
+            Storage::disk('sftp')->put($ktp, base64_decode(($images), 'r+'));
+
+            try {
+                $users->update([
+                    'name' => $request->nama,
+                    'email' => $request->email,
+                    'password' => bcrypt($request->password)
+                ]);
+
+                $update = UserMaintenance::where('id', $record->id)->update([
+                    'nama' => $request->nama,
+                    'wilayah' => $request->wilayah,
+                    'pekerjaan' => $request->pekerjaan,
+                    'status' => $request->status,
+                    'no_telp' => $request->no_telp,
+                    'foto' => $foto,
+                    'ktp' => $ktp,
+                    'keterangan' => $request->keterangan,
+                ]);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+        }else{
             $update = UserMaintenance::where('id', $record->id)->update([
                 'nama' => $request->nama,
                 'pekerjaan' => $request->pekerjaan,
                 'no_telp' => $request->no_telp,
                 'keterangan' => $request->keterangan,
             ]);
-        }else{
-            foreach ($files as $key => $file) {
-                $image_64 = $file; //your base64 encoded data
-                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
-                $image = str_replace($replace, '', $image_64);
-                $image = str_replace(' ', '+', $image);
-                $imageName = Str::random(10).'.'.$extension;
-                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
-
-                $update = UserMaintenance::where('id', $record->id)->update([
-                    'nama' => $request->nama,
-                    'pekerjaan' => $request->pekerjaan,
-                    'foto' => $imageName,
-                    'no_telp' => $request->no_telp,
-                    'keterangan' => $request->keterangan,
-                ]);
-            }
         }
 
         if($update){
@@ -173,10 +190,16 @@ class UserMaintenanceController extends Controller
 
     public function destroy($id)
     {
-        $record = UserMaintenance::find($id)->delete();
+        try {
+            $user = UserMaintenance::where('id', $id)->first();
+            $record = UserMaintenance::find($id)->delete();
+            $uDel = User::where('id', $user->user_id)->delete();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
 
-        if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        if($record && $uDel){
+            return $this->successResponse([$record, $uDel],Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }

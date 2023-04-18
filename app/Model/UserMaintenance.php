@@ -18,4 +18,8 @@ class UserMaintenance extends Model
     public function resultJob() {
         return $this->internalMemoMaintenance()->where('flag','=', 0);
     }
+
+    public function user(){
+        return $this->hasOne('App\User', 'id', 'user_id');
+    }
 }
