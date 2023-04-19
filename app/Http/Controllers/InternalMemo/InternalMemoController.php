@@ -475,11 +475,19 @@ class InternalMemoController extends Controller
         $files = $request['files'];
         $videos = $request['videos'];
 
-        $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
-        foreach ($userMaintenance as $key => $value){
-            UserMaintenance::where('id', $value)->update([
-                'flag' => 0
+        try {
+            $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
+            foreach ($userMaintenance as $key => $value){
+                UserMaintenance::where('id', $value)->update([
+                    'flag' => 0
+                ]);
+            }
+
+            InternalMemoMaintenance::where('id_internal_memo', $id)->update([
+                'flag' => 4
             ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
 
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
@@ -489,7 +497,7 @@ class InternalMemoController extends Controller
          */
         if($pic->kategori_proses === 0 || $pic->kategori_proses === 4){
             InternalMemo::where('id', $id)->update([
-                'flag' => $pic->kategori_proses
+                'flag' => 4
             ]);
 
             HistoryMemo::create([
