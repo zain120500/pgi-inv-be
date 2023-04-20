@@ -208,6 +208,8 @@ class MaintenanceController extends Controller
                 'message' => "
 No Memo : *$memo->im_number*
 Status : *PROSES*
+No Telp Cabang : 089xxxxx
+Maps : asdamosdaosdmaois
 Info Lebih Lanjut Silahkan Klik Link Dibawah Ini
 Link Login : http://portal.pusatgadai.id
                 ",

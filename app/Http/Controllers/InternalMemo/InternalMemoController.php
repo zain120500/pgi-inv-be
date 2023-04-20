@@ -398,7 +398,6 @@ class InternalMemoController extends Controller
                 "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
                 "waktu" => Carbon::now()->format('h')
             ]);
-
         }
 
         if($array){
@@ -475,11 +474,19 @@ class InternalMemoController extends Controller
         $files = $request['files'];
         $videos = $request['videos'];
 
-        $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
-        foreach ($userMaintenance as $key => $value){
-            UserMaintenance::where('id', $value)->update([
-                'flag' => 0
+        try {
+            $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
+            foreach ($userMaintenance as $key => $value){
+                UserMaintenance::where('id', $value)->update([
+                    'flag' => 0
+                ]);
+            }
+
+            InternalMemoMaintenance::where('id_internal_memo', $id)->update([
+                'flag' => 4
             ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
 
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
@@ -489,7 +496,7 @@ class InternalMemoController extends Controller
          */
         if($pic->kategori_proses === 0 || $pic->kategori_proses === 4){
             InternalMemo::where('id', $id)->update([
-                'flag' => $pic->kategori_proses
+                'flag' => 4
             ]);
 
             HistoryMemo::create([
@@ -580,33 +587,33 @@ class InternalMemoController extends Controller
 
     public function menuArchive(Request $request)
     {
-        $record = InternalMemo::whereIn('flag', [4, 3, 10])->orderBy('created_at', 'DESC')->paginate(15);
+        $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->orderBy('created_at', 'DESC')->paginate(15);
 
         if($request->im_number){
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_fpp){
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_jenis_fpp){
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_kategori_sub_fpp){
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_devisi){
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->paginate(15);
         }elseif($request->id_cabang){
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->paginate(15);
         }else if($request->created_at){
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->orderBy('created_at', $request->created_at)->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->orderBy('created_at', $request->created_at)->paginate(15);
         }else if($request->startDate && $request->endDate){
             $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
             $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
         }else if($request->flag) {
             $record = InternalMemo::orderBy('created_at', 'DESC')
                 ->where('flag', $request->flag)->paginate(15);
         }else if($request->id_cabang_multiple) {
             $id_cabang_multiple = $request->id_cabang_multiple;
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->orderBy('created_at', 'DESC')
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->orderBy('created_at', 'DESC')
                 ->whereIn('id_cabang', $id_cabang_multiple)->paginate(15);
         }
 
@@ -621,7 +628,7 @@ class InternalMemoController extends Controller
         });
 
         if($request->kabupaten_kota_id) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 10])->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
+            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10])->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function($query) use ($request) {
                 $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
             })->paginate(15);
         }
