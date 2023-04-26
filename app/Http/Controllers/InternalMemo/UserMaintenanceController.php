@@ -109,8 +109,16 @@ class UserMaintenanceController extends Controller
                 return $e->getMessage();
             }
         }else{
+            $user = User::create([
+                'name' => $request->nama,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role_id' => $request->role_id
+            ]);
+
             $record = UserMaintenance::create([
                 'nama' => $request->nama,
+                'user_id' => $user->id,
                 'wilayah' => $request->wilayah,
                 'pekerjaan' => $request->pekerjaan,
                 'status' => $request->status,
@@ -250,6 +258,8 @@ class UserMaintenanceController extends Controller
     {
         try {
             $user = UserMaintenance::where('id', $id)->first();
+            Storage::disk('sftp')->delete(basename($user->foto));
+            Storage::disk('sftp')->delete(basename($user->ktp));
             $record = UserMaintenance::find($id)->delete();
             $uDel = User::where('id', $user->user_id)->delete();
         } catch (\Exception $e) {
