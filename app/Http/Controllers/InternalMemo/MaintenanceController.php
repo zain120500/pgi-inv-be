@@ -602,8 +602,6 @@ Link Login : http://portal.pusatgadai.id
                 $update = InternalMemoMaintenance::where('id_user_maintenance', $values)->where('id_internal_memo', $value)->first();
 
                 if(empty($request->date)){
-                    $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
-
                     $imMainteance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $value,
                         'id_user_maintenance' => $values,
@@ -636,14 +634,16 @@ Link Login : http://portal.pusatgadai.id
                         return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
                     }
                 }else if(!empty($update)){
-                    $update->update([
+                    $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
+
+                    $updates->update([
                         'date' => $request->date,
                         'created_by' => auth()->user()->id
                     ]);
-                    $arr[] = $update->first();
+                    $arr[] = $updates->first();
 
-                    if($update){
-                        return $this->successResponse($update,Constants::HTTP_MESSAGE_200, 200);
+                    if($arr){
+                        return $this->successResponse($arr,Constants::HTTP_MESSAGE_200, 200);
                     } else {
                         return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
                     }
