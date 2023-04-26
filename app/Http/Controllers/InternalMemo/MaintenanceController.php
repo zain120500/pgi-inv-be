@@ -344,11 +344,15 @@ Link Login : http://portal.pusatgadai.id
                 'flag' => 1
             ]);
 
+            $im = InternalMemo::where('id', $memo->id_internal_memo)->update([
+                'flag' => 12
+            ]);
+
             $hM = HistoryMemo::create([
                 'id_internal_memo' => $memo->id_internal_memo,
                 'user_id' => $uM->user_id,
                 'status' => 12,
-                'keterangan' => 'Maintenance Sudah Selesai',
+                'keterangan' => 'Maintenance Sudah Hadir',
                 "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
                 "waktu" => Carbon::now()->format('h')
             ]);
@@ -967,12 +971,25 @@ Link Login : http://portal.pusatgadai.id
             $iMemoMaintenance->update([
                 'flag' => 3
             ]);
+
+            $im = InternalMemo::where('id', $request->id_internal_memo)->update([
+                'flag' => 13
+            ]);
+
+            $hM = HistoryMemo::create([
+                'id_internal_memo' => $iMemoMaintenance->id_internal_memo,
+                'user_id' => $uMaintenance->user_id,
+                'status' => 13,
+                'keterangan' => 'Maintenance Sudah Selesai',
+                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                "waktu" => Carbon::now()->format('h')
+            ]);
         } catch (\Exception $e) {
             return $e->getMessage();
         }
 
         if($iMemoMaintenance){
-            return $this->successResponse($iMemoMaintenance,Constants::HTTP_MESSAGE_200, 200);
+            return $this->successResponse([$iMemoMaintenance, $hM, $im],Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
