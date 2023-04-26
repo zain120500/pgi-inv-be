@@ -231,6 +231,9 @@ class UserMaintenanceController extends Controller
                     'password' => bcrypt($request->password)
                 ]);
 
+                Storage::disk('sftp')->delete(basename($record->foto));
+                Storage::disk('sftp')->delete(basename($record->ktp));
+
                 $update = UserMaintenance::where('id', $record->id)->update([
                     'nama' => $request->nama,
                     'wilayah' => $request->wilayah,
@@ -260,6 +263,8 @@ class UserMaintenanceController extends Controller
                     'password' => bcrypt($request->password)
                 ]);
 
+                Storage::disk('sftp')->delete(basename($record->foto));
+
                 $update = UserMaintenance::where('id', $record->id)->update([
                     'nama' => $request->nama,
                     'wilayah' => $request->wilayah,
@@ -287,6 +292,8 @@ class UserMaintenanceController extends Controller
                     'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
+
+                Storage::disk('sftp')->delete(basename($record->ktp));
 
                 $update = UserMaintenance::where('id', $record->id)->update([
                     'nama' => $request->nama,
