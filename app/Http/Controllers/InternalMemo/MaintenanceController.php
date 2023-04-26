@@ -602,12 +602,14 @@ Link Login : http://portal.pusatgadai.id
                 $update = InternalMemoMaintenance::where('id_user_maintenance', $values)->where('id_internal_memo', $value)->first();
 
                 if(empty($request->date)){
+                    $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
+
                     $imMainteance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $value,
                         'id_user_maintenance' => $values,
-                        'date' => Carbon::now(),
-                        'link' => (Str::random(5).$values),
-                        'kode' => (Str::random(5)),
+                        'date' => $update->date,
+                        'link' => $this->generateRandomString(4),
+                        'kode' => $this->generateRandomString(4),
                         'flag' => 0,
                         'created_by' => auth()->user()->id
                     ]);
