@@ -135,7 +135,7 @@ class UserMaintenanceController extends Controller
         $record = UserMaintenance::find($id);
         $users = User::where('id', $record->user_id)->first();
 
-        if(!empty($files) || !empty($ktp)) {
+        if(!empty($files) && !empty($ktp)) {
             $image_64 = $files; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
             $replace = substr($image_64, 0, strpos($image_64, ',')+1);
@@ -172,7 +172,7 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(!empty($files)) {
+        }else if(!empty($files) && empty($ktp)) {
             $image_64 = $files; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
             $replace = substr($image_64, 0, strpos($image_64, ',')+1);
@@ -200,7 +200,7 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(!empty($ktp)) {
+        }else if(!empty($ktp) && empty($files)) {
             $image = $ktp; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
             $replace = substr($image, 0, strpos($image, ',')+1);
@@ -231,7 +231,9 @@ class UserMaintenanceController extends Controller
         }else if(empty($files) || empty($ktp)){
             $update = UserMaintenance::where('id', $record->id)->update([
                 'nama' => $request->nama,
+                'wilayah' => $request->wilayah,
                 'pekerjaan' => $request->pekerjaan,
+                'status' => $request->status,
                 'no_telp' => $request->no_telp,
                 'keterangan' => $request->keterangan,
             ]);
