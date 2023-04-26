@@ -948,13 +948,6 @@ Link Login : http://portal.pusatgadai.id
             return $query;
         });
 
-        $ids = [3,4];
-
-        $collection = InternalMemo::orderByRaw('FIELD (flag, ' . implode(', ', $ids) . ') DESC')
-            ->get();
-
-        return $collection;
-
         if($iMemo){
             return $this->successResponse($iMemo,Constants::HTTP_MESSAGE_200, 200);
         } else {
