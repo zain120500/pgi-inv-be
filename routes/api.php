@@ -346,6 +346,7 @@ Route::group([
             Route::post('/createBarangMaintenance', 'MaintenanceController@createBarangMaintenance');
             Route::post('/deleteBarangMaintenance', 'MaintenanceController@deleteBarangMaintenance');
             Route::get('/getStockBarangV2', 'MaintenanceController@getStockBarangV2');
+            Route::get('/stock-barang-v3', 'MaintenanceController@getStockBarangV3');
             Route::get('/getListMaintenance', 'MaintenanceController@getListMaintenance');
             Route::post('/newInternalMaintenance/test', 'MaintenanceController@newInternalMaintenance');
             Route::get('/getDetailBarang', 'MaintenanceController@getDetailBarang');
