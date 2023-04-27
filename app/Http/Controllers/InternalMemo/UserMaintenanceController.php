@@ -325,6 +325,13 @@ class UserMaintenanceController extends Controller
                 return $e->getMessage();
             }
         }else if(empty($files) || empty($ktp)){
+            $users->update([
+                'name' => $request->nama,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => bcrypt($request->password)
+            ]);
+
             $update = UserMaintenance::where('id', $record->id)->update([
                 'nama' => $request->nama,
                 'username' => $request->username,
