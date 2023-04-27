@@ -30,10 +30,11 @@ class KategoriSubController extends Controller
     public function store(Request $request)
     {
         $query = KategoriSubFpp::create([
-                    "name"=> $request->name,
-                    "id_kategori_fpp"=> $request->id_kategori_fpp
-                ]);
-        
+            "name"=> $request->name,
+            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "sla" => $request->sla
+        ]);
+
         if ($query) {
             return $this->successResponse($query,'Success', 200);
         } else {
@@ -60,12 +61,12 @@ class KategoriSubController extends Controller
 
     public function update(Request $request, $id)
     {
-        $query = KategoriSubFpp::where('id', $id)
-                ->update([
-                    "name"=> $request->name,
-                    "id_kategori_fpp"=> $request->id_kategori_fpp
-                ]);
-        
+        $query = KategoriSubFpp::where('id', $id)->update([
+            "name"=> $request->name,
+            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "sla" => $request->sla
+        ]);
+
         if ($query) {
             return $this->successResponse($query,'Success', 200);
         } else {
