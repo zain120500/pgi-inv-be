@@ -141,7 +141,7 @@ class MaintenanceController extends Controller
             foreach ($maintenanceUser as $keys => $values){
                 $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
                 $this->ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp);
-                $this->ProceesWaMaintenance($memo, $user);
+                $this->ProceesWaMaintenance($memo, $user, $cabang);
             }
 
 
@@ -190,7 +190,7 @@ class MaintenanceController extends Controller
     /**
      * Function untuk whatsupp maintenance
      */
-    public function  ProceesWaMaintenance($memo, $user) {
+    public function  ProceesWaMaintenance($memo, $user, $cabang) {
         $token = env("FONTE_TOKEN");
         $curl = curl_init();
 
@@ -208,8 +208,8 @@ class MaintenanceController extends Controller
                 'message' => "
 No Memo : *$memo->im_number*
 Status : *PROSES*
-No Telp Cabang : 089xxxxx
-Maps : asdamosdaosdmaois
+No Telp Cabang : $cabang->telepon
+Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
 Info Lebih Lanjut Silahkan Klik Link Dibawah Ini
 Link Login : http://portal.pusatgadai.id
                 ",
@@ -787,6 +787,24 @@ Link Login : http://portal.pusatgadai.id
             })->paginate(10);
         }else{
             $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->paginate(10);
+        }
+
+        if($stockBarang){
+            return $this->successResponse($stockBarang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function getStockBarangV3(Request $request)
+    {
+        $value = $request->tipe;
+        if(!empty($request->tipe)){
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value) {
+                $q->where('tipe', 'like', '%' . $value . '%');
+            })->get();
+        }else{
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->get();
         }
 
         if($stockBarang){
