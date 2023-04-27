@@ -87,6 +87,7 @@ class UserMaintenanceController extends Controller
             try {
                 $user = User::create([
                     'name' => $request->nama,
+                    'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password),
                     'role_id' => $request->role_id
@@ -94,6 +95,7 @@ class UserMaintenanceController extends Controller
 
                 $record = UserMaintenance::create([
                     'nama' => $request->nama,
+                    'username' => $request->username,
                     'user_id' => $user->id,
                     'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
@@ -120,6 +122,7 @@ class UserMaintenanceController extends Controller
             try {
                 $user = User::create([
                     'name' => $request->nama,
+                    'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password),
                     'role_id' => $request->role_id
@@ -127,6 +130,7 @@ class UserMaintenanceController extends Controller
 
                 $record = UserMaintenance::create([
                     'nama' => $request->nama,
+                    'username' => $request->username,
                     'user_id' => $user->id,
                     'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
@@ -152,6 +156,7 @@ class UserMaintenanceController extends Controller
             try {
                 $user = User::create([
                     'name' => $request->nama,
+                    'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password),
                     'role_id' => $request->role_id
@@ -159,6 +164,7 @@ class UserMaintenanceController extends Controller
 
                 $record = UserMaintenance::create([
                     'nama' => $request->nama,
+                    'username' => $request->username,
                     'user_id' => $user->id,
                     'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
@@ -175,6 +181,7 @@ class UserMaintenanceController extends Controller
         }else if(empty($files) && empty($ktp)){
             $user = User::create([
                 'name' => $request->nama,
+                'username' => $request->username,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
                 'role_id' => $request->role_id
@@ -182,6 +189,7 @@ class UserMaintenanceController extends Controller
 
             $record = UserMaintenance::create([
                 'nama' => $request->nama,
+                'username' => $request->username,
                 'user_id' => $user->id,
                 'wilayah' => $request->wilayah,
                 'pekerjaan' => $request->pekerjaan,
@@ -227,6 +235,7 @@ class UserMaintenanceController extends Controller
             try {
                 $users->update([
                     'name' => $request->nama,
+                    'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
@@ -236,6 +245,7 @@ class UserMaintenanceController extends Controller
 
                 $update = UserMaintenance::where('id', $record->id)->update([
                     'nama' => $request->nama,
+                    'username' => $request->username,
                     'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
                     'status' => $request->status,
@@ -243,6 +253,7 @@ class UserMaintenanceController extends Controller
                     'foto' => $foto,
                     'ktp' => $ktp,
                     'keterangan' => $request->keterangan,
+                    'is_active' => $request->is_active
                 ]);
             } catch (\Exception $e) {
                 return $e->getMessage();
@@ -259,6 +270,7 @@ class UserMaintenanceController extends Controller
             try {
                 $users->update([
                     'name' => $request->nama,
+                    'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
@@ -267,12 +279,14 @@ class UserMaintenanceController extends Controller
 
                 $update = UserMaintenance::where('id', $record->id)->update([
                     'nama' => $request->nama,
+                    'username' => $request->username,
                     'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
                     'status' => $request->status,
                     'no_telp' => $request->no_telp,
                     'foto' => $foto,
                     'keterangan' => $request->keterangan,
+                    'is_active' => $request->is_active
                 ]);
             } catch (\Exception $e) {
                 return $e->getMessage();
@@ -289,6 +303,7 @@ class UserMaintenanceController extends Controller
             try {
                 $users->update([
                     'name' => $request->nama,
+                    'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
@@ -297,12 +312,14 @@ class UserMaintenanceController extends Controller
 
                 $update = UserMaintenance::where('id', $record->id)->update([
                     'nama' => $request->nama,
+                    'username' => $request->username,
                     'wilayah' => $request->wilayah,
                     'pekerjaan' => $request->pekerjaan,
                     'status' => $request->status,
                     'no_telp' => $request->no_telp,
                     'ktp' => $ktp,
                     'keterangan' => $request->keterangan,
+                    'is_active' => $request->is_active
                 ]);
             } catch (\Exception $e) {
                 return $e->getMessage();
@@ -310,11 +327,13 @@ class UserMaintenanceController extends Controller
         }else if(empty($files) || empty($ktp)){
             $update = UserMaintenance::where('id', $record->id)->update([
                 'nama' => $request->nama,
+                'username' => $request->username,
                 'wilayah' => $request->wilayah,
                 'pekerjaan' => $request->pekerjaan,
                 'status' => $request->status,
                 'no_telp' => $request->no_telp,
                 'keterangan' => $request->keterangan,
+                'is_active' => $request->is_active
             ]);
         }
 
