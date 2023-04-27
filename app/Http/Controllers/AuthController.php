@@ -38,7 +38,7 @@ class AuthController extends Controller
         $user = "";
         $id_top_menu = [];
 
-        $credentials = request(['email', 'password']);
+        $credentials = request(['name', 'password']);
         if (!$token = auth()->attempt($credentials)) {
             return $this->errorResponse('Incorrect username or password.', 401);
         } else {

@@ -31,7 +31,7 @@ class KategoriSubController extends Controller
     {
         $query = KategoriSubFpp::create([
             "name"=> $request->name,
-            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "id_kategori_jenis"=> $request->id_kategori_jenis,
             "sla" => $request->sla
         ]);
 
@@ -63,7 +63,7 @@ class KategoriSubController extends Controller
     {
         $query = KategoriSubFpp::where('id', $id)->update([
             "name"=> $request->name,
-            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            "id_kategori_jenis"=> $request->id_kategori_jenis,
             "sla" => $request->sla
         ]);
 
