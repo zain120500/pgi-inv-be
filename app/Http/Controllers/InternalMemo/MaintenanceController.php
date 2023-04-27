@@ -799,9 +799,14 @@ Link Login : http://portal.pusatgadai.id
     public function getStockBarangV3(Request $request)
     {
         $value = $request->tipe;
+        $values = $request->kode_barang;
         if(!empty($request->tipe)){
-            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value) {
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value, $values) {
                 $q->where('tipe', 'like', '%' . $value . '%');
+            })->get();
+        }else if(!empty($request->kode_barang)){
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function($q) use($value, $values) {
+                $q->where('kode_barang', 'like', '%' . $values . '%');
             })->get();
         }else{
             $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->get();
