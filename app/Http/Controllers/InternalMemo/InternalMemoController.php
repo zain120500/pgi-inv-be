@@ -96,7 +96,7 @@ class InternalMemoController extends Controller
 
         $internalMemo = InternalMemo::create([
             "im_number" => "IM". Carbon::now()->format('Ymd') . str_pad($number+1, 3, 0, STR_PAD_LEFT),
-            "id_kategori_fpp"=> $request->id_kategori_fpp,
+//            "id_kategori_fpp"=> $request->id_kategori_fpp,
             "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
             "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
             "id_devisi"=> $request->id_devisi,
@@ -166,7 +166,7 @@ class InternalMemoController extends Controller
         $query->createdBy->makeHidden(['created_at','updated_at','email_verified_at']);
         $query->cabang;
         $query->devisi->makeHidden(['created_at','updated_at']);
-        $query->kategori->makeHidden(['created_at','updated_at']);
+//        $query->kategori->makeHidden(['created_at','updated_at']);
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->memoRating;
@@ -207,7 +207,7 @@ class InternalMemoController extends Controller
         $query = InternalMemo::where('id', $id)->first();
 
         $query->update([
-            "id_kategori_fpp"=> $request->id_kategori_fpp,
+//            "id_kategori_fpp"=> $request->id_kategori_fpp,
             "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
             "id_kategori_sub_fpp"=> $request->id_kategori_sub_fpp,
             "id_devisi"=> $request->id_devisi,
