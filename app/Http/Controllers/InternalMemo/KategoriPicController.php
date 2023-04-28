@@ -53,14 +53,11 @@ class KategoriPicController extends Controller
         $kProses = $request->kategori_proses;
 
         try {
-            $kModel = KategoriFpp::where('id', $kategori)->first();
-
             foreach ($kProses as $keys => $kP){
                 $query = KategoriPicFpp::create([
                     "user_id"=> $request->user_id,
                     "devisi_id"=> $request->devisi_id,
-                    "id_kategori_fpp"=> $kModel->id,
-                    "id_kategori_jenis_fpp"=> $kModel->id_kategori_jenis_fpp,
+                    "id_kategori_jenis_fpp"=> $kategori,
                     "kategori_proses"=> $kP,
                     "created_by"=> auth()->user()->id
                 ]);
