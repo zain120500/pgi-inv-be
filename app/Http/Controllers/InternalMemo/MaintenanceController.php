@@ -596,10 +596,10 @@ Link Login : http://portal.pusatgadai.id
         $user = $request->id_user_maintenance;
         $memo = $request->id_memo;
 
-        $arr = [];
+        $imMainteance = [];
         foreach ($memo as $key => $value){
             foreach ($user as $keys => $values){
-                $update = InternalMemoMaintenance::where('id_user_maintenance', $values)->where('id_internal_memo', $value)->first();
+                $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
 
                 if(empty($request->date)){
                     $imMainteance = InternalMemoMaintenance::create([
@@ -611,12 +611,6 @@ Link Login : http://portal.pusatgadai.id
                         'flag' => 0,
                         'created_by' => auth()->user()->id
                     ]);
-
-                    if($imMainteance){
-                        return $this->successResponse($imMainteance,Constants::HTTP_MESSAGE_200, 200);
-                    } else {
-                        return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-                    }
                 }else if(empty($update)){
                     $imMainteance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $value,
@@ -627,12 +621,6 @@ Link Login : http://portal.pusatgadai.id
                         'flag' => 0,
                         'created_by' => auth()->user()->id
                     ]);
-
-                    if($imMainteance){
-                        return $this->successResponse($imMainteance,Constants::HTTP_MESSAGE_200, 200);
-                    } else {
-                        return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-                    }
                 }else if(!empty($update)){
                     $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
 
@@ -640,15 +628,15 @@ Link Login : http://portal.pusatgadai.id
                         'date' => $request->date,
                         'created_by' => auth()->user()->id
                     ]);
-                    $arr[] = $updates->first();
-
-                    if($arr){
-                        return $this->successResponse($arr,Constants::HTTP_MESSAGE_200, 200);
-                    } else {
-                        return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-                    }
+                    $imMainteance[] = $updates->first();
                 }
             }
+        }
+
+        if($imMainteance){
+            return $this->successResponse($imMainteance,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
     }
 
