@@ -996,27 +996,6 @@ Link Login : http://portal.pusatgadai.id
         }
     }
 
-    public function inputMultiple(Request $request){
-        $memos = $request->id_memo;
-        $user = $request->id_user_maintenance;
-
-        foreach ($memos as $key => $value){
-            foreach ($user as $keys => $values){
-                $imMainteance = InternalMemoMaintenance::create([
-                    'id_internal_memo' => $value,
-                    'id_user_maintenance' => $values,
-                    'date' => Carbon::now(),
-                    'link' => $this->generateRandomString(4),
-                    'kode' => $this->generateRandomString(4),
-                    'flag' => 0,
-                    'created_by' => auth()->user()->id
-                ]);
-            }
-        }
-
-        return $imMainteance;
-    }
-
     public function getFlagStatus($id)
     {
         if($id == 0){
