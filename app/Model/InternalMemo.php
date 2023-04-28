@@ -66,6 +66,11 @@ class InternalMemo extends Model
         return $this->hasMany('App\Model\InternalMemoMaintenance', 'id_internal_memo', 'id');
     }
 
+    public function maintenanceUser() {
+        $user = UserMaintenance::where('user_id', auth()->user()->id)->first();
+        return $this->memoMaintenance()->where('id_user_maintenance','=', $user->id);
+    }
+
     function memoRating()
     {
         return $this->hasMany('App\Model\InternalMemoRating', 'id_internal_memo', 'id');

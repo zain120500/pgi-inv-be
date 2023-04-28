@@ -952,6 +952,8 @@ Link Login : http://portal.pusatgadai.id
             $query->kategori;
             $query->kategoriJenis;
             $query->kategoriSub;
+            $query->maintenanceUser;
+            $query->memoRating;
 
             return $query;
         });
