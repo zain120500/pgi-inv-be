@@ -868,6 +868,7 @@ class InternalMemoController extends Controller
             ->orWhere('kepala_unit_id', $user)->get()->pluck('id');
 
         $internal = InternalMemo::whereIn('id_cabang', $cabang)->where('flag', '!=', 4)->orderBy('created_at', 'DESC')->get();
+        $internal = InternalMemo::whereIn('id_cabang', $cabang)->where('flag', '!=', 4)->orderBy('created_at', 'DESC')->get();
 
         if($request->id_devisi){
             $internal = InternalMemo::whereIn('id_cabang', $cabang)->orderBy('created_at', 'DESC')
