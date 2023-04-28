@@ -49,12 +49,25 @@ class KategoriPicController extends Controller
 
     public function store(Request $request)
     {
-        $query = KategoriPicFpp::create([
-            "user_id"=> $request->user_id,
-            "devisi_id"=> $request->devisi_id,
-            "id_kategori_fpp"=> $request->id_kategori_fpp,
-            "created_by"=> auth()->user()->id
-        ]);
+        $kategori = $request->id_kategori_fpp;
+        $kProses = $request->kategori_proses;
+
+        try {
+            $kModel = KategoriFpp::where('id', $kategori)->first();
+
+            foreach ($kProses as $keys => $kP){
+                $query = KategoriPicFpp::create([
+                    "user_id"=> $request->user_id,
+                    "devisi_id"=> $request->devisi_id,
+                    "id_kategori_fpp"=> $kModel->id,
+                    "id_kategori_jenis_fpp"=> $kModel->id_kategori_jenis_fpp,
+                    "kategori_proses"=> $kP,
+                    "created_by"=> auth()->user()->id
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
 
         if($query){
             return $this->successResponse($query,'Success', 200);
