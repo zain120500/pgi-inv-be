@@ -90,7 +90,8 @@ class UserMaintenanceController extends Controller
                     'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password),
-                    'role_id' => $request->role_id
+                    'role_id' => $request->role_id,
+                    'devisi_id' => 5
                 ]);
 
                 $record = UserMaintenance::create([
@@ -125,7 +126,8 @@ class UserMaintenanceController extends Controller
                     'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password),
-                    'role_id' => $request->role_id
+                    'role_id' => $request->role_id,
+                    'devisi_id' => 5
                 ]);
 
                 $record = UserMaintenance::create([
@@ -159,7 +161,8 @@ class UserMaintenanceController extends Controller
                     'username' => $request->username,
                     'email' => $request->email,
                     'password' => bcrypt($request->password),
-                    'role_id' => $request->role_id
+                    'role_id' => $request->role_id,
+                    'devisi_id' => 5
                 ]);
 
                 $record = UserMaintenance::create([
@@ -184,7 +187,8 @@ class UserMaintenanceController extends Controller
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
-                'role_id' => $request->role_id
+                'role_id' => $request->role_id,
+                'devisi_id' => 5
             ]);
 
             $record = UserMaintenance::create([
