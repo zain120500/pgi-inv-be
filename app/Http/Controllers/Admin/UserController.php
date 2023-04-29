@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
@@ -11,6 +12,23 @@ use App\Model\Menu;
 
 class UserController extends Controller
 {
+    public function all()
+    {
+        $users = User::orderBy('created_at', 'ASC')->get();
+
+        $collect_user = $users->map(function ($query) {
+            $query->role;
+            $query->admin;
+
+            return $query;
+        });
+
+        if($users){
+            return $this->successResponse($users,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
 
     public function index()
     {
@@ -51,7 +69,7 @@ class UserController extends Controller
 
             return $q;
         });
-        
+
         return $this->successResponse($query,'Success', 200);
     }
 

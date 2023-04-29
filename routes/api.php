@@ -119,6 +119,7 @@ Route::group([
     ], function ($router) {
 
         Route::get('/', 'UserController@index');
+        Route::get('/all', 'UserController@all');
         Route::get('/{id}', 'UserController@show');
     });
 
