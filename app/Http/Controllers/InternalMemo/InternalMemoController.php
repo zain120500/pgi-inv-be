@@ -158,7 +158,7 @@ class InternalMemoController extends Controller
 
     public function show($id)
     {
-        $query = InternalMemo::where('id', $id)->with('memoMaintenance.userMaintenance')->withCount('memoMaintenanceCount')->first();
+        $query = InternalMemo::where('id', $id)->with('memoMaintenance.userMaintenance')->withCount('memoMaintenanceCount', 'totalUserMaintenance')->first();
 
         $now = date('Y-m-d H:i:s', strtotime('now'));
 
