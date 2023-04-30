@@ -71,7 +71,13 @@ class InternalMemo extends Model
         return $this->memoMaintenance()->where('flag', 1);
     }
 
-    public function maintenanceUser() {
+    public function totalUserMaintenance()
+    {
+        return $this->memoMaintenance();
+    }
+
+    public function maintenanceUser()
+    {
         $user = UserMaintenance::where('user_id', auth()->user()->id)->first();
         return $this->memoMaintenance()->where('id_user_maintenance','=', $user->id);
     }
