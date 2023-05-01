@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Constants;
 use App\Http\Resources\User as UserResource;
+use App\Model\KategoriPicFpp;
+use App\Model\KategoriProsesPic;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidateUserRegistration;
 use App\Http\Requests\ValidateUserLogin;
@@ -33,8 +35,8 @@ class AuthController extends Controller
         return new UserResource($user);
     }
 
-    public function login(ValidateUserLogin $request){
-
+    public function login(ValidateUserLogin $request)
+    {
         $user = "";
         $id_top_menu = [];
 
@@ -69,11 +71,12 @@ class AuthController extends Controller
 
         $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
             ->where('user_staff_id', auth()->user()->id)
-
             ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
             ->get();
 
         $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
+
+        $kategoriProses = KategoriPicFpp::where('user_id', auth()->user()->id)->get();
 
         return response()->json([
             'type' =>'success',
@@ -81,7 +84,8 @@ class AuthController extends Controller
             'token' => $token,
             'user' => $user,
             'top_menu'=> $top_menu,
-            'cabang' => $cabang
+            'cabang' => $cabang,
+            'kategori_proses' => $kategoriProses
         ]);
     }
 
