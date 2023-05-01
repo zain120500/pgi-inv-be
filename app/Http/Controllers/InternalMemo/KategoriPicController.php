@@ -99,7 +99,7 @@ class KategoriPicController extends Controller
             ->update([
                 "user_id"=> $request->user_id,
                 "devisi_id"=> $request->devisi_id,
-                "id_kategori_fpp"=> $request->id_kategori_fpp,
+                "id_kategori_jenis_fpp"=> $request->id_kategori_fpp,
                 "kategori_proses"=> $request->kategori_proses,
                 "created_by"=> auth()->user()->id
             ]);
