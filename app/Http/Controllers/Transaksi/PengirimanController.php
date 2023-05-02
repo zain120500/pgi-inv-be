@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Transaksi;
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\Cabang;
+use App\Model\StokBarang;
 use App\Model\TblCabang;
 use Illuminate\Http\Request;
 
@@ -76,6 +77,55 @@ class PengirimanController extends Controller
     public function storeDetail(Request $request)
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
+
+        $pengiriman = Pengiriman::where('id', $request->id_pengiriman)->first();
+
+        $bStockPengirim = StokBarang::where([
+            'pic' => $pengiriman->pengirim,
+            'nomer_barang' => $barangTipe->kode_barang
+        ])->first();
+
+        $bStockPenerima = StokBarang::where([
+            'pic' => $pengiriman->penerima,
+            'nomer_barang' => $barangTipe->kode_barang
+        ])->first();
+
+        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
+        $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
+
+        try {
+            StokBarang::where('id', $bStockPengirim->id)->update([
+                'nomer_barang' => $bStockPengirim->nomer_barang,
+                'id_tipe' => $bStockPengirim->id_tipe,
+                'detail_barang' => $bStockPengirim->detail_barang,
+                'imei' => $bStockPengirim->imei,
+                'pic' => $bStockPengirim->pic,
+                'satuan' => $bStockPengirim->satuan,
+                'total_asset' => $bStockPengirim->total_asset,
+                'user_input' => $bStockPengirim->user_input,
+                'last_update' => $bStockPengirim->last_update,
+                'jumlah_stok' => $pengurangan
+            ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        try {
+            StokBarang::where('id', $bStockPenerima->id)->update([
+                'nomer_barang' => $bStockPenerima->nomer_barang,
+                'id_tipe' => $bStockPenerima->id_tipe,
+                'detail_barang' => $bStockPenerima->detail_barang,
+                'imei' => $bStockPenerima->imei,
+                'pic' => $bStockPenerima->pic,
+                'satuan' => $bStockPenerima->satuan,
+                'total_asset' => $bStockPenerima->total_asset,
+                'user_input' => $bStockPenerima->user_input,
+                'last_update' => $bStockPenerima->last_update,
+                'jumlah_stok' => $penambahan
+            ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
 
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
