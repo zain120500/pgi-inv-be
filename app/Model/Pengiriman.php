@@ -14,5 +14,15 @@ class Pengiriman extends Model
     {
         return $this->hasMany('App\Model\PengirimanDetail', 'id_pengiriman', 'id');
 	}
-    
+
+    function cabangPengirim()
+    {
+        return $this->hasOne('App\Model\Cabang', 'kode', 'pengirim');
+    }
+
+    function cabangPenerima()
+    {
+        return $this->hasOne('App\Model\Cabang', 'kode', 'penerima');
+    }
+
 }
