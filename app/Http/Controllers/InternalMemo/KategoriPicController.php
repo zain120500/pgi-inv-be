@@ -49,7 +49,7 @@ class KategoriPicController extends Controller
 
     public function store(Request $request)
     {
-        $kategori = $request->id_kategori_fpp;
+        $kategori = $request->id_kategori_jenis_fpp;
         $kProses = $request->kategori_proses;
 
         try {
