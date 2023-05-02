@@ -490,54 +490,63 @@ class InternalMemoController extends Controller
             return $e->getMessage();
         }
 
-        $update = InternalMemo::where('id', $id)->update([
-            'flag' => 4
-        ]);
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
-        HistoryMemo::create([
-            "id_internal_memo"=> $id,
-            "user_id"=> auth()->user()->id,
-            "status"=> 4,
-            "keterangan"=> $this->getFlagStatus(4).' '.auth()->user()->name
-        ]);
+        /**
+         * Cek Kategori Ku / Pic
+         */
+        if($pic->kategori_proses === 0 || $pic->kategori_proses === 4){
+            InternalMemo::where('id', $id)->update([
+                'flag' => 4
+            ]);
 
-        if(!empty($files)) {
-            foreach ($files as $key => $file) {
-                $image_64 = $file; //your base64 encoded data
-                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
-                $image = str_replace($replace, '', $image_64);
-                $image = str_replace(' ', '+', $image);
-                $imageName = Str::random(10).'.'.$extension;
-                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+            HistoryMemo::create([
+                "id_internal_memo"=> $id,
+                "user_id"=> auth()->user()->id,
+                "status"=> $pic->kategori_proses,
+                "keterangan"=> $this->getFlagStatus($pic->kategori_proses).' '.auth()->user()->name
+            ]);
 
-                $file = InternalMemoFile::create([
-                    "id_internal_memo" => $id,
-                    "path" => $imageName,
-                    "flag" => "foto_pic_ku"
-                ]);
+            if(!empty($files)) {
+                foreach ($files as $key => $file) {
+                    $image_64 = $file; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                    $image = str_replace($replace, '', $image_64);
+                    $image = str_replace(' ', '+', $image);
+                    $imageName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                    $file = InternalMemoFile::create([
+                        "id_internal_memo" => $id,
+                        "path" => $imageName,
+                        "flag" => "foto_pic_ku"
+                    ]);
+                }
             }
-        }
-        if(!empty($videos)){
-            foreach ($videos as $key => $video) {
-                $image_64 = $video; //your base64 encoded data
-                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-                $replace = substr($image_64, 0, strpos($image_64, ',')+1);
-                $image = str_replace($replace, '', $image_64);
-                $image = str_replace(' ', '+', $image);
-                $videoName = Str::random(10).'.'.$extension;
-                Storage::disk('sftp')->put($videoName, base64_decode(($image), 'r+'));
+            if(!empty($videos)){
+                foreach ($videos as $key => $video) {
+                    $image_64 = $video; //your base64 encoded data
+                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                    $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+                    $image = str_replace($replace, '', $image_64);
+                    $image = str_replace(' ', '+', $image);
+                    $videoName = Str::random(10).'.'.$extension;
+                    Storage::disk('sftp')->put($videoName, base64_decode(($image), 'r+'));
 
-                $video = InternalMemoFile::create([
-                    "id_internal_memo" => $id,
-                    "path" => $videoName,
-                    "flag" => "video_pic_ku"
-                ]);
+                    $video = InternalMemoFile::create([
+                        "id_internal_memo" => $id,
+                        "path" => $videoName,
+                        "flag" => "video_pic_ku"
+                    ]);
+                }
             }
+        }else{
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9001, 403);
         }
 
-        if($update){
-            return $this->successResponse($update,Constants::HTTP_MESSAGE_200, 200);
+        if($pic){
+            return $this->successResponse($pic,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
