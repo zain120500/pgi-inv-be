@@ -177,6 +177,8 @@ class PengirimanController extends Controller
             $details = PengirimanDetail::where('id_pengiriman', $query->id);
             $query['total_unit'] = $details->sum('jumlah');
             $query['total_pembelian'] = $details->sum('total_harga');
+            $query->cabangPengirim;
+            $query->cabangPenerima;
 
             $query['detail'] = $pengiriman_detail;
 
