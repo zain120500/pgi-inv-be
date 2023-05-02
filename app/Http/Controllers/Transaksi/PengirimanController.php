@@ -33,6 +33,8 @@ class PengirimanController extends Controller
             $q['total_pembelian'] = $details->sum('total_harga');
 
             $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
+            $q->cabangPengirim;
+            $q->cabangPenerima;
             return $q;
         });
 
