@@ -263,7 +263,6 @@ Route::group([
 
             });
 
-
             Route::post('/cabang', 'PengirimanController@getCabang');
             Route::post('/cabangPusat', 'PengirimanController@getCabangPusat');
 
