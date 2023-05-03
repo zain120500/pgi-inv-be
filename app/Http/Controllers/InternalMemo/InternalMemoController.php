@@ -482,6 +482,7 @@ class InternalMemoController extends Controller
          */
         if($pic->kategori_proses === 0 || $pic->kategori_proses === 4){
 
+            DB::beginTransaction();
             try {
                 $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
                 foreach ($userMaintenance as $key => $value){
@@ -493,7 +494,10 @@ class InternalMemoController extends Controller
                 InternalMemoMaintenance::where('id_internal_memo', $id)->update([
                     'flag' => 4
                 ]);
+
+                DB::commit();
             } catch (\Exception $e) {
+                DB::rollback();
                 return $e->getMessage();
             }
 
