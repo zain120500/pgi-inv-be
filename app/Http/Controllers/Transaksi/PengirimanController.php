@@ -315,17 +315,17 @@ class PengirimanController extends Controller
     public function destroy($id)
     {
         $query = Pengiriman::find($id);
-        $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
+        $pengiriman = PengirimanDetail::where('id_pengiriman', $query->id)->first();
 
         if(!empty($query)){
 
             DB::beginTransaction();
             try {
-                BarangKeluar::where('id_tipe', $query->id_tipe)->where('pic', $pengiriman->pengirim)->delete();
+                BarangKeluar::where('pic', $query->pengirim)->where('id_tipe', $pengiriman->id_tipe)->delete();
                 $query->delete();
 
                 PengirimanDetail::where('id_pengiriman',$query->id)->delete();
-                InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
+//                InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollback();
