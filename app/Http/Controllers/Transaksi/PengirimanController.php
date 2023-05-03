@@ -18,8 +18,7 @@ use App\Model\InternalMemoPengiriman;
 use App\Model\BarangTipe;
 use App\Model\BarangKeluar;
 use App\Model\UserStaffCabang;
-
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class PengirimanController extends Controller
 {
@@ -316,11 +315,37 @@ class PengirimanController extends Controller
     public function destroy($id)
     {
         $query = Pengiriman::find($id);
-        if(!empty($query)){
-            $query->delete();
+        $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
 
-            PengirimanDetail::where('id_pengiriman',$query->id)->delete();
-            InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
+        $stokBarang = StokBarang::where('id_tipe', $query->id_tipe)->where('pic', $pengiriman->pengirim)->first();
+
+        $total = (($stokBarang->jumlah_stok)-($query->jumlah));
+
+        if(!empty($query)){
+
+            DB::beginTransaction();
+            try {
+                StokBarang::where('id', $stokBarang->id)->update([
+                    'nomer_barang' => $stokBarang->nomer_barang,
+                    'id_tipe' => $stokBarang->id_tipe,
+                    'detail_barang' => $stokBarang->detail_barang,
+                    'imei' => $stokBarang->imei,
+                    'pic' => $stokBarang->pic,
+                    'satuan' => $stokBarang->satuan,
+                    'total_asset' => $stokBarang->total_asset,
+                    'user_input' => $stokBarang->user_input,
+                    'last_update' => $stokBarang->last_update,
+                    'jumlah_stok' => $total
+                ]);
+                $query->delete();
+
+                PengirimanDetail::where('id_pengiriman',$query->id)->delete();
+                InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                return $e->getMessage();
+            }
 
             return $this->successResponse($query,'Success', 200);
         } else {
@@ -331,8 +356,35 @@ class PengirimanController extends Controller
     public function destroyDetail($id)
     {
         $query = PengirimanDetail::find($id);
+        $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
+
+        $stokBarang = StokBarang::where('id_tipe', $query->id_tipe)->where('pic', $pengiriman->pengirim)->first();
+
+        $total = (($stokBarang->jumlah_stok)-($query->jumlah));
+
         if(!empty($query)){
-            $query->delete();
+
+            DB::beginTransaction();
+            try {
+                StokBarang::where('id', $stokBarang->id)->update([
+                    'nomer_barang' => $stokBarang->nomer_barang,
+                    'id_tipe' => $stokBarang->id_tipe,
+                    'detail_barang' => $stokBarang->detail_barang,
+                    'imei' => $stokBarang->imei,
+                    'pic' => $stokBarang->pic,
+                    'satuan' => $stokBarang->satuan,
+                    'total_asset' => $stokBarang->total_asset,
+                    'user_input' => $stokBarang->user_input,
+                    'last_update' => $stokBarang->last_update,
+                    'jumlah_stok' => $total
+                ]);
+                $query->delete();
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                return $e->getMessage();
+            }
+
             return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
