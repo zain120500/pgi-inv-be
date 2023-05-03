@@ -317,21 +317,31 @@ class PengirimanController extends Controller
         $query = Pengiriman::find($id);
         $pengiriman = PengirimanDetail::where('id_pengiriman', $query->id)->first();
 
-        if(!empty($query)){
-
+        if(!empty($query && !empty($pengiriman))) {
             DB::beginTransaction();
             try {
                 BarangKeluar::where('pic', $query->pengirim)->where('id_tipe', $pengiriman->id_tipe)->delete();
                 $query->delete();
 
-                PengirimanDetail::where('id_pengiriman',$query->id)->delete();
+                PengirimanDetail::where('id_pengiriman', $query->id)->delete();
 //                InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollback();
                 return $e->getMessage();
             }
+        }else if(empty($pengiriman)){
+            DB::beginTransaction();
+            try {
+                $query->delete();
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                return $e->getMessage();
+            }
+        }
 
+        if(!empty($query)){
             return $this->successResponse($query,'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
