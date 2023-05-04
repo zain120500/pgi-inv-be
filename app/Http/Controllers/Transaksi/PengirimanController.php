@@ -128,7 +128,7 @@ class PengirimanController extends Controller
             return $e->getMessage();
         }
 
-        if(empty($barangTipe)){
+        if(!empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
             $query = PengirimanDetail::create([
@@ -286,8 +286,8 @@ class PengirimanController extends Controller
         $id = $request->id;
         $status = $request->status;
 
-        $pengiriman = Pengiriman::where('id_pengiriman', $id)->first();
-        $query = PengirimanDetail::where('id', $id)->update(["status" => $status]);
+        $pengiriman = Pengiriman::where('id', $id)->first();
+        $query = PengirimanDetail::where('id_pengiriman', $id)->update(["status" => $status]);
 
         if($status == 1) { //jika barang pengiriman diterima
 
