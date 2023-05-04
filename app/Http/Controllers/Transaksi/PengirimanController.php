@@ -286,11 +286,12 @@ class PengirimanController extends Controller
         $id = $request->id;
         $status = $request->status;
 
-        $pengiriman = Pengiriman::where('id', $id)->first();
-        $query = PengirimanDetail::where('id_pengiriman', $id)->update(["status" => $status]);
+        $query = PengirimanDetail::where('id', $id)->first();
+        $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
+
+        $query->update(["status" => $status]);
 
         if($status == 1) { //jika barang pengiriman diterima
-
             BarangKeluar::create([
                 "tanggal" => date("Y-m-d"),
                 "id_tipe" => $query->id_tipe,

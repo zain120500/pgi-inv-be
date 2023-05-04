@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\InternalMemo\MaintenanceControllerV2;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/attendanceMaintenance/{id}', 'InternalMemo\MaintenanceController@attendanceMaintenance');
 Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
+Route::post('/forget-password', [AuthController::class, 'submitForgetPasswordForm']);
+Route::post('/reset-password', [AuthController::class, 'submitResetPasswordForm']);
 
 Route::group([
     // 'namespace' => 'Profile',
@@ -32,6 +34,7 @@ Route::group([
     Route::post('/login', 'AuthController@login')->name('login');
     Route::get('/user', 'AuthController@user');
     Route::post('/logout', 'AuthController@logout');
+    Route::get('/refresh-token', 'AuthController@refreshToken');
 });
 
 
@@ -191,6 +194,7 @@ Route::group([
             'prefix' => 'barang-masuk'
         ], function ($router) {
 
+            Route::get('/barang-cabang-kode', 'BarangMasukController@barangByCabangKode');
             Route::get('/', 'BarangMasukController@index');
             Route::get('/{id}', 'BarangMasukController@show');
         });

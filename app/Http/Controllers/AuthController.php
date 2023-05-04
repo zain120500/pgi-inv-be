@@ -6,6 +6,7 @@ use App\Helpers\Constants;
 use App\Http\Resources\User as UserResource;
 use App\Model\KategoriPicFpp;
 use App\Model\KategoriProsesPic;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Requests\ValidateUserRegistration;
 use App\Http\Requests\ValidateUserLogin;
@@ -16,13 +17,19 @@ use App\Model\Role;
 use App\Model\Menu;
 use App\Model\TopMenu;
 use App\Model\Cabang;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:api', ['except' => ['login','register','submitForgetPasswordForm','submitResetPasswordForm']]);
     }
 
     public function register(ValidateUserRegistration $request){
@@ -115,5 +122,77 @@ class AuthController extends Controller
             'code' => 200,
             'status' => Constants::HTTP_MESSAGE_200
         ]);
+    }
+
+    public function refreshToken()
+    {
+        try{
+            $token = auth()->refresh(true, true);
+        }catch(TokenInvalidException $e){
+            throw new AccessDeniedHttpException('The token is invalid');
+        }
+
+        return response()->json([
+            'code' => 200,
+            'status' => Constants::HTTP_MESSAGE_200,
+            'token' => $token
+        ]);
+    }
+
+    public function submitForgetPasswordForm(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users',
+        ]);
+
+        $token = Str::random(64);
+
+        DB::table('password_resets')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]);
+
+        Mail::send('email.forgetPassword', ['token' => $token], function($message) use($request){
+            $message->to($request->email);
+            $message->subject('Reset Password');
+        });
+
+        if($request->email){
+            return $this->successResponse($request->email,Constants::ERROR_MESSAGE_9004, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function submitResetPasswordForm(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users',
+            'password' => 'required|string|min:6|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+
+        $updatePassword = DB::table('password_resets')
+            ->where([
+                'email' => $request->email,
+                'token' => $request->token
+            ])
+            ->first();
+
+        if(!$updatePassword){
+            return back()->withInput()->with('error', 'Invalid token!');
+        }
+
+        $user = User::where('email', $request->email)
+            ->update(['password' => bcrypt($request->password)]);
+
+        DB::table('password_resets')->where(['email'=> $request->email])->delete();
+
+        if($user){
+            return $this->successResponse($user,Constants::ERROR_MESSAGE_9005, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Barang;
 
+use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,7 @@ use App\Model\BarangMasuk;
 
 class BarangMasukController extends Controller
 {
-    
+
     public function index()
     {
         $barang = BarangMasuk::paginate(15);
@@ -54,5 +55,16 @@ class BarangMasukController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function barangByCabangKode(Request $request)
+    {
+        $bMasuk = BarangMasuk::where('pic', $request->kode_cabang)->orderBy('id', 'DESC')->paginate(15);
+
+        if($bMasuk){
+            return $this->successResponse($bMasuk,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
     }
 }

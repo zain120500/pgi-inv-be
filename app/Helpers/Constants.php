@@ -10,4 +10,6 @@ class Constants
     const ERROR_MESSAGE_9001 = 'Anda Tidak Mendapatkan Hak Akses';
     const ERROR_MESSAGE_9002 = 'Silahkan Input Quantity';
     const ERROR_MESSAGE_9003 = 'Kode Yang Anda Masukan Salah';
+    const ERROR_MESSAGE_9004 = 'We have e-mailed your password reset link!';
+    const ERROR_MESSAGE_9005 = 'Your password has been changed!';
 }
