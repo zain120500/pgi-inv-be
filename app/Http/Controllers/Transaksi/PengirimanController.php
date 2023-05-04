@@ -24,7 +24,10 @@ class PengirimanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pengiriman::orderBy('tanggal', 'DESC')->paginate(15);
+        $loginId = auth()->user()->id;
+        $cabang = Cabang::where('kepala_cabang_id', $loginId)->orWhere('kepala_cabang_senior_id', $loginId)->orWhere('kepala_unit_id', $loginId)->orWhere('area_manager_id', $loginId)->get()->pluck('kode');
+
+        $query = Pengiriman::whereIn('pengirim', $cabang)->orderBy('tanggal', 'DESC')->paginate(15);
         $collect = $query->getCollection()->map(function ($q) {
             $details = PengirimanDetail::where('id_pengiriman', $q->id);
 
