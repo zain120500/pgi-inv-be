@@ -131,7 +131,7 @@ class PengirimanController extends Controller
             return $e->getMessage();
         }
 
-        if(!empty($barangTipe)){
+        if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
             $query = PengirimanDetail::create([
