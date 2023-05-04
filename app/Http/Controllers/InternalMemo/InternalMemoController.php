@@ -24,6 +24,11 @@ use DateTime;
 
 class InternalMemoController extends Controller
 {
+
+    public function __construct(){
+        $this->testGlobal();
+    }
+
     public function index(Request $request)
     {
         $internal = InternalMemo::where('flag', '!=', 4)->withCount('memoMaintenanceCount','totalUserMaintenance')->orderBy('created_at', 'DESC')->get();
@@ -412,19 +417,13 @@ class InternalMemoController extends Controller
     {
         $internal = InternalMemo::find($id);
 
-        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
-
-        if($pic->kategori_proses == 0|| $pic->kategori_proses == 4){
-            $create = InternalMemoRating::create([
-                'id_internal_memo' => $internal->id,
-                'user_id' => auth()->user()->id,
-                'rating' => $request->rating,
-                'keterangan' => $request->keterangan,
-                'created_by' => auth()->user()->id,
-            ]);
-        }else{
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9001, 403);
-        }
+        $create = InternalMemoRating::create([
+            'id_internal_memo' => $internal->id,
+            'user_id' => auth()->user()->id,
+            'rating' => $request->rating,
+            'keterangan' => $request->keterangan,
+            'created_by' => auth()->user()->id,
+        ]);
 
         if($create){
             return $this->successResponse($create,Constants::HTTP_MESSAGE_200, 200);
