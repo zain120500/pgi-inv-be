@@ -12,4 +12,9 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ApiResponser;
 
+    public function testGlobal()
+    {
+        $loginid = auth()->user()->id;
+        return $loginid;
+    }
 }
