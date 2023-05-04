@@ -286,8 +286,8 @@ class PengirimanController extends Controller
         $id = $request->id;
         $status = $request->status;
 
-        $pengiriman = Pengiriman::where('id', $id)->first();
-        $query = PengirimanDetail::where('id_pengiriman', $id)->first();
+        $query = PengirimanDetail::where('id', $id)->first();
+        $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
 
         $query->update(["status" => $status]);
 
