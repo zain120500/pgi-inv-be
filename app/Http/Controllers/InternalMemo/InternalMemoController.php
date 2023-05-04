@@ -494,15 +494,15 @@ class InternalMemoController extends Controller
             return $e->getMessage();
         }
 
-        InternalMemo::where('id', $id)->update([
+        $memo = InternalMemo::where('id', $id)->update([
             'flag' => 4
         ]);
 
         HistoryMemo::create([
             "id_internal_memo"=> $id,
             "user_id"=> auth()->user()->id,
-            "status"=> $pic->kategori_proses,
-            "keterangan"=> $this->getFlagStatus($pic->kategori_proses).' '.auth()->user()->name
+            "status"=> 4,
+            "keterangan"=> $this->getFlagStatus(4).' '.auth()->user()->name
         ]);
 
         if(!empty($files)) {
@@ -540,8 +540,8 @@ class InternalMemoController extends Controller
             }
         }
 
-        if($pic){
-            return $this->successResponse($pic,Constants::HTTP_MESSAGE_200, 200);
+        if($memo){
+            return $this->successResponse($memo,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
