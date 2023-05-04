@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Barang;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Model\Cabang;
 use Illuminate\Http\Request;
 
 use App\Model\BarangTipe;
@@ -59,7 +60,10 @@ class BarangMasukController extends Controller
 
     public function barangByCabangKode(Request $request)
     {
-        $bMasuk = BarangMasuk::where('pic', $request->kode_cabang)->orderBy('id', 'DESC')->paginate(15);
+        $loginId = auth()->user()->id;
+        $cabang = Cabang::where('kepala_cabang_id', $loginId)->orWhere('kepala_cabang_senior_id', $loginId)->orWhere('kepala_unit_id', $loginId)->orWhere('area_manager_id', $loginId)->get()->pluck('kode');
+
+        $bMasuk = BarangMasuk::whereIn('pic', $cabang)->orderBy('id', 'DESC')->paginate(15);
 
         if($bMasuk){
             return $this->successResponse($bMasuk,Constants::HTTP_MESSAGE_200, 200);
