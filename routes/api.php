@@ -194,6 +194,7 @@ Route::group([
             'prefix' => 'barang-masuk'
         ], function ($router) {
 
+            Route::get('/barang-cabang-kode', 'BarangMasukController@barangByCabangKode');
             Route::get('/', 'BarangMasukController@index');
             Route::get('/{id}', 'BarangMasukController@show');
         });
