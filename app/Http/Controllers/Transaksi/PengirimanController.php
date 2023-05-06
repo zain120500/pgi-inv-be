@@ -24,23 +24,26 @@ class PengirimanController extends Controller
 {
     public function index(Request $request)
     {
-        $loginId = auth()->user()->id;
-        $cabang = Cabang::where('kepala_cabang_id', $loginId)->orWhere('kepala_cabang_senior_id', $loginId)->orWhere('kepala_unit_id', $loginId)->orWhere('area_manager_id', $loginId)->get()->pluck('kode');
+        foreach ($this->cabangGlobal() as $cabang){
+            if($cabang->kode == "P00001"){
+                $query = Pengiriman::orderBy('tanggal', 'DESC')->paginate(15);
+            }else{
+                $query = Pengiriman::whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))->orderBy('tanggal', 'DESC')->paginate(15);
+            }
+            $collect = $query->getCollection()->map(function ($q) {
+                $details = PengirimanDetail::where('id_pengiriman', $q->id);
 
-        $query = Pengiriman::whereIn('pengirim', $cabang)->orderBy('tanggal', 'DESC')->paginate(15);
-        $collect = $query->getCollection()->map(function ($q) {
-            $details = PengirimanDetail::where('id_pengiriman', $q->id);
+                $q['total_unit'] = $details->sum('jumlah');
+                $q['total_pembelian'] = $details->sum('total_harga');
 
-            $q['total_unit'] = $details->sum('jumlah');
-            $q['total_pembelian'] = $details->sum('total_harga');
+                $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
+                $q->cabangPengirim;
+                $q->cabangPenerima;
+                return $q;
+            });
 
-            $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
-            $q->cabangPengirim;
-            $q->cabangPenerima;
-            return $q;
-        });
-
-        return $this->successResponse($query->setCollection($collect),'Success', 200);
+            return $this->successResponse($query->setCollection($collect),'Success', 200);
+        }
     }
 
     public function create()

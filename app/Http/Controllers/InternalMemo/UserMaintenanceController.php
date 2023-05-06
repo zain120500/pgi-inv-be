@@ -54,6 +54,7 @@ class UserMaintenanceController extends Controller
     public function show($id)
     {
         $record = UserMaintenance::find($id);
+        $record->user;
 
         if($record){
             return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
