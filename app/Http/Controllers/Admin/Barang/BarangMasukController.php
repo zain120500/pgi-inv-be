@@ -15,7 +15,7 @@ class BarangMasukController extends Controller
 
     public function index()
     {
-        $barang = BarangMasuk::paginate(15);
+        $barang = BarangMasuk::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->paginate(15);
 
         $collect = $barang->getCollection()->map(function ($query) {
             return $query->barangTipe;
@@ -60,10 +60,7 @@ class BarangMasukController extends Controller
 
     public function barangByCabangKode(Request $request)
     {
-        $loginId = auth()->user()->id;
-        $cabang = Cabang::where('kepala_cabang_id', $loginId)->orWhere('kepala_cabang_senior_id', $loginId)->orWhere('kepala_unit_id', $loginId)->orWhere('area_manager_id', $loginId)->get()->pluck('kode');
-
-        $bMasuk = BarangMasuk::whereIn('pic', $cabang)->orderBy('id', 'DESC')->paginate(15);
+        $bMasuk = BarangMasuk::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->orderBy('id', 'DESC')->paginate(15);
 
         if($bMasuk){
             return $this->successResponse($bMasuk,Constants::HTTP_MESSAGE_200, 200);
