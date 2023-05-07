@@ -85,55 +85,6 @@ class PengirimanController extends Controller
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
 
-        $pengiriman = Pengiriman::where('id', $request->id_pengiriman)->first();
-
-        $bStockPengirim = StokBarang::where([
-            'pic' => $pengiriman->pengirim,
-            'nomer_barang' => $barangTipe->kode_barang
-        ])->first();
-
-        $bStockPenerima = StokBarang::where([
-            'pic' => $pengiriman->penerima,
-            'nomer_barang' => $barangTipe->kode_barang
-        ])->first();
-
-        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
-        $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
-
-        try {
-            StokBarang::where('id', $bStockPengirim->id)->update([
-                'nomer_barang' => $bStockPengirim->nomer_barang,
-                'id_tipe' => $bStockPengirim->id_tipe,
-                'detail_barang' => $bStockPengirim->detail_barang,
-                'imei' => $bStockPengirim->imei,
-                'pic' => $bStockPengirim->pic,
-                'satuan' => $bStockPengirim->satuan,
-                'total_asset' => $bStockPengirim->total_asset,
-                'user_input' => $bStockPengirim->user_input,
-                'last_update' => $bStockPengirim->last_update,
-                'jumlah_stok' => $pengurangan
-            ]);
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-
-        try {
-            StokBarang::where('id', $bStockPenerima->id)->update([
-                'nomer_barang' => $bStockPenerima->nomer_barang,
-                'id_tipe' => $bStockPenerima->id_tipe,
-                'detail_barang' => $bStockPenerima->detail_barang,
-                'imei' => $bStockPenerima->imei,
-                'pic' => $bStockPenerima->pic,
-                'satuan' => $bStockPenerima->satuan,
-                'total_asset' => $bStockPenerima->total_asset,
-                'user_input' => $bStockPenerima->user_input,
-                'last_update' => $bStockPenerima->last_update,
-                'jumlah_stok' => $penambahan
-            ]);
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
@@ -298,18 +249,69 @@ class PengirimanController extends Controller
         $query->update(["status" => $status]);
 
         if($status == 1) { //jika barang pengiriman diterima
-            BarangKeluar::create([
-                "tanggal" => date("Y-m-d"),
-                "id_tipe" => $query->id_tipe,
-                "nomer_barang" => $query->nomer_barang,
-                "detail_barang" => $query->detail_barang,
-                "pic" => $pengiriman->pengirim,
-                "jumlah" => $query->jumlah,
-                "satuan" => $query->satuan,
-                "total_harga" => $query->total_harga,
-                "imei" => $query->imei,
-                "user_input" => auth()->user()->admin->username,
-            ]);
+            $bStockPengirim = StokBarang::where([
+                'pic' => $pengiriman->pengirim,
+                'nomer_barang' => $query->nomer_barang
+            ])->first();
+
+            $bStockPenerima = StokBarang::where([
+                'pic' => $pengiriman->penerima,
+                'nomer_barang' => $query->nomer_barang
+            ])->first();
+
+            $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
+            $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
+
+            try {
+                StokBarang::where('id', $bStockPengirim->id)->update([
+                    'nomer_barang' => $bStockPengirim->nomer_barang,
+                    'id_tipe' => $bStockPengirim->id_tipe,
+                    'detail_barang' => $bStockPengirim->detail_barang,
+                    'imei' => $bStockPengirim->imei,
+                    'pic' => $bStockPengirim->pic,
+                    'satuan' => $bStockPengirim->satuan,
+                    'total_asset' => $bStockPengirim->total_asset,
+                    'user_input' => $bStockPengirim->user_input,
+                    'last_update' => $bStockPengirim->last_update,
+                    'jumlah_stok' => $pengurangan
+                ]);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+
+            try {
+                StokBarang::where('id', $bStockPenerima->id)->update([
+                    'nomer_barang' => $bStockPenerima->nomer_barang,
+                    'id_tipe' => $bStockPenerima->id_tipe,
+                    'detail_barang' => $bStockPenerima->detail_barang,
+                    'imei' => $bStockPenerima->imei,
+                    'pic' => $bStockPenerima->pic,
+                    'satuan' => $bStockPenerima->satuan,
+                    'total_asset' => $bStockPenerima->total_asset,
+                    'user_input' => $bStockPenerima->user_input,
+                    'last_update' => $bStockPenerima->last_update,
+                    'jumlah_stok' => $penambahan
+                ]);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+
+            try {
+                BarangKeluar::create([
+                    "tanggal" => date("Y-m-d"),
+                    "id_tipe" => $query->id_tipe,
+                    "nomer_barang" => $query->nomer_barang,
+                    "detail_barang" => $query->detail_barang,
+                    "pic" => $pengiriman->pengirim,
+                    "jumlah" => $query->jumlah,
+                    "satuan" => $query->satuan,
+                    "total_harga" => $query->total_harga,
+                    "imei" => $query->imei,
+                    "user_input" => auth()->user()->admin->username,
+                ]);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
         }
 
         if($query){
