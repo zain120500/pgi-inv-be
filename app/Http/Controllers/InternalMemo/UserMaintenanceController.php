@@ -241,7 +241,7 @@ class UserMaintenanceController extends Controller
                 $users->update([
                     'name' => $request->nama,
                     'username' => $request->username,
-                    'email' => $request->email,
+//                    'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
 
@@ -276,7 +276,7 @@ class UserMaintenanceController extends Controller
                 $users->update([
                     'name' => $request->nama,
                     'username' => $request->username,
-                    'email' => $request->email,
+//                    'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
 
@@ -309,7 +309,7 @@ class UserMaintenanceController extends Controller
                 $users->update([
                     'name' => $request->nama,
                     'username' => $request->username,
-                    'email' => $request->email,
+//                    'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
 
@@ -333,7 +333,7 @@ class UserMaintenanceController extends Controller
             $users->update([
                 'name' => $request->nama,
                 'username' => $request->username,
-                'email' => $request->email,
+//                'email' => $request->email,
                 'password' => bcrypt($request->password)
             ]);
 
