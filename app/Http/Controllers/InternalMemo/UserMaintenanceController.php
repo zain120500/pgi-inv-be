@@ -242,7 +242,7 @@ class UserMaintenanceController extends Controller
                     'name' => $request->nama,
                     'username' => $request->username,
 //                    'email' => $request->email,
-//                    'password' => bcrypt($request->password)
+                    'password' => bcrypt($request->password)
                 ]);
 
                 Storage::disk('sftp')->delete(basename($record->foto));
@@ -277,7 +277,7 @@ class UserMaintenanceController extends Controller
                     'name' => $request->nama,
                     'username' => $request->username,
 //                    'email' => $request->email,
-//                    'password' => bcrypt($request->password)
+                    'password' => bcrypt($request->password)
                 ]);
 
                 Storage::disk('sftp')->delete(basename($record->foto));
@@ -310,7 +310,7 @@ class UserMaintenanceController extends Controller
                     'name' => $request->nama,
                     'username' => $request->username,
 //                    'email' => $request->email,
-//                    'password' => bcrypt($request->password)
+                    'password' => bcrypt($request->password)
                 ]);
 
                 Storage::disk('sftp')->delete(basename($record->ktp));
@@ -334,7 +334,7 @@ class UserMaintenanceController extends Controller
                 'name' => $request->nama,
                 'username' => $request->username,
 //                'email' => $request->email,
-//                'password' => bcrypt($request->password)
+                'password' => bcrypt($request->password)
             ]);
 
             $update = UserMaintenance::where('id', $record->id)->update([
