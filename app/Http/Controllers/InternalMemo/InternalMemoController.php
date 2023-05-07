@@ -24,11 +24,6 @@ use DateTime;
 
 class InternalMemoController extends Controller
 {
-
-    public function __construct(){
-        $this->testGlobal();
-    }
-
     public function index(Request $request)
     {
         $internal = InternalMemo::where('flag', '!=', 4)->withCount('memoMaintenanceCount','totalUserMaintenance')->orderBy('created_at', 'DESC')->get();

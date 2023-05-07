@@ -16,12 +16,21 @@ use App\Model\KategoriPicFpp;
 use App\Model\Pemakaian;
 use App\Model\StokBarang;
 use App\Model\UserMaintenance;
+use App\Model\UserStaffCabang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class OldFunctionController extends Controller
 {
+    public function __construct()
+    {
+        $loginId = auth()->user()->id;
+        $this->cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
+            ->where('user_staff_id', $loginId)
+            ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
+            ->get();
+    }
 
     public function uploadBuktiPic(Request $request, $id)
     {
