@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Admin\Barang;
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\Cabang;
+use App\Model\Pengiriman;
+use App\Model\PengirimanDetail;
 use Illuminate\Http\Request;
 
 use App\Model\BarangTipe;
 use App\Model\BarangMasuk;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BarangMasukController extends Controller
 {
@@ -60,10 +63,20 @@ class BarangMasukController extends Controller
 
     public function barangByCabangKode(Request $request)
     {
-        $bMasuk = BarangMasuk::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->orderBy('id', 'DESC')->paginate(15);
+        $bMasuk = Pengiriman::whereIn('penerima', $this->cabangGlobal()->pluck('kode'))->orderBy('id', 'DESC')->get();
+
+        foreach ($bMasuk as $barangMasuk){
+            $q[] = PengirimanDetail::where('id_pengiriman', $barangMasuk->id)->first();
+        }
+
+        $data = $q;
+        $total = count($q);
+        $perPage = 10; // How many items do you want to display.
+        $currentPage = 1; // The index page.
+        $paginator = new LengthAwarePaginator($data, $total, $perPage, $currentPage);
 
         if($bMasuk){
-            return $this->successResponse($bMasuk,Constants::HTTP_MESSAGE_200, 200);
+            return $this->successResponse($paginator,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
