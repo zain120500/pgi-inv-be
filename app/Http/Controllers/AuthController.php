@@ -51,7 +51,7 @@ class AuthController extends Controller
         $credentials = request(['username', 'password']);
         if (!$token = auth()->attempt($credentials)) {
             return $this->errorResponse('Incorrect username or password.', 401);
-        } else if(auth()->user()->id_user_staff_pugindo == 0 || auth()->user()->id_user_staff_pugindo == null){
+        } else if(auth()->user()->id_user_staff_pugindo == 0 || auth()->user()->id_user_staff_pugindo == null) {
             $user = auth()->user();
             $access_menu = $user->role->roleMenu;
             $access_menu = $access_menu->map(function ($query) use ($id_top_menu) {
@@ -59,46 +59,44 @@ class AuthController extends Controller
                 return $query;
             });
 
-            return $user;
-        }else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9006, 403);
-        }
-
-        //get Top Menu from Menu Model
-        foreach ($user->role->roleMenu as $key => $val_menu) {
-            if(!empty($val_menu->menu->parent_id)){
-                if( !in_array( $val_menu->menu->parent_id ,$id_top_menu ) ){
-                    $id_top_menu[] = $val_menu->menu->parent_id;
+            //get Top Menu from Menu Model
+            foreach ($user->role->roleMenu as $key => $val_menu) {
+                if(!empty($val_menu->menu->parent_id)){
+                    if( !in_array( $val_menu->menu->parent_id ,$id_top_menu ) ){
+                        $id_top_menu[] = $val_menu->menu->parent_id;
+                    }
                 }
             }
+            // $cabang = "";
+            // if ($user->role_id == 3) {         //Jika Kepala Unit (3)
+            //     $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
+            // } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
+            //     $cabang = Cabang::select('id','name')->where('kepala_cabang_id', $user->id)->get();
+            // } elseif ($user->role_id == 5) {        //Jika Kepala Cabang Senior (5)
+            //     $cabang = Cabang::select('id','name')->where('kepala_cabang_senior_id', $user->id)->get();
+            // }
+
+            $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
+                ->where('user_staff_id', auth()->user()->id)
+                ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
+                ->get();
+
+            $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
+
+            $kategoriProses = KategoriPicFpp::where('user_id', auth()->user()->id)->get();
+
+            return response()->json([
+                'type' =>'success',
+                'message' => 'Logged in.',
+                'token' => $token,
+                'user' => $user,
+                'top_menu'=> $top_menu,
+                'cabang' => $cabang,
+                'kategori_proses' => $kategoriProses
+            ]);
+        }else{
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9006, 403);
         }
-        // $cabang = "";
-        // if ($user->role_id == 3) {         //Jika Kepala Unit (3)
-        //     $cabang = Cabang::select('id','name')->where('kepala_unit_id', $user->id)->get();
-        // } elseif ($user->role_id == 4) {         //Jika Kepala Cabang (4)
-        //     $cabang = Cabang::select('id','name')->where('kepala_cabang_id', $user->id)->get();
-        // } elseif ($user->role_id == 5) {        //Jika Kepala Cabang Senior (5)
-        //     $cabang = Cabang::select('id','name')->where('kepala_cabang_senior_id', $user->id)->get();
-        // }
-
-        $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
-            ->where('user_staff_id', auth()->user()->id)
-            ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
-            ->get();
-
-        $top_menu = TopMenu::whereIn('id', $id_top_menu)->pluck('code');
-
-        $kategoriProses = KategoriPicFpp::where('user_id', auth()->user()->id)->get();
-
-        return response()->json([
-            'type' =>'success',
-            'message' => 'Logged in.',
-            'token' => $token,
-            'user' => $user,
-            'top_menu'=> $top_menu,
-            'cabang' => $cabang,
-            'kategori_proses' => $kategoriProses
-        ]);
     }
 
     public function user()
