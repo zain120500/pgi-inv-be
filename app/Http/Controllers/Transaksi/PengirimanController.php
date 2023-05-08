@@ -64,7 +64,7 @@ class PengirimanController extends Controller
             "flag"      => $request->flag,
             "status"    => $request->status,
             "keterangan"=> $request->keterangan,
-            "user_input"=> auth()->user()->admin->username,
+            "user_input"=> auth()->user()->name,
             "last_update" => date('Y-m-d H:i:s', strtotime('now'))
         ]);
 
