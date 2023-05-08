@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\StokPusat;
 use App\Model\UserStaffCabang;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -12,6 +13,18 @@ use App\Traits\ApiResponser;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ApiResponser;
+
+    public function cabangGlobalPusat()
+    {
+        $loginId = auth()->user()->id;
+        $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
+            ->where('user_staff_id', $loginId)
+            ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
+            ->get()->pluck('id');
+        $stokPusat = StokPusat::where('cabang_id', $cabang)->get();
+
+        return $stokPusat;
+    }
 
     public function cabangGlobal()
     {

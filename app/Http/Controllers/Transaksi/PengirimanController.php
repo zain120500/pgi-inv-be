@@ -24,8 +24,8 @@ class PengirimanController extends Controller
 {
     public function index(Request $request)
     {
-        foreach ($this->cabangGlobal() as $cabang){
-            if($cabang->kode == "P00001"){
+        foreach ($this->cabangGlobalPusat() as $cabang){
+            if($cabang->lokasi == 2){
                 $query = Pengiriman::orderBy('tanggal', 'DESC')->paginate(15);
             }else{
                 $query = Pengiriman::whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))->orderBy('tanggal', 'DESC')->paginate(15);
