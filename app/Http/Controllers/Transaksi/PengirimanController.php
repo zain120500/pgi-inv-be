@@ -99,33 +99,35 @@ class PengirimanController extends Controller
             'nomer_barang' => $query->nomer_barang
         ])->first();
 
+        return $bStockPenerima;
+
         $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
         $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
 
-        if(empty($barangTipe)){
-            return $this->errorResponse('Barang Tipe is Null', 403);
-        } else {
-            $query = PengirimanDetail::create([
-                "id_pengiriman"=> $request->id_pengiriman,
-                "id_tipe"=> $request->id_tipe,
-                "nomer_barang"=> $barangTipe->kode_barang,
-                "harga"=> $request->harga,
-                "jumlah"=> $request->jumlah,
-                "total_harga"=> (int)$request->harga * (int)$request->jumlah,
-                "satuan"=> $request->satuan,
-                "imei"=> $request->imei,
-                "detail_barang"=> $request->detail_barang,
-                "keterangan"=> $request->keterangan,
-                "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
-                "status"=> 0
-            ]);
-
-            if($query){
-                return $this->successResponse($query,'Success', 200);
-            } else {
-                return $this->errorResponse('Data is Null', 403);
-            }
-        }
+//        if(empty($barangTipe)){
+//            return $this->errorResponse('Barang Tipe is Null', 403);
+//        } else {
+//            $query = PengirimanDetail::create([
+//                "id_pengiriman"=> $request->id_pengiriman,
+//                "id_tipe"=> $request->id_tipe,
+//                "nomer_barang"=> $barangTipe->kode_barang,
+//                "harga"=> $request->harga,
+//                "jumlah"=> $request->jumlah,
+//                "total_harga"=> (int)$request->harga * (int)$request->jumlah,
+//                "satuan"=> $request->satuan,
+//                "imei"=> $request->imei,
+//                "detail_barang"=> $request->detail_barang,
+//                "keterangan"=> $request->keterangan,
+//                "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
+//                "status"=> 0
+//            ]);
+//
+//            if($query){
+//                return $this->successResponse($query,'Success', 200);
+//            } else {
+//                return $this->errorResponse('Data is Null', 403);
+//            }
+//        }
     }
 
     public function show($id)
@@ -133,11 +135,6 @@ class PengirimanController extends Controller
         $query = Pengiriman::find($id);
 
         if(!empty($query)){
-            if(!empty($query->id_user_input)){
-                $query['user_input'] = Admin::where('id',$query->id_user_input)->first()->makeHidden(['password']);
-            } else {
-                $query['user_input'] = Admin::where('username',$query->user_input)->first()->makeHidden(['password']);
-            }
             $query['kategori'] = PengirimanKategori::where('id', $query->kategori)->first();
 
             $pengiriman_detail = $query->detail;

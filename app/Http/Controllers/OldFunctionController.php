@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Constants;
+use App\Model\Admin;
 use App\Model\BarangHistory;
 use App\Model\BarangTipe;
 use App\Model\Cabang;
@@ -14,6 +15,9 @@ use App\Model\InternalMemoMaintenance;
 use App\Model\KategoriJenisFpp;
 use App\Model\KategoriPicFpp;
 use App\Model\Pemakaian;
+use App\Model\Pengiriman;
+use App\Model\PengirimanDetail;
+use App\Model\PengirimanKategori;
 use App\Model\StokBarang;
 use App\Model\UserMaintenance;
 use App\Model\UserStaffCabang;
@@ -605,6 +609,39 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
 //        $perPage = 10; // How many items do you want to display.
 //        $currentPage = 1; // The index page.
 //        $paginator = new LengthAwarePaginator($data, $total, $perPage, $currentPage);
+    }
+
+    public function showPengiriman($id)
+    {
+        $query = Pengiriman::find($id);
+
+        if(!empty($query)){
+            if(!empty($query->id_user_input)){
+                $query['user_input'] = Admin::where('id',$query->id_user_input)->first()->makeHidden(['password']);
+            } else {
+                $query['user_input'] = Admin::where('username',$query->user_input)->first()->makeHidden(['password']);
+            }
+            $query['kategori'] = PengirimanKategori::where('id', $query->kategori)->first();
+
+            $pengiriman_detail = $query->detail;
+            $collect = $pengiriman_detail->map(function ($q) {
+                $q['status_code'] = $this->getCodeStatus($q->status);
+                $q['barang_tipe'] = BarangTipe::where('id', $q->id_tipe)->get();
+                return $q;
+            });
+
+            $details = PengirimanDetail::where('id_pengiriman', $query->id);
+            $query['total_unit'] = $details->sum('jumlah');
+            $query['total_pembelian'] = $details->sum('total_harga');
+            $query->cabangPengirim;
+            $query->cabangPenerima;
+
+            $query['detail'] = $pengiriman_detail;
+
+            return $this->successResponse($query,'Success', 200);
+        } else {
+            return $this->errorResponse('Data is Null', 403);
+        }
     }
 
 }
