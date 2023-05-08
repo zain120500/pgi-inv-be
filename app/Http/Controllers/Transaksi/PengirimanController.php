@@ -6,6 +6,7 @@ use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\Cabang;
 use App\Model\StokBarang;
+use App\Model\StokPusat;
 use App\Model\TblCabang;
 use Illuminate\Http\Request;
 
@@ -424,6 +425,17 @@ class PengirimanController extends Controller
 
         if($cabang){
             return $this->successResponse($cabang,Constants::HTTP_MESSAGE_200, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
+    public function dropdownRuangan()
+    {
+        $stokPusat = StokPusat::orderBy('id', 'ASC')->get();
+
+        if($stokPusat){
+            return $this->successResponse($stokPusat,Constants::HTTP_MESSAGE_200, 200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }

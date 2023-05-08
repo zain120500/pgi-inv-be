@@ -269,6 +269,7 @@ Route::group([
 
             Route::post('/cabang', 'PengirimanController@getCabang');
             Route::post('/cabangPusat', 'PengirimanController@getCabangPusat');
+            Route::get('/dropdown-ruangan', 'PengirimanController@dropdownRuangan');
 
             Route::get('/', 'PengirimanController@index');
             Route::get('/{id}', 'PengirimanController@show');
