@@ -51,7 +51,7 @@ class AuthController extends Controller
         $credentials = request(['username', 'password']);
         if (!$token = auth()->attempt($credentials)) {
             return $this->errorResponse('Incorrect username or password.', 401);
-        } else if(auth()->user()->id_user_staff_pugindo == 0 || auth()->user()->id_user_staff_pugindo == null) {
+        } else if(auth()->user()->is_active == 1) {
             $user = auth()->user();
             $access_menu = $user->role->roleMenu;
             $access_menu = $access_menu->map(function ($query) use ($id_top_menu) {
@@ -95,7 +95,7 @@ class AuthController extends Controller
                 'kategori_proses' => $kategoriProses
             ]);
         }else{
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9006, 403);
+            return $this->errorResponse(Constants::ERROR_MESSAGE_9007, 403);
         }
     }
 
