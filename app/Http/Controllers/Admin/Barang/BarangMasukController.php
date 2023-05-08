@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Model\Cabang;
 use App\Model\Pengiriman;
 use App\Model\PengirimanDetail;
+use App\Model\PengirimanKategori;
 use Illuminate\Http\Request;
 
 use App\Model\BarangTipe;
@@ -80,8 +81,20 @@ class BarangMasukController extends Controller
                 $query = Pengiriman::whereIn('penerima', $this->cabangGlobal()->pluck('kode'))->orderBy('id', 'DESC')->paginate(15);
             }
 
+            $collect = $query->getCollection()->map(function ($q) {
+                $details = PengirimanDetail::where('id_pengiriman', $q->id);
+
+                $q['total_unit'] = $details->sum('jumlah');
+                $q['total_pembelian'] = $details->sum('total_harga');
+
+                $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
+                $q->cabangPengirim;
+                $q->cabangPenerima;
+                return $q;
+            });
+
             if($query){
-                return $this->successResponse($query,Constants::HTTP_MESSAGE_200, 200);
+                return $this->successResponse($query->setCollection($collect),'Success', 200);
             } else {
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
