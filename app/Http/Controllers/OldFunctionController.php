@@ -594,4 +594,17 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         return $response;
     }
 
+    public function manualPaginationLaravel()
+    {
+//        foreach ($bMasuk as $barangMasuk){
+//            $q[] = PengirimanDetail::where('id_pengiriman', $barangMasuk->id)->first();
+//        }
+//
+//        $data = $q;
+//        $total = count($q);
+//        $perPage = 10; // How many items do you want to display.
+//        $currentPage = 1; // The index page.
+//        $paginator = new LengthAwarePaginator($data, $total, $perPage, $currentPage);
+    }
+
 }

@@ -14,18 +14,6 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ApiResponser;
 
-    public function cabangGlobalPusat()
-    {
-        $loginId = auth()->user()->id;
-        $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
-            ->where('user_staff_id', $loginId)
-            ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
-            ->get()->pluck('id');
-        $stokPusat = StokPusat::where('cabang_id', $cabang)->get();
-
-        return $stokPusat;
-    }
-
     public function cabangGlobal()
     {
         $loginId = auth()->user()->id;
@@ -34,6 +22,14 @@ class Controller extends BaseController
             ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
             ->get();
 
-        return $cabang;
+        foreach ($cabang as $cab){
+            if($cab->kode === "00001"){
+                $query = StokPusat::where('cabang_id', $cab->id)->get();
+            }else{
+                $query = $cabang;
+            }
+        }
+
+        return $query;
     }
 }
