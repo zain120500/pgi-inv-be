@@ -64,7 +64,7 @@ class PengirimanController extends Controller
             "flag"      => $request->flag,
             "status"    => $request->status,
             "keterangan"=> $request->keterangan,
-            "user_input"=> auth()->user()->name,
+            "user_input"=> auth()->user()->admin->username,
             "last_update" => date('Y-m-d H:i:s', strtotime('now'))
         ]);
 
@@ -85,6 +85,22 @@ class PengirimanController extends Controller
     public function storeDetail(Request $request)
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
+
+        $pengiriman = Pengiriman::where('id', $request->id_pengiriman)->first();
+        $query = PengirimanDetail::where('id', $request->id_pengiriman)->first();
+
+        $bStockPengirim = StokBarang::where([
+            'pic' => $pengiriman->pengirim,
+            'nomer_barang' => $query->nomer_barang
+        ])->first();
+
+        $bStockPenerima = StokBarang::where([
+            'pic' => $pengiriman->penerima,
+            'nomer_barang' => $query->nomer_barang
+        ])->first();
+
+        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
+        $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
 
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
