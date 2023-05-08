@@ -74,11 +74,14 @@ class BarangMasukController extends Controller
 
     public function barangByCabangPenerima(Request $request)
     {
+        /*
+         * Status 2 = dikirim
+         */
         foreach ($this->cabangGlobal() as $cabang){
             if($cabang->lokasi == 2){
-                $query = Pengiriman::whereIn('penerima', $this->cabangGlobal()->pluck('kode_cabang'))->orderBy('tanggal', 'DESC')->paginate(15);
+                $query = Pengiriman::whereIn('penerima', $this->cabangGlobal()->pluck('kode_cabang'))->where('status', 2)->orderBy('tanggal', 'DESC')->paginate(15);
             }else{
-                $query = Pengiriman::whereIn('penerima', $this->cabangGlobal()->pluck('kode'))->orderBy('id', 'DESC')->paginate(15);
+                $query = Pengiriman::whereIn('penerima', $this->cabangGlobal()->pluck('kode'))->where('status', 2)->orderBy('id', 'DESC')->paginate(15);
             }
 
             $collect = $query->getCollection()->map(function ($q) {
