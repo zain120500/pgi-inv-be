@@ -86,48 +86,48 @@ class PengirimanController extends Controller
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
 
-        $pengiriman = Pengiriman::where('id', $request->id_pengiriman)->first();
-        $query = PengirimanDetail::where('id', $request->id_pengiriman)->first();
-
-        $bStockPengirim = StokBarang::where([
-            'pic' => $pengiriman->pengirim,
-            'nomer_barang' => $query->nomer_barang
-        ])->first();
-
-        $bStockPenerima = StokBarang::where([
-            'pic' => $pengiriman->penerima,
-            'nomer_barang' => $query->nomer_barang
-        ])->first();
-
-        return $bStockPenerima;
-
-        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
-        $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
-
-//        if(empty($barangTipe)){
-//            return $this->errorResponse('Barang Tipe is Null', 403);
-//        } else {
-//            $query = PengirimanDetail::create([
-//                "id_pengiriman"=> $request->id_pengiriman,
-//                "id_tipe"=> $request->id_tipe,
-//                "nomer_barang"=> $barangTipe->kode_barang,
-//                "harga"=> $request->harga,
-//                "jumlah"=> $request->jumlah,
-//                "total_harga"=> (int)$request->harga * (int)$request->jumlah,
-//                "satuan"=> $request->satuan,
-//                "imei"=> $request->imei,
-//                "detail_barang"=> $request->detail_barang,
-//                "keterangan"=> $request->keterangan,
-//                "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
-//                "status"=> 0
-//            ]);
+//        $pengiriman = Pengiriman::where('id', $request->id_pengiriman)->first();
+//        $query = PengirimanDetail::where('id', $request->id_pengiriman)->first();
 //
-//            if($query){
-//                return $this->successResponse($query,'Success', 200);
-//            } else {
-//                return $this->errorResponse('Data is Null', 403);
-//            }
-//        }
+//        $bStockPengirim = StokBarang::where([
+//            'pic' => $pengiriman->pengirim,
+//            'nomer_barang' => $query->nomer_barang
+//        ])->first();
+//
+//        $bStockPenerima = StokBarang::where([
+//            'pic' => $pengiriman->penerima,
+//            'nomer_barang' => $query->nomer_barang
+//        ])->first();
+//
+//        return $bStockPenerima;
+//
+//        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
+//        $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
+
+        if(empty($barangTipe)){
+            return $this->errorResponse('Barang Tipe is Null', 403);
+        } else {
+            $query = PengirimanDetail::create([
+                "id_pengiriman"=> $request->id_pengiriman,
+                "id_tipe"=> $request->id_tipe,
+                "nomer_barang"=> $barangTipe->kode_barang,
+                "harga"=> $request->harga,
+                "jumlah"=> $request->jumlah,
+                "total_harga"=> (int)$request->harga * (int)$request->jumlah,
+                "satuan"=> $request->satuan,
+                "imei"=> $request->imei,
+                "detail_barang"=> $request->detail_barang,
+                "keterangan"=> $request->keterangan,
+                "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
+                "status"=> 0
+            ]);
+
+            if($query){
+                return $this->successResponse($query,'Success', 200);
+            } else {
+                return $this->errorResponse('Data is Null', 403);
+            }
+        }
     }
 
     public function show($id)
