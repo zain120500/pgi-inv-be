@@ -171,11 +171,7 @@ class InternalMemoController extends Controller
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->memoRating;
-        $internalMemoBarang = $query->internalMemoBarang;
-//        foreach ($internalMemoBarang as $keys => $values){
-//            $cabs = Cabang::where('id', $query->cabang->id)->first();
-//            $query->arr = StokBarang::where('id_tipe', $values->id_barang)->where('pic', $cabs->kode)->get();
-//        }
+        $listBarang = $query->internalMemoBarang;
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
         foreach ($listHistoryMemo as $key => $value) {

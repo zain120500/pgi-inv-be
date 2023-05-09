@@ -17,7 +17,7 @@ class Pengiriman extends Model
 
     function cabangPengirim()
     {
-        return $this->hasOne('App\Model\StokPusat', 'kode_cabang', 'pengirim');
+        return $this->hasOne('App\Model\Cabang', 'kode', 'pengirim');
     }
 
     function cabangPenerima()
