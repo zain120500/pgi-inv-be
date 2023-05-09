@@ -15,6 +15,6 @@ class InternalMemoBarang extends Model
 
     function internalMemoBarang()
     {
-        return $this->hasMany('App\Model\InternalMemoBarang', 'id_internal_memo', 'id');
+        return $this->hasOne('App\Model\StokBarang', 'id', 'id_barang');
     }
 }

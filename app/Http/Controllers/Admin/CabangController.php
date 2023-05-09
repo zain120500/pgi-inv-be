@@ -75,10 +75,9 @@ class CabangController extends Controller
     public function show($id)
     {
         $cabang = Cabang::find($id);
-        $userCabang = UserStaffCabang::where('cabang_id',$cabang->id)->get();
+        $userCabang = UserStaffCabang::where('cabang_id',$cabang->id)->with('user.devisi')->get();
 
         $userCabang->map(function ($q) {
-            $q->user;
             $q->role;
         });
 
