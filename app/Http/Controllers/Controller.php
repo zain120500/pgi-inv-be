@@ -22,14 +22,14 @@ class Controller extends BaseController
             ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
             ->get();
 
-        foreach ($cabang as $cab){
-            if($cab->kode === "00001"){
-                $query = StokPusat::where('cabang_id', $cab->id)->get();
-            }else{
-                $query = $cabang;
-            }
-        }
+//        foreach ($cabang as $cab){
+//            if($cab->kode === "00001"){
+//                $query = StokPusat::where('cabang_id', $cab->id)->get();
+//            }else{
+//                $query = $cabang;
+//            }
+//        }
 
-        return $query;
+        return $cabang;
     }
 }
