@@ -25,26 +25,21 @@ class PengirimanController extends Controller
 {
     public function index(Request $request)
     {
-        foreach ($this->cabangGlobal() as $cabang){
-            if($cabang->lokasi == 2){
-                $query = Pengiriman::orderBy('tanggal', 'DESC')->paginate(15);
-            }else{
-                $query = Pengiriman::whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))->orderBy('tanggal', 'DESC')->paginate(15);
-            }
-            $collect = $query->getCollection()->map(function ($q) {
-                $details = PengirimanDetail::where('id_pengiriman', $q->id);
+        $query = Pengiriman::whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))->orderBy('tanggal', 'DESC')->paginate(15);
 
-                $q['total_unit'] = $details->sum('jumlah');
-                $q['total_pembelian'] = $details->sum('total_harga');
+        $collect = $query->getCollection()->map(function ($q) {
+            $details = PengirimanDetail::where('id_pengiriman', $q->id);
 
-                $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
-                $q->cabangPengirim;
-                $q->cabangPenerima;
-                return $q;
-            });
+            $q['total_unit'] = $details->sum('jumlah');
+            $q['total_pembelian'] = $details->sum('total_harga');
 
-            return $this->successResponse($query->setCollection($collect),'Success', 200);
-        }
+            $q['kategori'] = PengirimanKategori::where('id', $q->kategori)->first();
+            $q->cabangPengirim;
+            $q->cabangPenerima;
+            return $q;
+        });
+
+        return $this->successResponse($query->setCollection($collect),'Success', 200);
     }
 
     public function create()
@@ -86,23 +81,32 @@ class PengirimanController extends Controller
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
 
-//        $pengiriman = Pengiriman::where('id', $request->id_pengiriman)->first();
-//        $query = PengirimanDetail::where('id', $request->id_pengiriman)->first();
-//
-//        $bStockPengirim = StokBarang::where([
-//            'pic' => $pengiriman->pengirim,
-//            'nomer_barang' => $query->nomer_barang
-//        ])->first();
-//
-//        $bStockPenerima = StokBarang::where([
-//            'pic' => $pengiriman->penerima,
-//            'nomer_barang' => $query->nomer_barang
-//        ])->first();
-//
-//        return $bStockPenerima;
-//
-//        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
-//        $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
+        $pengiriman = Pengiriman::where('id', $request->id_pengiriman)->first();
+        $query = PengirimanDetail::where('id', $request->id_pengiriman)->first();
+
+        $bStockPengirim = StokBarang::where([
+            'pic' => $pengiriman->pengirim,
+            'nomer_barang' => $query->nomer_barang
+        ])->first();
+
+        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
+
+        try {
+            StokBarang::where('id', $bStockPengirim->id)->update([
+                'nomer_barang' => $bStockPengirim->nomer_barang,
+                'id_tipe' => $bStockPengirim->id_tipe,
+                'detail_barang' => $bStockPengirim->detail_barang,
+                'imei' => $bStockPengirim->imei,
+                'pic' => $bStockPengirim->pic,
+                'satuan' => $bStockPengirim->satuan,
+                'total_asset' => $bStockPengirim->total_asset,
+                'user_input' => $bStockPengirim->user_input,
+                'last_update' => $bStockPengirim->last_update,
+                'jumlah_stok' => $pengurangan
+            ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
 
         if(empty($barangTipe)){
             return $this->errorResponse('Barang Tipe is Null', 403);
@@ -252,7 +256,6 @@ class PengirimanController extends Controller
         }
     }
 
-
     public function updatePengirimanDetail(Request $request){ //merubah status pengiriman
         $id = $request->id;
         $status = $request->status;
@@ -263,35 +266,12 @@ class PengirimanController extends Controller
         $query->update(["status" => $status]);
 
         if($status == 1) { //jika barang pengiriman diterima
-            $bStockPengirim = StokBarang::where([
-                'pic' => $pengiriman->pengirim,
-                'nomer_barang' => $query->nomer_barang
-            ])->first();
-
             $bStockPenerima = StokBarang::where([
                 'pic' => $pengiriman->penerima,
                 'nomer_barang' => $query->nomer_barang
             ])->first();
 
-            $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
             $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
-
-            try {
-                StokBarang::where('id', $bStockPengirim->id)->update([
-                    'nomer_barang' => $bStockPengirim->nomer_barang,
-                    'id_tipe' => $bStockPengirim->id_tipe,
-                    'detail_barang' => $bStockPengirim->detail_barang,
-                    'imei' => $bStockPengirim->imei,
-                    'pic' => $bStockPengirim->pic,
-                    'satuan' => $bStockPengirim->satuan,
-                    'total_asset' => $bStockPengirim->total_asset,
-                    'user_input' => $bStockPengirim->user_input,
-                    'last_update' => $bStockPengirim->last_update,
-                    'jumlah_stok' => $pengurangan
-                ]);
-            } catch (\Exception $e) {
-                return $e->getMessage();
-            }
 
             try {
                 StokBarang::where('id', $bStockPenerima->id)->update([
