@@ -5,6 +5,7 @@ namespace App\Http\Controllers\InternalMemo;
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\Cabang;
+use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
 use App\Model\KategoriProsesPic;
@@ -171,9 +172,17 @@ class InternalMemoController extends Controller
         $query->kategoriJenis->makeHidden(['created_at','updated_at']);
         $query->kategoriSub;
         $query->memoRating;
-        $listBarang = $query->internalMemoBarang;
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
+        $query['barang'] = DB::table('internal_memo_barang')
+            ->where('id_internal_memo', $query->id)
+            ->join("stok_barang",function($join){
+                $join->on("stok_barang.id_tipe","=","internal_memo_barang.id_barang")
+                    ->on("stok_barang.pic","=","internal_memo_barang.cabang_id");
+            })
+            ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
+            ->select('internal_memo_barang.*','barang_tipe.tipe', 'stok_barang.jumlah_stok', 'stok_barang.nomer_barang')
+            ->get();
         foreach ($listHistoryMemo as $key => $value) {
 
             if($key == 0){

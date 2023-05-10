@@ -12,9 +12,14 @@ use App\Model\KategoriSubFpp;
 class KategoriSubController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $query = KategoriSubFpp::paginate(15);
+        $value = $request->search;
+        $query = KategoriSubFpp::where('name', 'like', '%' . $value . '%')
+            ->orWhere('id_kategori_fpp', 'like', '%' . $value . '%')
+            ->orWhere('id_kategori_jenis', 'like', '%' . $value . '%')
+            ->orWhere('sla', 'like', '%' . $value . '%')
+            ->paginate(15);
 
         return $this->successResponse($query,'Success', 200);
 
@@ -25,7 +30,6 @@ class KategoriSubController extends Controller
         $query = KategoriSubFpp::all();
         return $this->successResponse($query,'Success', 200);
     }
-
 
     public function store(Request $request)
     {

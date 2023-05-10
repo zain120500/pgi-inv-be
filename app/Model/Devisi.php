@@ -9,5 +9,4 @@ class Devisi extends Model
     protected $table = 'tbl_divisi';
     protected $primaryKey = 'DivisiID';
     protected $guarded = [''];
-
 }
