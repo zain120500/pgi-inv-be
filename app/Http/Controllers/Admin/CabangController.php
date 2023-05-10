@@ -74,15 +74,11 @@ class CabangController extends Controller
 
     public function show($id)
     {
-        $cabang = Cabang::find($id);
-        $userCabang = UserStaffCabang::where('cabang_id',$cabang->id)->with('user.devisi', 'user.role')->get();
+        $query = Cabang::find($id);
+        $query['user_cabang'] = UserStaffCabang::where('cabang_id', $query->id)->with('user.devisi', 'user.role')->get();
 
-        if($userCabang){
-            return response()->json([
-                'type' =>'success',
-                'cabang' => $cabang,
-                'userCabang' => $userCabang
-            ]);
+        if($query){
+            return $this->successResponse($query,Constants::HTTP_MESSAGE_200);
         } else {
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
