@@ -31,7 +31,6 @@ class KategoriSubController extends Controller
         return $this->successResponse($query,'Success', 200);
     }
 
-
     public function store(Request $request)
     {
         $query = KategoriSubFpp::create([
