@@ -132,7 +132,7 @@ Route::group([
     ], function ($router) {
         Route::get('/', 'CabangController@index');
         Route::get('/all', 'CabangController@all');
-        Route::get('/{id}', 'CabangController@show');
+        Route::get('/test/{id}', 'CabangController@show');
         Route::post('/', 'CabangController@store');
         Route::delete('/delete/{id}', 'CabangController@destroy')->name('cabang.delete');
         Route::post('/{id}', 'CabangController@update');
