@@ -15,6 +15,11 @@ class Cabang extends Model
         return $this->hasOne('App\Model\Kabupaten','id','kabupaten_kota_id');
     }
 
+    function userStaffCabang()
+    {
+        return $this->hasMany('App\Model\UserStaffCabang','cabang_id','id');
+    }
+
     public function scopeWhereLike($query, $column, $value)
     {
         return $query->where($column, 'like', '%'.$value.'%');
