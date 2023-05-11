@@ -746,19 +746,15 @@ class InternalMemoController extends Controller
     {
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
-
-        if($pic->kategori_proses == 4 || $pic->kategori_proses == 0){
-            if(!empty($request->catatan_tolak)){
-                $internalMemo->update([
-                    'catatan_tolak' => $request->catatan_tolak,
-                    'flag' => 8
-                ]);
-            }else{
-                $internalMemo->update([
-                    'flag' => 8
-                ]);
-            }
+        if(!empty($request->catatan_tolak)){
+            $internalMemo->update([
+                'catatan_tolak' => $request->catatan_tolak,
+                'flag' => 8
+            ]);
+        }else{
+            $internalMemo->update([
+                'flag' => 8
+            ]);
         }
 
         $create = HistoryMemo::create([
