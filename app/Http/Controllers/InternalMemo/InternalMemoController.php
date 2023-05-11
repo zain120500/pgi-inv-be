@@ -342,19 +342,15 @@ class InternalMemoController extends Controller
     public function ignoreMemo(Request $request,$id){
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
-
-        if($pic->kategori_proses == 1 || $pic->kategori_proses == 2){
-            if(!empty($request->catatan_tolak)){
-                $internalMemo->update([
-                    'catatan_tolak' => $request->catatan_tolak,
-                    'flag' => 10
-                ]);
-            }else{
-                $internalMemo->update([
-                    'flag' => 10
-                ]);
-            }
+        if(!empty($request->catatan_tolak)){
+            $internalMemo->update([
+                'catatan_tolak' => $request->catatan_tolak,
+                'flag' => 10
+            ]);
+        }else{
+            $internalMemo->update([
+                'flag' => 10
+            ]);
         }
 
         $create = HistoryMemo::create([
@@ -381,19 +377,15 @@ class InternalMemoController extends Controller
         foreach ($ids[0] as $key => $value){
             $array[] = InternalMemo::where('id', $value)->first();
 
-            $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
-
-            if($pic->kategori_proses == 1 || $pic->kategori_proses == 2){
-                if(!empty($request->catatan_tolak)){
-                    InternalMemo::where('id', $value)->update([
-                        'catatan_tolak' => $request->catatan_tolak,
-                        'flag' => 10
-                    ]);
-                }else{
-                    InternalMemo::where('id', $value)->update([
-                        'flag' => 10
-                    ]);
-                }
+            if(!empty($request->catatan_tolak)){
+                InternalMemo::where('id', $value)->update([
+                    'catatan_tolak' => $request->catatan_tolak,
+                    'flag' => 10
+                ]);
+            }else{
+                InternalMemo::where('id', $value)->update([
+                    'flag' => 10
+                ]);
             }
 
             $create = HistoryMemo::create([
