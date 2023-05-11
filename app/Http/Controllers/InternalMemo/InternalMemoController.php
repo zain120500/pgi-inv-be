@@ -748,7 +748,6 @@ class InternalMemoController extends Controller
 
         if(!empty($request->catatan_tolak)){
             $internalMemo->update([
-                'catatan_tolak' => $request->catatan_tolak,
                 'flag' => 8
             ]);
         }else{
