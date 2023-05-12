@@ -174,15 +174,26 @@ class InternalMemoController extends Controller
         $query->memoRating;
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
-        $query['barang'] = DB::table('internal_memo_barang')
-            ->where('id_internal_memo', $query->id)
-            ->join("stok_barang",function($join){
-                $join->on("stok_barang.id_tipe","=","internal_memo_barang.id_barang")
-                    ->on("stok_barang.pic","=","internal_memo_barang.cabang_id");
-            })
-            ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
-            ->select('internal_memo_barang.*','barang_tipe.tipe', 'stok_barang.jumlah_stok', 'stok_barang.nomer_barang')
-            ->get();
+        $barang_memo = InternalMemoBarang::where('id_internal_memo', $query->id)->get();
+        foreach ($barang_memo as $b){
+            $cabang = Cabang::where('id', $b->cabang_id)->first();
+            $value[] = DB::table('stok_barang')
+                ->where('id_tipe', $b->id_barang)
+                ->where('pic', $cabang->kode)
+                ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
+                ->first();
+        }
+        $query['barang'] = $value;
+//        $query['barang'] = DB::table('internal_memo_barang')
+//            ->where('id_internal_memo', '=', $query->id)
+//            ->join("cabang", "cabang.id", "=", "internal_memo_barang.cabang_id")
+//            ->join("stok_barang",function($join){
+//                $join->on("stok_barang.id_tipe","=","internal_memo_barang.id_barang")
+//                    ->on("stok_barang.pic","=","cabang.kode");
+//            })
+//            ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
+//            ->select('internal_memo_barang.*','barang_tipe.tipe', 'stok_barang.jumlah_stok', 'stok_barang.nomer_barang', 'stok_barang.pic')
+//            ->get();
         foreach ($listHistoryMemo as $key => $value) {
 
             if($key == 0){
