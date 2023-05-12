@@ -177,10 +177,12 @@ class InternalMemoController extends Controller
         $barang_memo = InternalMemoBarang::where('id_internal_memo', $query->id)->get();
         foreach ($barang_memo as $b){
             $cabang = Cabang::where('id', $b->cabang_id)->first();
-            $value[] = DB::table('stok_barang')
-                ->where('id_tipe', $b->id_barang)
-                ->where('pic', $cabang->kode)
+            $value[] = DB::table('internal_memo_barang')
+                ->join("stok_barang", "stok_barang.id_tipe", "=", "internal_memo_barang.id_barang")
+                ->where('stok_barang.id_tipe', $b->id_barang)
+                ->where('stok_barang.pic', $cabang->kode)
                 ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
+                ->select('internal_memo_barang.*','stok_barang.*', 'barang_tipe.*')
                 ->first();
         }
         $query['barang'] = $value;
