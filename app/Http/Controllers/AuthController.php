@@ -141,6 +141,26 @@ class AuthController extends Controller
         ]);
     }
 
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+
+        $user = User::where('id', auth()->user()->id)->first();
+
+        $user->update([
+            'password' => bcrypt($request->password)
+        ]);
+
+        if($user){
+            return $this->successResponse($user,Constants::ERROR_MESSAGE_9005, 200);
+        } else {
+            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+        }
+    }
+
     public function submitForgetPasswordForm(Request $request)
     {
         $request->validate([
