@@ -175,17 +175,22 @@ class InternalMemoController extends Controller
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
         $barang_memo = InternalMemoBarang::where('id_internal_memo', $query->id)->get();
-        foreach ($barang_memo as $b){
-            $cabang = Cabang::where('id', $b->cabang_id)->first();
-            $value[] = DB::table('internal_memo_barang')
-                ->join("stok_barang", "stok_barang.id_tipe", "=", "internal_memo_barang.id_barang")
-                ->where('stok_barang.id_tipe', $b->id_barang)
-                ->where('stok_barang.pic', $cabang->kode)
-                ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
-                ->select('internal_memo_barang.*','stok_barang.*', 'barang_tipe.*')
-                ->first();
+        if($barang_memo->isEmpty()){
+            $query['barang'] = "";
+        }else{
+            foreach ($barang_memo as $b){
+                $cabang = Cabang::where('id', $b->cabang_id)->first();
+                $value[] = DB::table('internal_memo_barang')
+                    ->join("stok_barang", "stok_barang.id_tipe", "=", "internal_memo_barang.id_barang")
+                    ->where('stok_barang.id_tipe', $b->id_barang)
+                    ->where('stok_barang.pic', $cabang->kode)
+                    ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
+                    ->select('internal_memo_barang.*','stok_barang.*', 'barang_tipe.*')
+                    ->first();
+            }
+            $query['barang'] = $value;
         }
-        $query['barang'] = $value;
+
 //        $query['barang'] = DB::table('internal_memo_barang')
 //            ->where('id_internal_memo', '=', $query->id)
 //            ->join("cabang", "cabang.id", "=", "internal_memo_barang.cabang_id")
