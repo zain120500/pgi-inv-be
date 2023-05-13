@@ -151,7 +151,8 @@ class AuthController extends Controller
         $user = User::where('id', auth()->user()->id)->first();
 
         $user->update([
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
+            'flag' => 1
         ]);
 
         if($user){
