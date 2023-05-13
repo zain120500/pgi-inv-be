@@ -152,7 +152,7 @@ class AuthController extends Controller
 
         $user->update([
             'password' => bcrypt($request->password),
-            'flag' => 1
+            'is_new_user' => 1
         ]);
 
         if($user){
