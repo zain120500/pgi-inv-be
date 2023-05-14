@@ -9,6 +9,7 @@ class Pembelian extends Model
     protected $table = 'pembelian';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+    public $timestamps = false;
 
     function UserInput()
     {
