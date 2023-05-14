@@ -690,9 +690,9 @@ Link Login : http://portal.pusatgadai.id
      */
     public function createUserMaitenance(Request $request)
     {
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
             $user = $request->id_user_maintenance;
             $memo = $request->id_memo;
             $imMainteance = [];
@@ -744,11 +744,11 @@ Link Login : http://portal.pusatgadai.id
             }
 
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function deleteUserMaintenance(Request $request)
