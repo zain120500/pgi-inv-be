@@ -685,6 +685,9 @@ Link Login : http://portal.pusatgadai.id
         }
     }
 
+    /*
+     * Anjay
+     */
     public function createUserMaitenance(Request $request)
     {
         DB::beginTransaction();
