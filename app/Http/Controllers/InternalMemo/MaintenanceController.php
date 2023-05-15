@@ -30,9 +30,9 @@ class MaintenanceController extends Controller
     public function newInternalMaintenance(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $user[] = $request->id_user_maintenance;
             $iMemo[] = $request->id_memo;
@@ -116,19 +116,19 @@ class MaintenanceController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function createHistoryBarang($id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
 
             $barang[] = $id;
@@ -141,11 +141,11 @@ class MaintenanceController extends Controller
                 ]);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     /**
@@ -415,9 +415,9 @@ Link Login : http://portal.pusatgadai.id
     public function updateMemoRescheduleV1(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $user = $request->id_user_maintenance;
             $memo = $request->id_memo;
@@ -445,20 +445,20 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function updateMemoRescheduleV2(Request $request)
     {
 
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $user[] = $request->id_user_maintenance;
             $iMemo[] = $request->id_memo;
@@ -487,11 +487,11 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function updateMemoRescheduleV3(Request $request)
