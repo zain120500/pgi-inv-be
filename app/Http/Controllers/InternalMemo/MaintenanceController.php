@@ -251,9 +251,9 @@ Link Login : http://portal.pusatgadai.id
     public function accMemoByPic($id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
 
             $internalMemo[] = $id;
@@ -285,11 +285,11 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function cabangByMemoId(Request $request)
