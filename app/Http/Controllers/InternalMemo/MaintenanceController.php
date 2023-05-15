@@ -251,9 +251,9 @@ Link Login : http://portal.pusatgadai.id
     public function accMemoByPic($id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
 
             $internalMemo[] = $id;
@@ -285,11 +285,11 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function cabangByMemoId(Request $request)
@@ -373,9 +373,9 @@ Link Login : http://portal.pusatgadai.id
     public function attendanceMaintenance(Request $request, $id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $memo = InternalMemoMaintenance::where('link', $id)->first();
             $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
@@ -405,11 +405,11 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function updateMemoRescheduleV1(Request $request)
@@ -497,9 +497,9 @@ Link Login : http://portal.pusatgadai.id
     public function updateMemoRescheduleV3(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $user[] = $request->id_user_maintenance;
             $iMemo[] = $request->id_memo;
@@ -612,11 +612,11 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function updateMemoMaintenance(Request $request)
@@ -754,9 +754,9 @@ Link Login : http://portal.pusatgadai.id
     public function deleteUserMaintenance(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $memo = $request->id_memo;
             $user = $request->id_user_maintenance;
@@ -779,19 +779,19 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function createBarangMaintenance(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $memo = $request->id_memo;
             $barang = $request->id_barang;
@@ -850,19 +850,19 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function deleteBarangMaintenance(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
 
             $memo = $request->id_memo;
@@ -904,11 +904,11 @@ Link Login : http://portal.pusatgadai.id
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function getStockBarangV2(Request $request)

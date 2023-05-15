@@ -273,9 +273,9 @@ class InternalMemoController extends Controller
     public function updateFile(Request $request, $id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $files = $request['files'];
             $videos = $request['videos'];
@@ -321,18 +321,18 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function addNewFile(Request $request, $id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $files = $request['files'];
             $videos = $request['videos'];
@@ -380,18 +380,18 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function destroy($id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $imFile = InternalMemoFile::find($id);
 
@@ -403,18 +403,18 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function ignoreMemo(Request $request, $id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
@@ -444,19 +444,19 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function ignoreMemoAll(Request $request)
     {
 
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $ids[] =  $request->id;
             $array = [];
@@ -491,18 +491,18 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function createInternalRating(Request $request, $id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $internal = InternalMemo::find($id);
 
@@ -520,10 +520,10 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function getRating($id)
@@ -568,8 +568,8 @@ class InternalMemoController extends Controller
         $files = $request['files'];
         $videos = $request['videos'];
 
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
             $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
             foreach ($userMaintenance as $key => $value) {
                 UserMaintenance::where('id', $value)->update([
@@ -635,11 +635,11 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function pdfLetter($id)
@@ -734,8 +734,8 @@ class InternalMemoController extends Controller
     public function accMemo($id)
     {
 
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
 
             $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
@@ -760,18 +760,18 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function accMemoAll(Request $request)
     {
 
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
 
             $ids[] =  $request->id;
             $array = [];
@@ -801,11 +801,11 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function paginateKuKc(Request $request)
@@ -869,8 +869,8 @@ class InternalMemoController extends Controller
     public function cancelMemo(Request $request, $id)
     {
 
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
 
             $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
@@ -899,11 +899,11 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function testIndexMemo(Request $request)
