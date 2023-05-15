@@ -30,9 +30,9 @@ class MaintenanceController extends Controller
     public function newInternalMaintenance(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $user[] = $request->id_user_maintenance;
             $iMemo[] = $request->id_memo;
@@ -116,11 +116,11 @@ class MaintenanceController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function createHistoryBarang($id)
