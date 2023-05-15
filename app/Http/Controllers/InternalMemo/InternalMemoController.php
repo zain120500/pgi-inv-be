@@ -93,9 +93,9 @@ class InternalMemoController extends Controller
     public function store(Request $request)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $files = $request['files'];
             $videos = $request['videos'];
@@ -163,10 +163,10 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function show($id)
@@ -240,9 +240,9 @@ class InternalMemoController extends Controller
     public function update(Request $request, $id)
     {
 
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//
+//        try {
 
             $query = InternalMemo::where('id', $id)->first();
 
@@ -264,10 +264,10 @@ class InternalMemoController extends Controller
             }
 
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollback();
-        }
+//            DB::commit();
+//        } catch (\Throwable $e) {
+//            DB::rollback();
+//        }
     }
 
     public function updateFile(Request $request, $id)
