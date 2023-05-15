@@ -734,8 +734,8 @@ class InternalMemoController extends Controller
     public function accMemo($id)
     {
 
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
 
             $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
@@ -760,18 +760,18 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function accMemoAll(Request $request)
     {
 
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
 
             $ids[] =  $request->id;
             $array = [];
@@ -801,11 +801,11 @@ class InternalMemoController extends Controller
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
-        }
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $e->getMessage();
+//        }
     }
 
     public function paginateKuKc(Request $request)
