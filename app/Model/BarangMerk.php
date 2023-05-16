@@ -21,4 +21,9 @@ class BarangMerk extends Model
         return $this->hasMany('App\Model\BarangJenis', 'id', 'id_jenis');
 	}
 
+    function barangJeniss()
+    {
+        return $this->hasOne('App\Model\BarangJenis', 'id', 'id_jenis');
+    }
+
 }

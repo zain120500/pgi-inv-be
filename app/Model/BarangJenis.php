@@ -18,7 +18,7 @@ class BarangJenis extends Model
 
     public function barangKategori()
     {
-        return $this->hasOne('App\Model\Kategori', 'id');
+        return $this->hasOne('App\Model\Kategori', 'id', 'id_kategori');
     }
 
     public function barangMerk()
