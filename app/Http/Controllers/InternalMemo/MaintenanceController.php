@@ -56,8 +56,8 @@ class MaintenanceController extends Controller
                     $userMaintenance->update(['flag' => 1]); //update pic sedang bertugas
                 }
 
-                foreach ($barangs[0] as $i => $barang) {
-                    if(!empty($barang)) {
+                if(count(array_filter($barangs)) > 0) {
+                    foreach ($barangs[0] as $i => $barang) {
                         $imBarang = InternalMemoBarang::create([
                             'id_internal_memo' => $memos,
                             'id_maintenance' => $imMaintenance->id,
@@ -110,10 +110,13 @@ class MaintenanceController extends Controller
                 $this->whatsuppMessage($memos);
                 $this->accMemoByPic($memos);
             }
-            $this->createHistoryBarang($barangs[0]);
 
-            if ($imBarang) {
-                return $this->successResponse($imBarang, Constants::HTTP_MESSAGE_200, 200);
+            if(count(array_filter($barangs)) > 0) {
+                $this->createHistoryBarang($barangs[0]);
+            }
+
+            if ($imMaintenance) {
+                return $this->successResponse($imMaintenance, Constants::HTTP_MESSAGE_200, 200);
             } else {
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
