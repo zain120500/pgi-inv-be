@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Barang\BarangStokController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use Illuminate\Support\Facades\Route;
@@ -229,6 +230,14 @@ Route::group([
             Route::post('/', 'BarangMerkController@store');
             Route::delete('/delete/{id}', 'BarangMerkController@destroy')->name('barang-merk.delete');
             Route::post('/{id}', 'BarangMerkController@update');
+
+        });
+
+        Route::group([
+            'prefix' => 'barang-stok'
+        ], function ($router) {
+            Route::get('/asset-tetap', [BarangStokController::class, 'assetTetap']);
+            Route::get('/asset-lancar', [BarangStokController::class, 'assetLancar']);
 
         });
     });
