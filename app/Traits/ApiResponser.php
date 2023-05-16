@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Helpers\Constants;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
@@ -27,5 +29,15 @@ trait ApiResponser{
 			'data' => null
 		], $code);
 	}
+
+    public static function buildResponse(int $code = Constants::HTTP_CODE_403, string $status = Constants::ERROR_MESSAGE_403, $data = [])
+    {
+        return response()->json(array(
+                'code' => $code,
+                'status' => $status,
+                'data' => $data,
+                'time_stamp' => Carbon::now(),
+        ));
+    }
 
 }
