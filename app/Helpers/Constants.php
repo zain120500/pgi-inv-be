@@ -14,4 +14,7 @@ class Constants
     const ERROR_MESSAGE_9005 = 'Your password has been changed!';
     const ERROR_MESSAGE_9006 = 'Akun Terdeteksi User Program Pugindo';
     const ERROR_MESSAGE_9007 = 'Akun Anda Tidak Aktif Silahkan Hubungi Pihak Terkait';
+
+    const HTTP_CODE_200 = 200;
+    const HTTP_CODE_403 = 403;
 }
