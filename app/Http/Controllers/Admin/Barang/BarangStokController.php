@@ -20,6 +20,7 @@ class BarangStokController extends Controller
         $bStok = StokBarang::whereIn('id_tipe', $bTipe->pluck('id'))->whereIn('pic', $this->cabangGlobal()->pluck('kode'))->paginate(15);
 
         $bStok->map(function ($query) {
+            $query->cabang;
             $query->barangTipe->barangMerk->barangJeniss->barangKategori;
 
             return $query;
@@ -40,6 +41,7 @@ class BarangStokController extends Controller
         $bStok = StokBarang::whereIn('id_tipe', $bTipe->pluck('id'))->whereIn('pic', $this->cabangGlobal()->pluck('kode'))->paginate(15);
 
         $bStok->map(function ($query) {
+            $query->cabang;
             $query->barangTipe->barangMerk->barangJeniss->barangKategori;
 
             return $query;

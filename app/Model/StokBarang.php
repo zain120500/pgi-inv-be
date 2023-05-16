@@ -18,4 +18,9 @@ class StokBarang extends Model
         return $this->hasOne('App\Model\BarangTipe', 'id', 'id_tipe');
     }
 
+    function cabang()
+    {
+        return $this->hasOne('App\Model\Cabang', 'kode', 'pic')->select(['name', 'alamat']);
+    }
+
 }
