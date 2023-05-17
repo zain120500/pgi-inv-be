@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use App\Model\Cabang;
 use App\Model\UserStaffCabang;
+use Illuminate\Support\Facades\DB;
 
 
 class CabangController extends Controller
@@ -75,15 +76,21 @@ class CabangController extends Controller
     public function show($id)
     {
         $query = Cabang::find($id);
-        $query['user_cabang'] = UserStaffCabang::where('cabang_id', $query->id)->get();
+        $query['user_cabang'] = DB::table('_user_staff_cabang')
+            ->where('cabang_id', $query->id)
+            ->join('users','users.id','=','_user_staff_cabang.user_staff_id')
+            ->join('role', 'role.id', '=', '_user_staff_cabang.role_id')
+            ->join('tbl_divisi', 'tbl_divisi.DivisiID', '=', 'users.devisi_id')
+            ->select('_user_staff_cabang.*', 'users.name', 'users.username', 'role.name as role_name', 'tbl_divisi.nm_Divisi')
+            ->get();
 
 //        $query = Cabang::where('id', $id)->with('userStaffCabang.user.devisi', 'userStaffCabang.user.role')->first();
 
-        if($query){
-            return $this->successResponse($query,Constants::HTTP_MESSAGE_200);
-        } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
