@@ -81,7 +81,7 @@ class CabangController extends Controller
             ->join('users','users.id','=','_user_staff_cabang.user_staff_id')
             ->join('role', 'role.id', '=', '_user_staff_cabang.role_id')
             ->join('tbl_divisi', 'tbl_divisi.DivisiID', '=', 'users.devisi_id')
-            ->select('_user_staff_cabang.*', 'users.name', 'users.username', 'role.name as role_name', 'tbl_divisi.nm_Divisi')
+            ->select('_user_staff_cabang.*', 'users.name', 'users.username', 'role.name as role_name', 'tbl_divisi.nm_Divisi as nama_divisi')
             ->get();
 
 //        $query = Cabang::where('id', $id)->with('userStaffCabang.user.devisi', 'userStaffCabang.user.role')->first();
