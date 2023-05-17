@@ -1127,7 +1127,7 @@ Link Login : http://portal.pusatgadai.id
                 'flag' => 3
             ]);
 
-            $im = InternalMemo::where('id', $request->id_internal_memo)->update([
+            $im = InternalMemo::where('id', $iMemoMaintenance->id_internal_memo)->update([
                 'flag' => 13
             ]);
 
