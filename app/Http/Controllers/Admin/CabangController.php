@@ -75,7 +75,7 @@ class CabangController extends Controller
     public function show($id)
     {
         $query = Cabang::find($id);
-        $query['user_cabang'] = UserStaffCabang::where('cabang_id', $query->id)->with('user.devisi', 'user.role')->get();
+        $query['user_cabang'] = UserStaffCabang::where('cabang_id', $query->id)->get();
 
 //        $query = Cabang::where('id', $id)->with('userStaffCabang.user.devisi', 'userStaffCabang.user.role')->first();
 
