@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Barang\BarangStokController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
+use App\Http\Controllers\Transaksi\PemakaianController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -312,6 +313,15 @@ Route::group([
 
             Route::post('/{id}', 'PembelianController@update');
             Route::post('/detail/{id}', 'PembelianController@updateDetail');
+
+        });
+
+        Route::group([
+            'prefix' => 'pemakaian'
+        ], function ($router) {
+            Route::get('/all', [PemakaianController::class, 'all']);
+            Route::get('/paginate', [PemakaianController::class, 'paginate']);
+            Route::post('/', [PemakaianController::class, 'store']);
 
         });
     });

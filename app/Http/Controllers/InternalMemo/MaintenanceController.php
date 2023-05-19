@@ -166,11 +166,16 @@ class MaintenanceController extends Controller
             $cabang = Cabang::where('id', $memo->id_cabang)->first();
             $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get();
 
+
+
             foreach ($maintenanceUser as $keys => $values) {
                 $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
+                return $user;
                 $this->ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp);
                 $this->ProceesWaMaintenance($memo, $user, $cabang);
             }
+
+
         }
     }
 
