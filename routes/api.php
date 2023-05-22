@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Barang\BarangStokController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InternalMemo\InternalMemoController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use App\Http\Controllers\Transaksi\PemakaianController;
 use Illuminate\Support\Facades\Route;
@@ -396,6 +397,8 @@ Route::group([
             /**
              * Internal Memo
              */
+            Route::get('/dashboard-kc', [InternalMemoController::class, 'dashboardKcImStatus']);
+            Route::get('/dashboard-mt', [InternalMemoController::class, 'dashboardMtImStatus']);
             Route::get('/', 'InternalMemoController@index');
             Route::get('/create', 'InternalMemoController@create');
             Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
