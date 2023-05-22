@@ -581,8 +581,6 @@ class InternalMemoController extends Controller
                 'flag' => 4
             ]);
 
-
-
             $memo = InternalMemo::where('id', $id)->update([
                 'flag' => 4
             ]);
