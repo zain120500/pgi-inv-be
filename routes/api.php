@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::get('/godmod/{id}', 'GodmodController@godmod')->name('godmod');
+
 
 Route::post('/attendanceMaintenance/{id}', 'InternalMemo\MaintenanceController@attendanceMaintenance');
 Route::post('/webhookTest', 'InternalMemo\MaintenanceController@webhookTest');
