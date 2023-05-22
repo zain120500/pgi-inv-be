@@ -1033,12 +1033,53 @@ class InternalMemoController extends Controller
 
     public function dashboardKcImStatus()
     {
-        $dashboardIm = InternalMemo::whereIn('id_cabang', $this->cabangGlobal()->pluck('kode'))->get();
+        try {
+            $kProses = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+            if($kProses == null){
+                $dashboardIm = InternalMemo::whereIn('id_cabang', $this->cabangGlobal()->pluck('kode'))->get();
+            }else if($kProses->kategori_proses == 1 || $kProses->kategori_proses == 2 || $kProses->kategori_proses == 3){
+                $dashboardIm = InternalMemo::get();
+            }
+
+            $res = ([
+                "total_memo" => $dashboardIm->count(),
+                "disetujui" => $dashboardIm->whereIn('flag', [1, 2])->count(),
+                "diproses" => $dashboardIm->where('flag', 3)->count(),
+                "ditolak" => $dashboardIm->where('flag', 10)->count(),
+                "diselesaikan" => $dashboardIm->where('flag', 4)->count(),
+            ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $dashboardIm->count()
+            $res
+        );
+    }
+
+    public function dashboardMtImStatus()
+    {
+        try {
+            $uMaintenance = UserMaintenance::where('user_id', auth()->user()->id)->first();
+            $iMemoMaintenance = InternalMemoMaintenance::where('id_user_maintenance', $uMaintenance->id)->get()->pluck('id_internal_memo');
+            $iMemo = InternalMemo::whereIn('id', $iMemoMaintenance)->get();
+
+            $res = ([
+                "total_memo" => $iMemo->count(),
+                "diproses" => $iMemo->where('flag', 3)->count(),
+                "diselesaikan" => $iMemo->where('flag', 4)->count(),
+            ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $res
         );
     }
 

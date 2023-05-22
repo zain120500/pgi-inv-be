@@ -398,6 +398,7 @@ Route::group([
              * Internal Memo
              */
             Route::get('/dashboard-kc', [InternalMemoController::class, 'dashboardKcImStatus']);
+            Route::get('/dashboard-mt', [InternalMemoController::class, 'dashboardMtImStatus']);
             Route::get('/', 'InternalMemoController@index');
             Route::get('/create', 'InternalMemoController@create');
             Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
