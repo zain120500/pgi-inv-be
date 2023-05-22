@@ -1031,6 +1031,17 @@ class InternalMemoController extends Controller
         }
     }
 
+    public function dashboardKcImStatus()
+    {
+        $dashboardIm = InternalMemo::whereIn('id_cabang', $this->cabangGlobal()->pluck('kode'))->get();
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $dashboardIm->count()
+        );
+    }
+
     //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus
     public function getFlagStatus($id)
     {
