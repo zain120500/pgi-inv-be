@@ -1043,7 +1043,7 @@ class InternalMemoController extends Controller
             }
 
             $res = ([
-                "total_memo" => $dashboardIm->count(),
+                "total_memo" => $dashboardIm->whereIn('flag', [1, 2, 3, 10, 4])->count(),
                 "disetujui" => $dashboardIm->whereIn('flag', [1, 2])->count(),
                 "diproses" => $dashboardIm->where('flag', 3)->count(),
                 "ditolak" => $dashboardIm->where('flag', 10)->count(),
@@ -1068,7 +1068,7 @@ class InternalMemoController extends Controller
             $iMemo = InternalMemo::whereIn('id', $iMemoMaintenance)->get();
 
             $res = ([
-                "total_memo" => $iMemo->count(),
+                "total_memo" => $iMemo->whereIn('flag', [3, 4])->count(),
                 "diproses" => $iMemo->where('flag', 3)->count(),
                 "diselesaikan" => $iMemo->where('flag', 4)->count(),
             ]);

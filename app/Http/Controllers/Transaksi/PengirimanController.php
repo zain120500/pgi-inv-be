@@ -25,7 +25,7 @@ class PengirimanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pengiriman::whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))->orderBy('tanggal', 'DESC')->paginate(15);
+        $query = Pengiriman::whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))->orderBy('id', 'DESC')->paginate(15);
 
         $collect = $query->getCollection()->map(function ($q) {
             $details = PengirimanDetail::where('id_pengiriman', $q->id);
@@ -39,7 +39,11 @@ class PengirimanController extends Controller
             return $q;
         });
 
-        return $this->successResponse($query->setCollection($collect),'Success', 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function create()
