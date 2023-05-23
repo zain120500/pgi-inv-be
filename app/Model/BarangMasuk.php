@@ -16,4 +16,9 @@ class BarangMasuk extends Model
         return $this->hasMany('App\Model\BarangTipe', 'id', 'id_tipe');
     }
 
+    public function barangTipee()
+    {
+        return $this->hasOne('App\Model\BarangTipe', 'id', 'id_tipe');
+    }
+
 }
