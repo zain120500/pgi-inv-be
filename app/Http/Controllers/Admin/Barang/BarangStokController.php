@@ -79,32 +79,34 @@ class BarangStokController extends Controller
     {
         $nomer_barang = $request->nomer_barang;
 
-//        $barangMasuk = DB::table('barang_masuk')
-//            ->where('barang_masuk.nomer_barang', $nomer_barang)
-//            ->join('barang_tipe', 'barang_masuk.id_tipe', '=', 'barang_tipe.id')
-//            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
-//            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
-//            ->select('barang_masuk.*', 'barang_tipe.*', 'barang_merk.*', 'barang_jenis.*');
+        $barangMasuk = DB::table('barang_masuk')
+            ->where('barang_masuk.nomer_barang', $nomer_barang)
+            ->join('barang_tipe', 'barang_masuk.id_tipe', '=', 'barang_tipe.id')
+            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
+            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
+            ->selectRaw("*, 'Terima' AS keterangan");
+
+        $barangKeluar = DB::table('barang_keluar')
+            ->where('barang_keluar.nomer_barang', $nomer_barang)
+            ->join('barang_tipe', 'barang_keluar.id_tipe', '=', 'barang_tipe.id')
+            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
+            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
+            ->selectRaw("*, 'Kirim' AS keterangan")
+            ->union($barangMasuk)
+            ->get();
+
+//        $users = DB::table('users')->selectRaw("*, 'admin' AS type")->get();
 //
-//        $barangKeluar = DB::table('barang_keluar')
-//            ->where('barang_keluar.nomer_barang', $nomer_barang)
-//            ->join('barang_tipe', 'barang_keluar.id_tipe', '=', 'barang_tipe.id')
-//            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
-//            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
-//            ->select('barang_keluar.*', 'barang_tipe.*', 'barang_merk.*', 'barang_jenis.*')
-//            ->union($barangMasuk)
-//            ->paginate(10);
-
-        $a = BarangMasuk::where('nomer_barang', '=', $nomer_barang)
-            ->with('barangTipee.barangMerk.barangJenis');
-
-        $b = BarangKeluar::where('nomer_barang', '=', $nomer_barang)->union($a)
-            ->with('barangTipe.barangMerk.barangJenis')->paginate(10);
+//        $a = BarangMasuk::where('nomer_barang', '=', $nomer_barang)
+//            ->with('barangTipee.barangMerk.barangJenis');
+//
+//        $b = BarangKeluar::where('nomer_barang', '=', $nomer_barang)->union($a)
+//            ->with('barangTipe.barangMerk.barangJenis')->paginate(10);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $b
+            $barangKeluar
         );
     }
 }
