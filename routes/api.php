@@ -241,6 +241,8 @@ Route::group([
             'prefix' => 'barang-stok'
         ], function ($router) {
             Route::get('/asset', [BarangStokController::class, 'assetByIdKategori']);
+            Route::get('/laporan-stok-barang', [BarangStokController::class, 'laporanStokBarang']);
+            Route::get('/history-barang', [BarangStokController::class, 'historyBarang']);
 
         });
     });

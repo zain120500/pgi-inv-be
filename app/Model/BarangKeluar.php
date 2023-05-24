@@ -14,6 +14,6 @@ class BarangKeluar extends Model
 
     public function barangTipe()
     {
-        return $this->belongTo('App\Model\BarangTipe');
+        return $this->hasOne('App\Model\BarangTipe', 'id', 'id_tipe');
     }
 }
