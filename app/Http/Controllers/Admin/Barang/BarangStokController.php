@@ -84,14 +84,16 @@ class BarangStokController extends Controller
             ->join('barang_tipe', 'barang_masuk.id_tipe', '=', 'barang_tipe.id')
             ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
             ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
-            ->selectRaw("*, 'Terima' AS keterangan");
+            ->join('cabang', 'barang_masuk.pic', '=', 'cabang.kode')
+            ->selectRaw("*, 'Terima' AS keterangan, cabang.name");
 
         $barangKeluar = DB::table('barang_keluar')
             ->where('barang_keluar.nomer_barang', $nomer_barang)
             ->join('barang_tipe', 'barang_keluar.id_tipe', '=', 'barang_tipe.id')
             ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
             ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
-            ->selectRaw("*, 'Kirim' AS keterangan")
+            ->join('cabang', 'barang_keluar.pic', '=', 'cabang.kode')
+            ->selectRaw("*, 'Kirim' AS keterangan, cabang.name")
             ->union($barangMasuk)
             ->get();
 
