@@ -170,7 +170,6 @@ class MaintenanceController extends Controller
 
             foreach ($maintenanceUser as $keys => $values) {
                 $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
-                return $user;
                 $this->ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp);
                 $this->ProceesWaMaintenance($memo, $user, $cabang);
             }
