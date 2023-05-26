@@ -12,6 +12,9 @@ use App\Model\BarangTipe;
 use App\Model\StokBarang;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class BarangStokController extends Controller
@@ -75,6 +78,10 @@ class BarangStokController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function historyBarang(Request $request)
     {
         $nomer_barang = $request->nomer_barang;
@@ -97,18 +104,26 @@ class BarangStokController extends Controller
             ->union($barangMasuk)
             ->get();
 
-//        $users = DB::table('users')->selectRaw("*, 'admin' AS type")->get();
-//
-//        $a = BarangMasuk::where('nomer_barang', '=', $nomer_barang)
-//            ->with('barangTipee.barangMerk.barangJenis');
-//
-//        $b = BarangKeluar::where('nomer_barang', '=', $nomer_barang)->union($a)
-//            ->with('barangTipe.barangMerk.barangJenis')->paginate(10);
+        $data = $this->paginate($barangKeluar);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $barangKeluar
+            $data
         );
+    }
+
+    /**
+     * @param $items
+     * @param $perPage
+     * @param $page
+     * @param $options
+     * @return LengthAwarePaginator
+     */
+    public function paginate($items, $perPage = 10, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }

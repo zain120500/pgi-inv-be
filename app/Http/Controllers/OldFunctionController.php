@@ -22,7 +22,11 @@ use App\Model\StokBarang;
 use App\Model\UserMaintenance;
 use App\Model\UserStaffCabang;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OldFunctionController extends Controller
@@ -642,6 +646,52 @@ Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
         } else {
             return $this->errorResponse('Data is Null', 403);
         }
+    }
+
+    public function historyBarang(Request $request)
+    {
+        $nomer_barang = $request->nomer_barang;
+
+        $barangMasuk = DB::table('barang_masuk')
+            ->where('barang_masuk.nomer_barang', $nomer_barang)
+            ->join('barang_tipe', 'barang_masuk.id_tipe', '=', 'barang_tipe.id')
+            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
+            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
+            ->join('cabang', 'barang_masuk.pic', '=', 'cabang.kode')
+            ->selectRaw("*, 'Terima' AS keterangan, cabang.name");
+
+        $barangKeluar = DB::table('barang_keluar')
+            ->where('barang_keluar.nomer_barang', $nomer_barang)
+            ->join('barang_tipe', 'barang_keluar.id_tipe', '=', 'barang_tipe.id')
+            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
+            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
+            ->join('cabang', 'barang_keluar.pic', '=', 'cabang.kode')
+            ->selectRaw("*, 'Kirim' AS keterangan, cabang.name")
+            ->union($barangMasuk)
+            ->get();
+
+        $data = $this->paginate($barangKeluar);
+
+//        $users = DB::table('users')->selectRaw("*, 'admin' AS type")->get();
+//
+//        $a = BarangMasuk::where('nomer_barang', '=', $nomer_barang)
+//            ->with('barangTipee.barangMerk.barangJenis');
+//
+//        $b = BarangKeluar::where('nomer_barang', '=', $nomer_barang)->union($a)
+//            ->with('barangTipe.barangMerk.barangJenis')->paginate(10);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $data
+        );
+    }
+
+    public function paginate($items, $perPage = 10, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 
 }
