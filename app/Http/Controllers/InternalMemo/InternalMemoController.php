@@ -28,37 +28,58 @@ class InternalMemoController extends Controller
     public function index(Request $request)
     {
 
-        $internal = InternalMemo::where('flag', '!=', 4)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->orderBy('created_at', 'DESC')->get();
+        $internal = InternalMemo::where('flag', '!=', 4)
+            ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+            ->orderBy('created_at', 'DESC')
+            ->get();
 
         if ($request->id_devisi) {
             $internal = InternalMemo::orderBy('created_at', 'DESC')
-                ->where('id_devisi', $request->id_devisi)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+                ->where('id_devisi', $request->id_devisi)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->id_kategori_fpp) {
             $internal = InternalMemo::orderBy('created_at', 'DESC')
-                ->where('id_kategori_fpp', $request->id_kategori_fpp)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+                ->where('id_kategori_fpp', $request->id_kategori_fpp)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->id_cabang) {
             $internal = InternalMemo::orderBy('created_at', 'DESC')
-                ->where('id_cabang', $request->id_cabang)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+                ->where('id_cabang', $request->id_cabang)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->id_kategori_jenis_fpp) {
             $internal = InternalMemo::orderBy('created_at', 'DESC')
-                ->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+                ->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->id_kategori_sub_fpp) {
             $internal = InternalMemo::orderBy('created_at', 'DESC')
-                ->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+                ->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->flag) {
             $internal = InternalMemo::orderBy('created_at', 'DESC')
-                ->where('flag', $request->flag)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+                ->where('flag', $request->flag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->created_at) {
-            $internal = InternalMemo::orderBy('created_at', $request->created_at)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+            $internal = InternalMemo::orderBy('created_at', $request->created_at)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->startDate && $request->endDate) {
             $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
             $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
-            $internal = InternalMemo::whereBetween('created_at', [$startDate, $endDate])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+            $internal = InternalMemo::whereBetween('created_at', [$startDate, $endDate])
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         } else if ($request->id_cabang_multiple) {
             $record = $request->id_cabang_multiple;
             $internal = InternalMemo::orderBy('created_at', 'DESC')
-                ->whereIn('id_cabang', $record)->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
+                ->whereIn('id_cabang', $record)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->get();
         }
 
         $collect = $internal->map(function ($query) {
@@ -676,37 +697,71 @@ class InternalMemoController extends Controller
 
     public function menuArchive(Request $request)
     {
-        $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->orderBy('created_at', 'DESC')->paginate(15);
+        $archiveFlag = [4, 3, 8, 7, 10, 12, 13];
+        $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+        $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+
+        $record = InternalMemo::whereIn('flag', $archiveFlag)
+            ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+            ->orderBy('created_at', 'DESC')
+            ->paginate(15);
 
         if ($request->im_number) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->where('im_number', $request->im_number)->orderBy('created_at', 'DESC')->paginate(15);
-        } elseif ($request->id_kategori_fpp) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->where('id_kategori_fpp', $request->id_kategori_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->where('im_number', 'like', '%' . $request->im_number . '%')
+                ->orderBy('created_at', 'DESC')
+                ->paginate(15);
         } elseif ($request->id_kategori_jenis_fpp) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('id_kategori_jenis_fpp', $request->id_kategori_jenis_fpp)
+                ->paginate(15);
         } elseif ($request->id_kategori_sub_fpp) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('id_kategori_sub_fpp', $request->id_kategori_sub_fpp)
+                ->paginate(15);
         } elseif ($request->id_devisi) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->where('id_devisi', $request->id_devisi)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('id_devisi', $request->id_devisi)
+                ->paginate(15);
         } elseif ($request->id_cabang) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->where('id_cabang', $request->id_cabang)->orderBy('created_at', 'DESC')->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('id_cabang', $request->id_cabang)
+                ->paginate(15);
         } else if ($request->created_at) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->orderBy('created_at', $request->created_at)->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->orderBy('created_at', $request->created_at)
+                ->paginate(15);
         } else if ($request->startDate && $request->endDate) {
-            $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
-            $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
-
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->whereBetween('created_at', [$startDate, $endDate])->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->paginate(15);
         } else if ($request->flag) {
-            $record = InternalMemo::orderBy('created_at', 'DESC')
-                ->where('flag', $request->flag)->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('flag', $request->flag)
+                ->paginate(15);
         } else if ($request->id_cabang_multiple) {
             $id_cabang_multiple = $request->id_cabang_multiple;
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->orderBy('created_at', 'DESC')
-                ->whereIn('id_cabang', $id_cabang_multiple)->paginate(15);
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->orderBy('created_at', 'DESC')
+                ->whereIn('id_cabang', $id_cabang_multiple)
+                ->paginate(15);
         }
 
-        $collect = $record->map(function ($query) {
+        $record->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
             $query->cabang->kabupatenKota;
             $query->devisi;
@@ -717,16 +772,18 @@ class InternalMemoController extends Controller
         });
 
         if ($request->kabupaten_kota_id) {
-            $record = InternalMemo::whereIn('flag', [4, 3, 8, 7, 10, 12, 13])->withCount('memoMaintenanceCount', 'totalUserMaintenance')->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function ($query) use ($request) {
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function ($query) use ($request) {
                 $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
             })->paginate(15);
         }
 
-        if ($record) {
-            return $this->successResponse($record, Constants::HTTP_MESSAGE_200, 200);
-        } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 
     public function accMemo($id)
