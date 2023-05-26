@@ -56,17 +56,17 @@ class PembelianController extends Controller
     public function indexDetail(Request $request)
     {
         if(!empty($request->nomer_barang)){
-            $query = PembelianDetail::where('nomer_barang', 'like', '%'.$request->nomer_barang.'%')->orderBy('created_at', 'DESC')->paginate(15);
+            $query = PembelianDetail::where('nomer_barang', 'like', '%'.$request->nomer_barang.'%')->paginate(15);
         } else if(!empty($request->id_tipe)){
-            $query = PembelianDetail::where('id_tipe', 'like', '%'.$request->id_tipe.'%')->orderBy('created_at', 'DESC')->paginate(15);
+            $query = PembelianDetail::where('id_tipe', 'like', '%'.$request->id_tipe.'%')->paginate(15);
         } else if(!empty($request->from) and !empty($request->to)){
-            $query = PembelianDetail::whereBetween('created_at', [$request->from, $request->to])->orderBy('created_at', 'DESC')->paginate(15);
+            $query = PembelianDetail::whereBetween('created_at', [$request->from, $request->to])->paginate(15);
         } else if(!empty($request->id_pengiriman)){
-            $query = PembelianDetail::where('id_pengiriman', $request->id_pengiriman)->orderBy('created_at', 'DESC')->paginate(15);
+            $query = PembelianDetail::where('id_pengiriman', $request->id_pengiriman)->paginate(15);
         } else if(!empty($request->status)){
-            $query = PembelianDetail::where('status', $request->status)->orderBy('created_at', 'DESC')->paginate(15);
+            $query = PembelianDetail::where('status', $request->status)->paginate(15);
         } else {
-            $query = PembelianDetail::orderBy('created_at', 'DESC')->paginate(15);
+            $query = PembelianDetail::paginate(15);
         }
 
         $collect = $query->getCollection()->map(function ($q) {
