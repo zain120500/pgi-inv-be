@@ -393,7 +393,6 @@ Route::group([
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
             Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');
             Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
-            Route::get('/testIndexMemo', 'InternalMemoController@testIndexMemo');
             Route::get('/im-cabang-id', 'InternalMemoController@imByCabangId');
 
             /**
