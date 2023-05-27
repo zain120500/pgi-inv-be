@@ -710,9 +710,7 @@ Link Login : http://portal.pusatgadai.id
                 foreach ($user as $keys => $values) {
                     $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
 
-                    if ($update->id_user_maintenance !== $values) {
-                        $array = $values;
-                    } else if (empty($update)) {
+                    if ($update == null) {
                         $imMainteance = InternalMemoMaintenance::create([
                             'id_internal_memo' => $value,
                             'id_user_maintenance' => $values,
@@ -722,7 +720,9 @@ Link Login : http://portal.pusatgadai.id
                             'flag' => 0,
                             'created_by' => auth()->user()->id
                         ]);
-                    } else if (!empty($update)) {
+                    } else if ($update->id_user_maintenance !== $values) {
+                        $array = $values;
+                    }else if (!empty($update)) {
                         $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
 
                         $updates->update([
