@@ -747,10 +747,8 @@ class InternalMemoController extends Controller
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->paginate(15);
         } else if ($request->flag) {
-            $record = InternalMemo::whereIn('flag', $archiveFlag)
+            $record = InternalMemo::where('flag', $request->flag)
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->where('flag', $request->flag)
                 ->paginate(15);
         } else if ($request->id_cabang_multiple) {
             $id_cabang_multiple = $request->id_cabang_multiple;
