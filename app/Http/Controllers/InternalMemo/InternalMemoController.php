@@ -712,6 +712,11 @@ class InternalMemoController extends Controller
                 ->where('im_number', 'like', '%' . $request->im_number . '%')
                 ->orderBy('created_at', 'DESC')
                 ->paginate(15);
+        }else if ($request->flag_status) {
+            $record = InternalMemo::withCount('memoMaintenanceCount', 'totalUserMaintenance')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('flag', $request->flag_status)
+                ->paginate(15);
         } elseif ($request->id_kategori_jenis_fpp) {
             $record = InternalMemo::whereIn('flag', $archiveFlag)
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
@@ -746,11 +751,7 @@ class InternalMemoController extends Controller
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->paginate(15);
-        } else if ($request->flag) {
-            $record = InternalMemo::where('flag', $request->flag)
-                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
-                ->paginate(15);
-        } else if ($request->id_cabang_multiple) {
+        }  else if ($request->id_cabang_multiple) {
             $id_cabang_multiple = $request->id_cabang_multiple;
             $record = InternalMemo::whereIn('flag', $archiveFlag)
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
