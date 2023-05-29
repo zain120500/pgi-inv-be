@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Barang\BarangStokController;
+use App\Http\Controllers\Admin\Barang\BarangTipeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\InternalMemoController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
@@ -215,6 +216,7 @@ Route::group([
         Route::group([
             'prefix' => 'barang-tipe'
         ], function ($router) {
+            Route::get('/tipe-all', [BarangTipeController::class, 'getBarangTipeAll']);
             Route::get('/all', 'BarangTipeController@all');
             Route::get('/', 'BarangTipeController@index');
             Route::get('/{id}', 'BarangTipeController@show');

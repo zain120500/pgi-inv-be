@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Barang;
 
+use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\BarangTipe;
@@ -13,7 +14,7 @@ class BarangTipeController extends Controller
 {
 
     public function index(Request $request)
-    {        
+    {
         if(!empty($request->tipe)) {
             $barang = BarangTipe::where('tipe', 'like', '%'.$request->tipe.'%')->paginate(15);
         } else if(!empty($request->kode_barang)){
@@ -34,12 +35,12 @@ class BarangTipeController extends Controller
         return response()->json([
             'status' =>'success',
             'data' => $barang->setCollection($collect)
-        ], 200); 
+        ], 200);
 
     }
 
     public function all(Request $request)
-    {        
+    {
         if(!empty($request->tipe)) {
             $barang = BarangTipe::where('tipe', 'like', '%'.$request->tipe.'%')->get();
         } else if(!empty($request->kode_barang)){
@@ -53,7 +54,7 @@ class BarangTipeController extends Controller
         return response()->json([
             'status' =>'success',
             'data' => $barang
-        ], 200); 
+        ], 200);
 
     }
 
@@ -128,7 +129,7 @@ class BarangTipeController extends Controller
         return response()->json([
             'status' =>'success',
             'data' => $query
-        ], 200); 
+        ], 200);
     }
 
     public function getkodebarang($id_jenis) //oke
@@ -151,5 +152,20 @@ class BarangTipeController extends Controller
 
         $nik = $kode.sprintf("%07s", $max_nik);
         return $nik;
+    }
+
+    public function getBarangTipeAll(Request $request)
+    {
+        $value = $request->search;
+
+        $record = BarangTipe::where('tipe', 'like', '%' . $value . '%')
+            ->orWhere('kode_barang', 'like', '%' . $value . '%')
+            ->get();
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 }
