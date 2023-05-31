@@ -390,8 +390,6 @@ Link Login : http://portal.pusatgadai.id
 
     public function attendanceMaintenance(Request $request, $id)
     {
-        $memo = InternalMemoMaintenance::where('link', $id)->first();
-        $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
         DB::beginTransaction();
         try {
             $memo = InternalMemoMaintenance::where('link', $id)->first();
@@ -708,47 +706,38 @@ Link Login : http://portal.pusatgadai.id
      */
     public function createUserMaitenance(Request $request)
     {
-        //        DB::beginTransaction();
-        //
-        //        try {
-        $user = $request->id_user_maintenance;
-        $memo = $request->id_memo;
-        $imMainteance = [];
-        $array = [];
-        foreach ($memo as $key => $value) {
-            foreach ($user as $keys => $values) {
-                $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
-                if ($update == null) {
-                    $imMainteance = InternalMemoMaintenance::create([
-                        'id_internal_memo' => $value,
-                        'id_user_maintenance' => $values,
-                        'date' => $request->date,
-                        'link' => $this->generateRandomString(4),
-                        'kode' => $this->generateRandomString(4),
-                        'flag' => 0,
-                        'created_by' => auth()->user()->id
-                    ]);
-                } else if ($update->id_user_maintenance !== $values) {
-                    $array = $values;
-                } else if (!empty($update)) {
-                    $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
-                    $updates->update([
-                        'date' => $request->date,
-                        'created_by' => auth()->user()->id
-                    ]);
-                    $imMainteance[] = $updates->first();
+//        DB::beginTransaction();
+//
+//        try {
+            $user = $request->id_user_maintenance;
+            $memo = $request->id_memo;
+            $imMainteance = [];
+            $array = [];
+            foreach ($memo as $key => $value){
+                foreach ($user as $keys => $values) {
+                    $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
 
-                    $imMainteance = InternalMemoMaintenance::create([
-                        'id_internal_memo' => $value,
-                        'id_user_maintenance' => $array,
-                        'date' => $request->date,
-                        'link' => $this->generateRandomString(6),
-                        'kode' => $this->generateRandomString(6),
-                        'flag' => 0,
-                        'created_by' => auth()->user()->id
-                    ]);
+                    if ($update == null) {
+                        $imMainteance = InternalMemoMaintenance::create([
+                            'id_internal_memo' => $value,
+                            'id_user_maintenance' => $values,
+                            'date' => $request->date,
+                            'link' => $this->generateRandomString(6),
+                            'kode' => $this->generateRandomString(6),
+                            'flag' => 0,
+                            'created_by' => auth()->user()->id
+                        ]);
+                    } else if ($update->id_user_maintenance !== $values) {
+                        $array = $values;
+                    }else if (!empty($update)) {
+                        $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
 
-                    $this->whatsuppMessage($value);
+                        $updates->update([
+                            'date' => $request->date,
+                            'created_by' => auth()->user()->id
+                        ]);
+                        $imMainteance[] = $updates->first();
+                    }
                 }
             }
 
