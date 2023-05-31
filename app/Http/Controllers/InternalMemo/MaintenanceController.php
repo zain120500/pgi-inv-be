@@ -408,8 +408,8 @@ Link Login : http://portal.pusatgadai.id
                 ]);
             }
 
-            if ($memo && $hM) {
-                return $this->successResponse(['memo' => $memo, 'history' => $hM], Constants::HTTP_MESSAGE_200, 200);
+            if ($memo) {
+                return $this->successResponse($memo, Constants::HTTP_MESSAGE_200, 200);
             } else {
                 return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
             }
