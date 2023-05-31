@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Barang\BarangTipeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\InternalMemoController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
+use App\Http\Controllers\InternalMemo\UserMaintenanceVendorController;
 use App\Http\Controllers\Transaksi\PemakaianController;
 use Illuminate\Support\Facades\Route;
 
@@ -393,6 +394,7 @@ Route::group([
             Route::get('/paginateKuKc', 'InternalMemoController@paginateKuKc');
             Route::get('/pdfMemo/{id}', 'InternalMemoController@pdfMemo');
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
+            Route::get('/menu-archive-pic', [InternalMemoController::class, 'menuArchivePic']);
             Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');
             Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
             Route::get('/im-cabang-id', 'InternalMemoController@imByCabangId');
@@ -467,6 +469,17 @@ Route::group([
             Route::post('/test', [UserMaintenanceController::class, 'store']);
             Route::post('/{id}', [UserMaintenanceController::class, 'update']);
             Route::delete('/delete/{id}', [UserMaintenanceController::class, 'destroy']);
+        });
+
+        Route::group([
+            'prefix' => 'user-maintenance-vendor'
+        ], function ($router) {
+            Route::get('/', [UserMaintenanceVendorController::class, 'all']);
+            Route::get('/paginate', [UserMaintenanceVendorController::class, 'paginate']);
+            Route::get('/{id}', [UserMaintenanceVendorController::class, 'show']);
+            Route::post('/', [UserMaintenanceVendorController::class, 'create']);
+            Route::post('/{id}', [UserMaintenanceVendorController::class, 'update']);
+            Route::delete('/delete/{id}', [UserMaintenanceVendorController::class, 'destroy']);
         });
 
         Route::group([

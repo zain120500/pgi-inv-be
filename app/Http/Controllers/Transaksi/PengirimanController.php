@@ -269,7 +269,7 @@ class PengirimanController extends Controller
 
         $query->update(["status" => $status]);
 
-        if($status == 1) { //jika barang pengiriman diterima
+        if($query->status == 1) { //jika barang pengiriman diterima
             $bStockPenerima = StokBarang::where([
                 'pic' => $pengiriman->penerima,
                 'nomer_barang' => $query->nomer_barang
