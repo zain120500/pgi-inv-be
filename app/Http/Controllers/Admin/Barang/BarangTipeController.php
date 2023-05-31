@@ -160,6 +160,7 @@ class BarangTipeController extends Controller
 
         $record = BarangTipe::where('tipe', 'like', '%' . $value . '%')
             ->orWhere('kode_barang', 'like', '%' . $value . '%')
+            ->with('barangMerk.barangJenis')
             ->get();
 
         return self::buildResponse(

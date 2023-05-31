@@ -942,11 +942,11 @@ Link Login : http://portal.pusatgadai.id
     {
         $value = $request->search;
         if (!empty($value)) {
-            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->whereHas('barangTipe', function ($q) use ($value) {
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe.barangMerk.barangJenis')->whereHas('barangTipe', function ($q) use ($value) {
                 $q->where('tipe', 'like', '%' . $value . '%')->orWhere('kode_barang', 'like', '%' . $value . '%');
             })->get();
         } else {
-            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->get();
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe.barangMerk.barangJenis')->get();
         }
 
         if ($stockBarang) {
