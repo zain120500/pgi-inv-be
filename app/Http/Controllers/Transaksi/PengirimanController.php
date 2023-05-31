@@ -267,9 +267,11 @@ class PengirimanController extends Controller
         $query = PengirimanDetail::where('id', $id)->first();
         $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
 
-        $query->update(["status" => $status]);
+        $query->update([
+            "status" => $status
+        ]);
 
-        if($status == 1) { //jika barang pengiriman diterima
+        if($query->status == 1) { //jika barang pengiriman diterima
             $bStockPenerima = StokBarang::where([
                 'pic' => $pengiriman->penerima,
                 'nomer_barang' => $query->nomer_barang

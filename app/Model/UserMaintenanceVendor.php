@@ -4,10 +4,9 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PengirimanDetail extends Model
+class UserMaintenanceVendor extends Model
 {
-    protected $table = 'pengiriman_detail';
+    protected $table = 'user_maintenance_vendor';
     protected $primaryKey = 'id';
     protected $guarded = [''];
-    public $timestamps = false;
 }
