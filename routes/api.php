@@ -7,6 +7,7 @@ use App\Http\Controllers\InternalMemo\InternalMemoController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceVendorController;
 use App\Http\Controllers\Transaksi\PemakaianController;
+use App\Http\Controllers\Transaksi\StokInventarisController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -331,6 +332,14 @@ Route::group([
             Route::get('/paginate', [PemakaianController::class, 'paginate']);
             Route::post('/', [PemakaianController::class, 'store']);
             Route::delete('/{id}', [PemakaianController::class, 'delete']);
+
+        });
+
+        Route::group([
+            'prefix' => 'stok-inventaris'
+        ], function ($router) {
+            Route::get('/all', [StokInventarisController::class, 'all']);
+            Route::get('/paginate', [StokInventarisController::class, 'paginate']);
 
         });
     });
