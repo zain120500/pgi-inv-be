@@ -330,6 +330,7 @@ Route::group([
             Route::get('/all', [PemakaianController::class, 'all']);
             Route::get('/paginate', [PemakaianController::class, 'paginate']);
             Route::post('/', [PemakaianController::class, 'store']);
+            Route::delete('/{id}', [PemakaianController::class, 'delete']);
 
         });
     });
