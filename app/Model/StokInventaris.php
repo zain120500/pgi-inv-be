@@ -9,6 +9,16 @@ class StokInventaris extends Model
     protected $table = 'stok_inventaris';
     protected $primaryKey = 'id';
     protected $guarded = [''];
+    public $timestamps = false;
 
-    protected $hidden = array('created_at', 'updated_at');
+
+    public function barangTipe()
+    {
+        return $this->belongsTo('App\Model\BarangTipe', 'id_tipe', 'id');
+    }
+
+    public function karyawan()
+    {
+        return $this->belongsTo('App\Model\TblKaryawan', 'pemakai', 'nik');
+    }
 }
