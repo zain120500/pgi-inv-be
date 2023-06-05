@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Model\Supplier;
+use App\Helpers\Constants;
 
 
 class SupplierController extends Controller
@@ -13,48 +14,78 @@ class SupplierController extends Controller
     {
         $supplier = Supplier::paginate(15);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $supplier
-        ], 200); 
+        // return response()->json([
+        //     'status' =>'success',
+        //     'data' => $supplier
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $supplier
+        );
     }
 
     public function all()
     {
-        $supplier = Supplier::all()->makeHidden(['created_at','updated_at']);
+        $supplier = Supplier::all()->makeHidden(['created_at', 'updated_at']);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $supplier
-        ], 200); 
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $supplier
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $supplier
+        );
     }
 
-    
+
     public function store(Request $request)
     {
         $query = Supplier::create([
-            "nama"=> $request->nama,
-            "alamat"=> $request->alamat,
-            "no_hp"=> $request->no_hp,
-            "link_web"=> $request->link_web,
-            "keterangan"=> $request->keterangan
+            "nama" => $request->nama,
+            "alamat" => $request->alamat,
+            "no_hp" => $request->no_hp,
+            "link_web" => $request->link_web,
+            "keterangan" => $request->keterangan
         ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $query
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $query
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function show($id)
     {
         $query = Supplier::find($id);
 
-        if(!empty($query)){
-            return $this->successResponse($query,'Success', 200);
+        if (!empty($query)) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
-        } 
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Data is Null'
+            );
+        }
     }
 
 
@@ -67,17 +98,23 @@ class SupplierController extends Controller
     {
         $query = Supplier::where('id', $id)
             ->update([
-                "nama"=> $request->nama,
-                "alamat"=> $request->alamat,
-                "no_hp"=> $request->no_hp,
-                "link_web"=> $request->link_web,
-                "keterangan"=> $request->keterangan
+                "nama" => $request->nama,
+                "alamat" => $request->alamat,
+                "no_hp" => $request->no_hp,
+                "link_web" => $request->link_web,
+                "keterangan" => $request->keterangan
             ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $query
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $query
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
 
@@ -85,9 +122,15 @@ class SupplierController extends Controller
     {
         $query = Supplier::find($id)->delete();
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $query
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 }

@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Model\Dropshipper;
 use App\Model\DropshipperDetail;
 
+use App\Helpers\Constants;
+
 class DropshipperController extends Controller
 {
 
@@ -15,10 +17,16 @@ class DropshipperController extends Controller
     {
         $query = Dropshipper::orderBy('tanggal', 'DESC')->paginate(15);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        // return response()->json([
+        //     'status' =>'success',
+        //     'data' => $query
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function create()
@@ -36,10 +44,16 @@ class DropshipperController extends Controller
         $query = Dropshipper::find($id);
         $query['detail'] = DropshipperDetail::where('id_dropshipper', $query->id)->get();
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);  
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $query
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)

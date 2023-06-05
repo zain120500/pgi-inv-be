@@ -16,18 +16,30 @@ class UserMaintenanceController extends Controller
     public function all(Request $request)
     {
         $record = UserMaintenance::orderBy('id', 'DESC')->get();
-        if($request->nama){
+        if ($request->nama) {
             $record = UserMaintenance::where('nama', 'LIKE', $request->nama)->get();
-        }elseif ($request->no_telp){
+        } elseif ($request->no_telp) {
             $record = UserMaintenance::where('no_telp', 'LIKE', $request->no_telp)->get();
-        }elseif ($request->pekerjaan){
+        } elseif ($request->pekerjaan) {
             $record = UserMaintenance::where('pekerjaan', 'LIKE', $request->pekerjaan)->get();
         }
 
-        if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        if ($record) {
+            // return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $record
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $record
+            );
         }
     }
 
@@ -35,19 +47,30 @@ class UserMaintenanceController extends Controller
     {
         $record = UserMaintenance::with('user')->orderBy('id', 'DESC')->paginate(15);
 
-        if($request->nama){
+        if ($request->nama) {
             $record = UserMaintenance::where('nama', 'like', '%' . $request->nama . '%')->with('user')->orderBy('id', 'DESC')->paginate(15);
-        }else if($request->no_telp){
+        } else if ($request->no_telp) {
             $record = UserMaintenance::where('no_telp', 'like', '%' . $request->no_telp . '%')->with('user')->orderBy('id', 'DESC')->paginate(15);
-        }
-        else if($request->flag){
+        } else if ($request->flag) {
             $record = UserMaintenance::where('flag', 'like', '%' . $request->flag . '%')->with('user')->orderBy('id', 'DESC')->paginate(15);
         }
 
-        if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        if ($record) {
+            // return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $record
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $record
+            );
         }
     }
 
@@ -56,10 +79,22 @@ class UserMaintenanceController extends Controller
         $record = UserMaintenance::find($id);
         $record->user;
 
-        if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        if ($record) {
+            // return $this->successResponse($record, Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $record
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $record
+            );
         }
     }
 
@@ -68,21 +103,21 @@ class UserMaintenanceController extends Controller
         $files = $request['foto'];
         $ktp = $request['ktp'];
 
-        if(!empty($files) && !empty($ktp)) {
+        if (!empty($files) && !empty($ktp)) {
             $image_64 = $files; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+            $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
             $image = str_replace($replace, '', $image_64);
             $image = str_replace(' ', '+', $image);
-            $foto = Str::random(10).'.'.$extension;
+            $foto = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($foto, base64_decode(($image), 'r+'));
 
             $image = $ktp; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image, 0, strpos($image, ',')+1);
+            $replace = substr($image, 0, strpos($image, ',') + 1);
             $images = str_replace($replace, '', $image);
             $images = str_replace(' ', '+', $images);
-            $ktp = Str::random(10).'.'.$extension;
+            $ktp = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($ktp, base64_decode(($images), 'r+'));
 
             try {
@@ -112,13 +147,13 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(!empty($files) && empty($ktp)) {
+        } else if (!empty($files) && empty($ktp)) {
             $image_64 = $files; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+            $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
             $image = str_replace($replace, '', $image_64);
             $image = str_replace(' ', '+', $image);
-            $foto = Str::random(10).'.'.$extension;
+            $foto = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($foto, base64_decode(($image), 'r+'));
 
             try {
@@ -147,13 +182,13 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(empty($files) && !empty($ktp)) {
+        } else if (empty($files) && !empty($ktp)) {
             $image = $ktp; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image, 0, strpos($image, ',')+1);
+            $replace = substr($image, 0, strpos($image, ',') + 1);
             $images = str_replace($replace, '', $image);
             $images = str_replace(' ', '+', $images);
-            $ktp = Str::random(10).'.'.$extension;
+            $ktp = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($ktp, base64_decode(($images), 'r+'));
 
             try {
@@ -182,7 +217,7 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(empty($files) && empty($ktp)){
+        } else if (empty($files) && empty($ktp)) {
             $user = User::create([
                 'name' => $request->nama,
                 'username' => $request->username,
@@ -206,10 +241,22 @@ class UserMaintenanceController extends Controller
             ]);
         }
 
-        if($record){
-            return $this->successResponse([$record, $user],Constants::HTTP_MESSAGE_200, 200);
+        if ($record) {
+            // return $this->successResponse([$record, $user], Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                [$record, $user]
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -220,28 +267,28 @@ class UserMaintenanceController extends Controller
         $record = UserMaintenance::find($id);
         $users = User::where('id', $record->user_id)->first();
 
-        if(!empty($files) && !empty($ktp)) {
+        if (!empty($files) && !empty($ktp)) {
             $image_64 = $files; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+            $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
             $image = str_replace($replace, '', $image_64);
             $image = str_replace(' ', '+', $image);
-            $foto = Str::random(10).'.'.$extension;
+            $foto = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($foto, base64_decode(($image), 'r+'));
 
             $image = $ktp; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image, 0, strpos($image, ',')+1);
+            $replace = substr($image, 0, strpos($image, ',') + 1);
             $images = str_replace($replace, '', $image);
             $images = str_replace(' ', '+', $images);
-            $ktp = Str::random(10).'.'.$extension;
+            $ktp = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($ktp, base64_decode(($images), 'r+'));
 
             try {
                 $users->update([
                     'name' => $request->nama,
                     'username' => $request->username,
-//                    'email' => $request->email,
+                    //                    'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
 
@@ -263,20 +310,20 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(!empty($files) && empty($ktp)) {
+        } else if (!empty($files) && empty($ktp)) {
             $image_64 = $files; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+            $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
             $image = str_replace($replace, '', $image_64);
             $image = str_replace(' ', '+', $image);
-            $foto = Str::random(10).'.'.$extension;
+            $foto = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($foto, base64_decode(($image), 'r+'));
 
             try {
                 $users->update([
                     'name' => $request->nama,
                     'username' => $request->username,
-//                    'email' => $request->email,
+                    //                    'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
 
@@ -296,20 +343,20 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(!empty($ktp) && empty($files)) {
+        } else if (!empty($ktp) && empty($files)) {
             $image = $ktp; //your base64 encoded data
             $extension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];   // .jpg .png .pdf
-            $replace = substr($image, 0, strpos($image, ',')+1);
+            $replace = substr($image, 0, strpos($image, ',') + 1);
             $images = str_replace($replace, '', $image);
             $images = str_replace(' ', '+', $images);
-            $ktp = Str::random(10).'.'.$extension;
+            $ktp = Str::random(10) . '.' . $extension;
             Storage::disk('sftp')->put($ktp, base64_decode(($images), 'r+'));
 
             try {
                 $users->update([
                     'name' => $request->nama,
                     'username' => $request->username,
-//                    'email' => $request->email,
+                    //                    'email' => $request->email,
                     'password' => bcrypt($request->password)
                 ]);
 
@@ -329,11 +376,11 @@ class UserMaintenanceController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }else if(empty($files) || empty($ktp)){
+        } else if (empty($files) || empty($ktp)) {
             $users->update([
                 'name' => $request->nama,
                 'username' => $request->username,
-//                'email' => $request->email,
+                //                'email' => $request->email,
                 'password' => bcrypt($request->password)
             ]);
 
@@ -349,10 +396,22 @@ class UserMaintenanceController extends Controller
             ]);
         }
 
-        if($update){
-            return $this->successResponse($update,Constants::HTTP_MESSAGE_200, 200);
+        if ($update) {
+            // return $this->successResponse($update, Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $update
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $update
+            );
         }
     }
 
@@ -368,10 +427,22 @@ class UserMaintenanceController extends Controller
             return $e->getMessage();
         }
 
-        if($record && $uDel){
-            return $this->successResponse([$record, $uDel],Constants::HTTP_MESSAGE_200, 200);
+        if ($record && $uDel) {
+            // return $this->successResponse([$record, $uDel], Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                [$record, $uDel]
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                [$record, $uDel]
+            );
         }
     }
 
@@ -379,10 +450,22 @@ class UserMaintenanceController extends Controller
     {
         $record = InternalMemo::orderBy('id', 'DESC')->get();
 
-        if($record){
-            return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
+        if ($record) {
+            // return $this->successResponse($record, Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $record
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 }

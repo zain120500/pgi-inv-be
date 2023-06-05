@@ -9,6 +9,7 @@ use App\Model\RoleMenu;
 use App\Model\Role;
 use App\User;
 use App\Model\UserStaffCabang;
+use App\Helpers\Constants;
 
 class CabangUserController extends Controller
 {
@@ -17,50 +18,97 @@ class CabangUserController extends Controller
     {
         $cabang = Cabang::paginate(15);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $cabang
-        ], 200); 
+        // return response()->json([
+        //     'status' =>'success',
+        //     'data' => $cabang
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $cabang
+        );
     }
 
-    public function getUserKCS(){ //Jika Kepala Cabang Senior (5)
-        $query = User::select('id','name')->where('role_id', 5)->get();
+    public function getUserKCS()
+    { //Jika Kepala Cabang Senior (5)
+        $query = User::select('id', 'name')->where('role_id', 5)->get();
 
-        if(!empty($query)){
-            return $this->successResponse($query,'Success', 200);
+        if (!empty($query)) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
-    public function getUserKC(){ //Jika Kepala Cabang (4)
-        $query = User::select('id','name')->where('role_id', 4)->get();
+    public function getUserKC()
+    { //Jika Kepala Cabang (4)
+        $query = User::select('id', 'name')->where('role_id', 4)->get();
 
-        if(!empty($query)){
-            return $this->successResponse($query,'Success', 200);
+        if (!empty($query)) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
-    public function getUserKU(){ //Jika Kepala Unit (3)
-        $query = User::select('id','name')->where('role_id', 3)->get();
+    public function getUserKU()
+    { //Jika Kepala Unit (3)
+        $query = User::select('id', 'name')->where('role_id', 3)->get();
 
-        if(!empty($query)){
-            return $this->successResponse($query,'Success', 200);
+        if (!empty($query)) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
     public function getCabangUser(Request $request)
     {
         $query = UserStaffCabang::query();
-        if(!empty($request->user)){
+        if (!empty($request->user)) {
             $query =  $query->where('user_staff_id', $request->user);
-        }if(!empty($request->cabang)){
+        }
+        if (!empty($request->cabang)) {
             $query =  $query->where('cabang_id', $request->cabang);
-        }if(!empty($request->role)){
+        }
+        if (!empty($request->role)) {
             $query =  $query->where('role_id', $request->role);
         }
 
@@ -86,30 +134,55 @@ class CabangUserController extends Controller
 
         foreach ($cabangs as $key => $cabang) {
             $query = UserStaffCabang::create([
-                "user_staff_id"=> $request->user_staff_id,
-                "cabang_id"=> $cabang,
-                "role_id"=> $user->role_id,
+                "user_staff_id" => $request->user_staff_id,
+                "cabang_id" => $cabang,
+                "role_id" => $user->role_id,
             ]);
         }
 
-        if(!empty($query)){
-            return $this->successResponse($query,'Success', 200);
+        if (!empty($query)) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data update Error', 403);
+            // return $this->errorResponse('Data update Error', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
-    public function userCabangUpdate(){
+    public function userCabangUpdate(Request $request, $id)
+    {
         $cabang = Cabang::where('id', $id)->update([
-            "kepala_cabang_id"=> $request->kepala_cabang_id,
-            "kepala_cabang_senior_id"=> $request->kepala_cabang_senior_id,
-            "kepala_unit_id"=> $request->kepala_unit_id,
+            "kepala_cabang_id" => $request->kepala_cabang_id,
+            "kepala_cabang_senior_id" => $request->kepala_cabang_senior_id,
+            "kepala_unit_id" => $request->kepala_unit_id,
         ]);
 
-        if(!empty($cabang)){
-            return $this->successResponse($cabang,'Success', 200);
+        if (!empty($cabang)) {
+            // return $this->successResponse($cabang, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $cabang
+            );
         } else {
-            return $this->errorResponse('Data update Error', 403);
+            // return $this->errorResponse('Data update Error', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $cabang
+            );
         }
     }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\BarangKeluar;
 use App\Model\BarangTipe;
+use App\Helpers\Constants;
 
 
 class BarangKeluarController extends Controller
@@ -15,10 +16,11 @@ class BarangKeluarController extends Controller
     {
         $barang = BarangKeluar::paginate(15);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $barang
-        ], 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $barang
+        );
     }
 
     public function create()
@@ -38,10 +40,11 @@ class BarangKeluarController extends Controller
         $query = BarangKeluar::find($id);
         $query['tipe'] = BarangTipe::find($query->id_tipe);
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);  
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)

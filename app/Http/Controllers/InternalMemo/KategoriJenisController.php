@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Model\KategoriFpp;
 use App\Model\KategoriJenisFpp;
+use App\Helpers\Constants;
 
 
 class KategoriJenisController extends Controller
@@ -21,14 +22,26 @@ class KategoriJenisController extends Controller
             return $query;
         });
 
-        return $this->successResponse($kategori,'Success', 200);
+        return $this->successResponse($kategori, 'Success', 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $kategori->setCollection($collect)
+        );
     }
 
     public function all()
     {
         $query = KategoriJenisFpp::all();
 
-        return $this->successResponse($query,'Success', 200);
+        // return $this->successResponse($query, 'Success', 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function create()
@@ -39,13 +52,25 @@ class KategoriJenisController extends Controller
     public function store(Request $request)
     {
         $query = KategoriJenisFpp::create([
-                    "name"=> $request->name
-                ]);
-        
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+            "name" => $request->name
+        ]);
+
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            // return $this->errorResponse('Process Data error', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
@@ -53,12 +78,24 @@ class KategoriJenisController extends Controller
     {
         $query = KategoriJenisFpp::find($id);
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $query->kategori;
 
-            return $this->successResponse($query,'Success', 200);
+            return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
@@ -70,14 +107,26 @@ class KategoriJenisController extends Controller
     public function update(Request $request, $id)
     {
         $query = KategoriJenisFpp::where('id', $id)
-                ->update([
-                    "name"=> $request->name
-                ]);
-        
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+            ->update([
+                "name" => $request->name
+            ]);
+
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Process Data error', 403);
+            // return $this->errorResponse('Process Data error', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
@@ -86,11 +135,23 @@ class KategoriJenisController extends Controller
     {
         $query = KategoriJenisFpp::find($id);
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $query->delete();
-            return $this->successResponse($query,'Success', 200);
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 }

@@ -34,23 +34,23 @@ class GodmodController extends Controller
         $user = User::find($id);
         if (!$token = JWTAuth::fromUser($user)) {
             return $this->errorResponse('Incorrect username or password.', 401);
-        } else if($user->is_active == 1) {
+        } else if ($user->is_active == 1) {
             $access_menu = $user->role->roleMenu;
             $access_menu = $access_menu->map(function ($query) use ($id_top_menu) {
-                $query['menu'] = Menu::select(['id','code','name','parent_id'])->where('id', $query->menu_id)->first();
+                $query['menu'] = Menu::select(['id', 'code', 'name', 'parent_id'])->where('id', $query->menu_id)->first();
                 return $query;
             });
 
             //get Top Menu from Menu Model
             foreach ($user->role->roleMenu as $key => $val_menu) {
-                if(!empty($val_menu->menu->parent_id)){
-                    if( !in_array( $val_menu->menu->parent_id ,$id_top_menu ) ){
+                if (!empty($val_menu->menu->parent_id)) {
+                    if (!in_array($val_menu->menu->parent_id, $id_top_menu)) {
                         $id_top_menu[] = $val_menu->menu->parent_id;
                     }
                 }
             }
 
-            $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
+            $cabang = UserStaffCabang::select('cabang.id', 'cabang.name', 'cabang.kode')
                 ->where('user_staff_id', $user->id)
                 ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
                 ->get();
@@ -60,16 +60,22 @@ class GodmodController extends Controller
             $kategoriProses = KategoriPicFpp::where('user_id', $user->id)->get();
 
             return response()->json([
-                'type' =>'success',
+                'type' => 'success',
                 'message' => 'Logged in.',
                 'token' => $token,
                 'user' => $user,
-                'top_menu'=> $top_menu,
+                'top_menu' => $top_menu,
                 'cabang' => $cabang,
                 'kategori_proses' => $kategoriProses
             ]);
-        }else{
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9007, 403);
+        } else {
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_9007, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $user
+            );
         }
     }
 }

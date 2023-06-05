@@ -5,6 +5,7 @@ namespace App\Helpers;
 class Constants
 {
     const HTTP_MESSAGE_200 = 'Success';
+    const HTTP_MESSAGE_403 = 'Error';
     const ERROR_MESSAGE_403 = 'Process Data error';
     const ERROR_MESSAGE_9000 = 'Anda Bukan Pic';
     const ERROR_MESSAGE_9001 = 'Anda Tidak Mendapatkan Hak Akses';

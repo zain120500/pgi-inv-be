@@ -13,26 +13,28 @@ use App\Model\LogRefund;
 use App\User;
 use DB;
 
+use App\Helpers\Constants;
+
 class PembelianController extends Controller
 {
     public function index(Request $request)
     {
-        if(!empty($request->from) and !empty($request->to)){
+        if (!empty($request->from) and !empty($request->to)) {
             $query = Pembelian::orderBy('tanggal', 'DESC')
                 ->whereBetween('tanggal', [$request->from, $request->to]);
         } else {
             $query = Pembelian::orderBy('tanggal', 'DESC');
         }
 
-        if(!empty($request->no_invoice)){
-            $query = $query->where('no_invoice', 'like', '%'.$request->no_invoice.'%')->paginate(15);
-        } else if(!empty($request->user_input)){
-            $query = $query->where('user_input', 'like', '%'.$request->user_input.'%')->paginate(15);
-        } else if(!empty($request->flag)){
+        if (!empty($request->no_invoice)) {
+            $query = $query->where('no_invoice', 'like', '%' . $request->no_invoice . '%')->paginate(15);
+        } else if (!empty($request->user_input)) {
+            $query = $query->where('user_input', 'like', '%' . $request->user_input . '%')->paginate(15);
+        } else if (!empty($request->flag)) {
             $query = $query->where('flag', $request->flag)->paginate(15);
-        } else if(!empty($request->from) and !empty($request->to)){
+        } else if (!empty($request->from) and !empty($request->to)) {
             $query = $query->whereBetween('tanggal', [$request->from, $request->to])->paginate(15);
-        } else if(!empty($request->id_supplier)){
+        } else if (!empty($request->id_supplier)) {
             $query = $query->where('id_supplier', $request->id_supplier)->paginate(15);
         } else {
             $query = $query->paginate(15);
@@ -50,20 +52,26 @@ class PembelianController extends Controller
             return $q;
         });
 
-        return $this->successResponse($query,'Success', 200);
+        // return $this->successResponse($query,'Success', 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function indexDetail(Request $request)
     {
-        if(!empty($request->nomer_barang)){
-            $query = PembelianDetail::where('nomer_barang', 'like', '%'.$request->nomer_barang.'%')->paginate(15);
-        } else if(!empty($request->id_tipe)){
-            $query = PembelianDetail::where('id_tipe', 'like', '%'.$request->id_tipe.'%')->paginate(15);
-        } else if(!empty($request->from) and !empty($request->to)){
+        if (!empty($request->nomer_barang)) {
+            $query = PembelianDetail::where('nomer_barang', 'like', '%' . $request->nomer_barang . '%')->paginate(15);
+        } else if (!empty($request->id_tipe)) {
+            $query = PembelianDetail::where('id_tipe', 'like', '%' . $request->id_tipe . '%')->paginate(15);
+        } else if (!empty($request->from) and !empty($request->to)) {
             $query = PembelianDetail::whereBetween('created_at', [$request->from, $request->to])->paginate(15);
-        } else if(!empty($request->id_pengiriman)){
+        } else if (!empty($request->id_pengiriman)) {
             $query = PembelianDetail::where('id_pengiriman', $request->id_pengiriman)->paginate(15);
-        } else if(!empty($request->status)){
+        } else if (!empty($request->status)) {
             $query = PembelianDetail::where('status', $request->status)->paginate(15);
         } else {
             $query = PembelianDetail::paginate(15);
@@ -77,7 +85,13 @@ class PembelianController extends Controller
             return $q;
         });
 
-        return $this->successResponse($query,'Success', 200);
+        // return $this->successResponse($query, 'Success', 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function create()
@@ -89,21 +103,33 @@ class PembelianController extends Controller
     {
 
         $query = Pembelian::create([
-            "no_invoice"=> $this->generateInvoice(),
-            "tanggal"=> $request->tanggal,
-            "id_supplier"=> $request->id_supplier,
+            "no_invoice" => $this->generateInvoice(),
+            "tanggal" => $request->tanggal,
+            "id_supplier" => $request->id_supplier,
             "is_dropship" => $request->is_dropship, // true/false
-            "pic"=> $request->pic,
-            "ongkir"=> $request->ongkir,
+            "pic" => $request->pic,
+            "ongkir" => $request->ongkir,
             "flag" => 0,
-            "keterangan"=> $request->keterangan,
-            "user_input"=> auth()->user()->admin->username
+            "keterangan" => $request->keterangan,
+            "user_input" => auth()->user()->admin->username
         ]);
 
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -111,26 +137,32 @@ class PembelianController extends Controller
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
 
-        if(empty($barangTipe)){
-            return $this->errorResponse('Barang Tipe is Null', 403);
+        if (empty($barangTipe)) {
+            // return $this->errorResponse('Barang Tipe is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         } else {
 
             $no_invoice = "";
 
-            if(empty($request->no_invoice)){
+            if (empty($request->no_invoice)) {
 
                 $no_invoice = $this->generateInvoice();
 
                 Pembelian::create([
-                    "no_invoice"=> $no_invoice,
-                    "tanggal"=> $request->tanggal,
-                    "id_supplier"=> $request->id_supplier,
+                    "no_invoice" => $no_invoice,
+                    "tanggal" => $request->tanggal,
+                    "id_supplier" => $request->id_supplier,
                     "is_dropship" => ($request->kode_cabang) ? true : false, // true/false
-                    "pic"=> $request->pic,
-                    "ongkir"=> $request->ongkir,
+                    "pic" => $request->pic,
+                    "ongkir" => $request->ongkir,
                     "flag" => 0,
-                    "keterangan"=> $request->keterangan,
-                    "user_input"=> auth()->user()->admin->username
+                    "keterangan" => $request->keterangan,
+                    "user_input" => auth()->user()->admin->username
                 ]);
             } else {
                 $no_invoice = $request->no_invoice;
@@ -138,28 +170,46 @@ class PembelianController extends Controller
 
             $pembelian = Pembelian::where('no_invoice', $no_invoice)->first();
 
-            if(empty($pembelian)) {
-                return $this->errorResponse('Data pembelian is Null', 403);
+            if (empty($pembelian)) {
+                // return $this->errorResponse('Data pembelian is Null', 403);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_403,
+                    Constants::HTTP_MESSAGE_403,
+                    null
+                );
             } else {
                 $query = PembelianDetail::create([
-                    "id_pembelian"=> $pembelian->id,
-                    "id_tipe"=> $request->id_tipe,
-                    "nomer_barang"=> $barangTipe->kode_barang,
-                    "harga"=> $request->harga,
-                    "jumlah"=> $request->jumlah,
-                    "total_harga"=> (int)$request->harga * (int)$request->jumlah,
-                    "satuan"=> $request->satuan,
-                    "imei"=> $request->imei,
-                    "detail_barang"=> $request->detail_barang,
-                    "keterangan_detail"=> $request->keterangan_detail,
-                    "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
-                    "status"=> 0
+                    "id_pembelian" => $pembelian->id,
+                    "id_tipe" => $request->id_tipe,
+                    "nomer_barang" => $barangTipe->kode_barang,
+                    "harga" => $request->harga,
+                    "jumlah" => $request->jumlah,
+                    "total_harga" => (int)$request->harga * (int)$request->jumlah,
+                    "satuan" => $request->satuan,
+                    "imei" => $request->imei,
+                    "detail_barang" => $request->detail_barang,
+                    "keterangan_detail" => $request->keterangan_detail,
+                    "id_gudang" => ($request->kode_cabang) ? $request->kode_cabang : NULL,
+                    "status" => 0
                 ]);
 
-                if($query){
-                    return $this->successResponse($query,'Success', 200);
+                if ($query) {
+                    // return $this->successResponse($query, 'Success', 200);
+
+                    return self::buildResponse(
+                        Constants::HTTP_CODE_200,
+                        Constants::HTTP_MESSAGE_200,
+                        $query
+                    );
                 } else {
-                    return $this->errorResponse('Data is Null', 403);
+                    // return $this->errorResponse('Data is Null', 403);
+
+                    return self::buildResponse(
+                        Constants::HTTP_CODE_403,
+                        Constants::HTTP_MESSAGE_403,
+                        null
+                    );
                 }
             }
         }
@@ -168,7 +218,7 @@ class PembelianController extends Controller
     public function show($id)
     {
         $query = Pembelian::find($id);
-        if(!empty($query)){
+        if (!empty($query)) {
             $details = PembelianDetail::where('id_pembelian', $query->id);
             $query['total_unit'] = $details->sum('jumlah');
             $query['total_pembelian'] = $details->sum('total_harga');
@@ -181,9 +231,21 @@ class PembelianController extends Controller
                 $detail->cabang;
                 $detail['status_code'] = $this->getCodeStatus($detail->status);
             }
-            return $this->successResponse($query,'Success', 200);
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -196,17 +258,29 @@ class PembelianController extends Controller
     {
         $query = Pembelian::where('id', $id)
             ->update([
-                "id_supplier"=> $request->id_supplier,
+                "id_supplier" => $request->id_supplier,
                 "is_dropship" => $request->is_dropship, // true/false
-                "pic"=> $request->pic,
-                "ongkir"=> $request->ongkir,
-                "keterangan"=> $request->keterangan,
-                "user_input"=> auth()->user()->admin->username
+                "pic" => $request->pic,
+                "ongkir" => $request->ongkir,
+                "keterangan" => $request->keterangan,
+                "user_input" => auth()->user()->admin->username
             ]);
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -214,64 +288,81 @@ class PembelianController extends Controller
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
 
-        if(empty($barangTipe)){
-            return $this->errorResponse('Barang Tipe is Null', 403);
+        if (empty($barangTipe)) {
+            // return $this->errorResponse('Barang Tipe is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         } else {
             $query = PembelianDetail::where('id', $id)
                 ->update([
-                    "id_tipe"=> $request->id_tipe,
-                    "nomer_barang"=> $barangTipe->kode_barang,
-                    "harga"=> $request->harga,
-                    "jumlah"=> $request->jumlah,
-                    "total_harga"=> (int)$request->harga * (int)$request->jumlah,
-                    "satuan"=> $request->satuan,
-                    "imei"=> $request->imei,
-                    "detail_barang"=> $request->detail_barang,
-                    "keterangan"=> $request->keterangan,
-                    "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL
+                    "id_tipe" => $request->id_tipe,
+                    "nomer_barang" => $barangTipe->kode_barang,
+                    "harga" => $request->harga,
+                    "jumlah" => $request->jumlah,
+                    "total_harga" => (int)$request->harga * (int)$request->jumlah,
+                    "satuan" => $request->satuan,
+                    "imei" => $request->imei,
+                    "detail_barang" => $request->detail_barang,
+                    "keterangan" => $request->keterangan,
+                    "id_gudang" => ($request->kode_cabang) ? $request->kode_cabang : NULL
                 ]);
-            if($query){
-                return $this->successResponse($query,'Success', 200);
+            if ($query) {
+                // return $this->successResponse($query, 'Success', 200);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_200,
+                    Constants::HTTP_MESSAGE_200,
+                    $query
+                );
             } else {
-                return $this->errorResponse('Data is Null', 403);
+                // return $this->errorResponse('Data is Null', 403);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_403,
+                    Constants::HTTP_MESSAGE_403,
+                    null
+                );
             }
         }
     }
 
-    public function updatePembelian(Request $request){ //merubah status pembelian
+    public function updatePembelian(Request $request)
+    { //merubah status pembelian
 
         $id = $request->id;
         $flag = $request->flag;
 
         $pembelian = Pembelian::where('id', $id)->first();
 
-        if($flag == 0){  // request void pembelian
+        if ($flag == 0) {  // request void pembelian
             PembelianDetail::where('id_pembelian', $pembelian->id)->update(["status" => 0]); //update barang jadi request void
-        } else if($flag == 6){  // request void pembelian
+        } else if ($flag == 6) {  // request void pembelian
 
-        } else if($flag == 2){ //terima barang
+        } else if ($flag == 2) { //terima barang
 
-        } else if($flag == 3){ //terima barang
+        } else if ($flag == 3) { //terima barang
             $details = PembelianDetail::where('id_pembelian', $pembelian->id);
             foreach ($details->get() as $key => $detail) {
                 $detail->update(["status" => 1]);  //update barang jadi OK
 
                 BarangMasuk::create([
-                    "tanggal"=> date("Y-m-d"),
-                    "id_tipe"=> $detail->id_tipe,
-                    "nomer_barang"=> $detail->nomer_barang,
-                    "detail_barang"=> $detail->detail_barang,
-                    "imei"=> $detail->imei,
-                    "pic"=> $pembelian->pic,
-                    "jumlah"=> $detail->jumlah,
-                    "satuan"=> $detail->satuan,
-                    "total_harga"=> $detail->total_harga,
-                    "user_input"=> auth()->user()->admin->username
+                    "tanggal" => date("Y-m-d"),
+                    "id_tipe" => $detail->id_tipe,
+                    "nomer_barang" => $detail->nomer_barang,
+                    "detail_barang" => $detail->detail_barang,
+                    "imei" => $detail->imei,
+                    "pic" => $pembelian->pic,
+                    "jumlah" => $detail->jumlah,
+                    "satuan" => $detail->satuan,
+                    "total_harga" => $detail->total_harga,
+                    "user_input" => auth()->user()->admin->username
                 ]);
-
             }
-
-        } else if($flag == 4){ // Approve Void Pembelian
+        } else if ($flag == 4) { // Approve Void Pembelian
 
             $details = PembelianDetail::where('id_pembelian', $pembelian->id);
 
@@ -295,79 +386,128 @@ class PembelianController extends Controller
 
         $pembelian->update(["flag" => $flag]);
 
-        if($pembelian){
-            return $this->successResponse($pembelian,'Success', 200);
+        if ($pembelian) {
+            // return $this->successResponse($pembelian, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $pembelian
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
-    public function updatePembelianDetail(Request $request){ //merubah status pembelian detail (barang pembelian)
+    public function updatePembelianDetail(Request $request)
+    { //merubah status pembelian detail (barang pembelian)
         $id = $request->id;
         $status = $request->status;
 
         $query = PembelianDetail::where('id', $id)->update(["status" => $status]);
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
     public function destroy($id)
     {
         $query = Pembelian::find($id);
-        if(!empty($query)){
+        if (!empty($query)) {
             $query->delete();
 
-            PembelianDetail::where('id_pembelian',$query->id)->delete();
-            return $this->successResponse($query,'Success', 200);
+            PembelianDetail::where('id_pembelian', $query->id)->delete();
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
     public function destroyDetail($id)
     {
         $query = PembelianDetail::find($id);
-        if(!empty($query)){
+        if (!empty($query)) {
             $query->delete();
-            return $this->successResponse($query,'Success', 200);
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
     public function getCodeFlag($id)
     {
-        if($id == 0){
+        if ($id == 0) {
             return "belum proses";
-        } else if($id == 1){
+        } else if ($id == 1) {
             return "sudah diproses";
-        } else if($id == 2){
+        } else if ($id == 2) {
             return "sudah dibayar";
-        } else if($id == 3){
+        } else if ($id == 3) {
             return "diterima";
-        } else if($id == 4){
+        } else if ($id == 4) {
             return "dibatalkan";
-        } else if($id == 5){
+        } else if ($id == 5) {
             return "barang selisih";
-        }else if($id == 6){
+        } else if ($id == 6) {
             return "request void";
         }
     }
 
     public function getCodeStatus($id)
     {
-        if($id == 0){
+        if ($id == 0) {
             return "Pending";
-        } else if($id == 1){
+        } else if ($id == 1) {
             return "Ok";
-        } else if($id == 2){
+        } else if ($id == 2) {
             return "Void";
-        } else if($id == 3){
+        } else if ($id == 3) {
             return "Selisih";
-        }else if($id == 4){
+        } else if ($id == 4) {
             return "request void";
         }
     }
@@ -381,7 +521,7 @@ class PembelianController extends Controller
         $bulan = $time = date("m");
         $tahun = $time = date("Y");
 
-        $nik = "B".$tahun.$bulan.$tanggal.sprintf("%04s", $max_nik);
+        $nik = "B" . $tahun . $bulan . $tanggal . sprintf("%04s", $max_nik);
         return $nik;
     }
 }
