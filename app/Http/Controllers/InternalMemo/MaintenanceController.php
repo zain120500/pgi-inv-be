@@ -62,6 +62,11 @@ class MaintenanceController extends Controller
                         'id_internal_memo' => $memos,
                         'id_maintenance' => $imMaintenance->id,
                         'id_barang' => $barang,
+                        'id_user_maintenance' => $users,
+                        'date' => $request->date,
+                        'link' => $this->generateRandomString(6),
+                        'kode' => $this->generateRandomString(6),
+                        'flag' => 0,
                         'created_by' => auth()->user()->id
                     ]);
 
@@ -469,56 +474,44 @@ Link Login : http://portal.pusatgadai.id
 
     public function attendanceMaintenance(Request $request, $id)
     {
-
-        //        DB::beginTransaction();
-        //
-        //        try {
-
         $memo = InternalMemoMaintenance::where('link', $id)->first();
         $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
+        DB::beginTransaction();
+        try {
+            $memo = InternalMemoMaintenance::where('link', $id)->first();
+            $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
 
         if ($memo->kode == $request->kode) {
             $memo->update([
                 'flag' => 1
             ]);
 
-            $im = InternalMemo::where('id', $memo->id_internal_memo)->update([
-                'flag' => 12
-            ]);
+                $im = InternalMemo::where('id', $memo->id_internal_memo)->first();
 
-            $hM = HistoryMemo::create([
-                'id_internal_memo' => $memo->id_internal_memo,
-                'user_id' => $uM->user_id,
-                'status' => 12,
-                'keterangan' => 'Maintenance Sudah Hadir',
-                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
-                "waktu" => Carbon::now()->format('h')
-            ]);
+                $im->update([
+                    'flag' => 12
+                ]);
+
+                HistoryMemo::create([
+                    'id_internal_memo' => $memo->id_internal_memo,
+                    'user_id' => $uM->user_id,
+                    'status' => 12,
+                    'keterangan' => 'Maintenance Sudah Hadir',
+                    "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                    "waktu" => Carbon::now()->format('h')
+                ]);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $e->getMessage();
         }
 
-        if ($memo) {
-            // return $this->successResponse($memo, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $memo
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $memo
+        );
     }
 
     public function updateMemoRescheduleV1(Request $request)
@@ -766,9 +759,6 @@ Link Login : http://portal.pusatgadai.id
 
     public function updateMemoMaintenance(Request $request)
     {
-
-
-
         //        $iMemo = $request->id_memo;
         //
         //        foreach ($iMemo as $keys => $value){
@@ -857,7 +847,6 @@ Link Login : http://portal.pusatgadai.id
         foreach ($memo as $key => $value) {
             foreach ($user as $keys => $values) {
                 $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
-
                 if ($update == null) {
                     $imMainteance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $value,
@@ -870,28 +859,27 @@ Link Login : http://portal.pusatgadai.id
                     ]);
                 } else if ($update->id_user_maintenance !== $values) {
                     $array = $values;
-                } else if (!empty($update)) {
+                }else if (!empty($update)) {
                     $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
-
                     $updates->update([
                         'date' => $request->date,
                         'created_by' => auth()->user()->id
                     ]);
                     $imMainteance[] = $updates->first();
                 }
+
+                $imMainteance = InternalMemoMaintenance::create([
+                    'id_internal_memo' => $value,
+                    'id_user_maintenance' => $array,
+                    'date' => $request->date,
+                    'link' => $this->generateRandomString(6),
+                    'kode' => $this->generateRandomString(6),
+                    'flag' => 0,
+                    'created_by' => auth()->user()->id
+                ]);
+
+                $this->whatsuppMessage($value);
             }
-
-            $imMainteance = InternalMemoMaintenance::create([
-                'id_internal_memo' => $value,
-                'id_user_maintenance' => $array,
-                'date' => $request->date,
-                'link' => $this->generateRandomString(4),
-                'kode' => $this->generateRandomString(4),
-                'flag' => 0,
-                'created_by' => auth()->user()->id
-            ]);
-
-            $this->whatsuppMessage($value);
         }
 
         if ($imMainteance) {
