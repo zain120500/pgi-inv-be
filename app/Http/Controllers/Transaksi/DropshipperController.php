@@ -18,7 +18,6 @@ class DropshipperController extends Controller
         $query = Dropshipper::orderBy('tanggal', 'DESC')->paginate(15);
 
 
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -40,7 +39,6 @@ class DropshipperController extends Controller
     {
         $query = Dropshipper::find($id);
         $query['detail'] = DropshipperDetail::where('id_dropshipper', $query->id)->get();
-
 
 
         return self::buildResponse(

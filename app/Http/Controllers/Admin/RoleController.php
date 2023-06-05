@@ -37,7 +37,6 @@ class RoleController extends Controller
         ]);
 
 
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,

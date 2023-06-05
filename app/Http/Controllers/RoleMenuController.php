@@ -18,7 +18,6 @@ class RoleMenuController extends Controller
         $query = RoleMenu::paginate(15);
 
 
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -34,7 +33,6 @@ class RoleMenuController extends Controller
             $query['role'] = RoleMenu::where('menu_id', $query->id)->pluck('role_id')->toArray();
             return $query;
         });
-
 
 
         return self::buildResponse(

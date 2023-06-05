@@ -82,7 +82,6 @@ class KategoriController extends Controller
     {
         $query = Kategori::find($id)->delete();
 
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,

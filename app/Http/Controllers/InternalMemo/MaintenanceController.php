@@ -390,42 +390,56 @@ Link Login : http://portal.pusatgadai.id
 
     public function attendanceMaintenance(Request $request, $id)
     {
-        DB::beginTransaction();
-        try {
-            $memo = InternalMemoMaintenance::where('link', $id)->first();
-            $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
 
-            if ($memo->kode == $request->kode) {
-                $memo->update([
-                    'flag' => 1
-                ]);
+        //        DB::beginTransaction();
+        //
+        //        try {
 
-                $im = InternalMemo::where('id', $memo->id_internal_memo)->first();
+        $memo = InternalMemoMaintenance::where('link', $id)->first();
+        $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
 
-                $im->update([
-                    'flag' => 12
-                ]);
+        if ($memo->kode == $request->kode) {
+            $memo->update([
+                'flag' => 1
+            ]);
 
-                HistoryMemo::create([
-                    'id_internal_memo' => $memo->id_internal_memo,
-                    'user_id' => $uM->user_id,
-                    'status' => 12,
-                    'keterangan' => 'Maintenance Sudah Hadir',
-                    "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
-                    "waktu" => Carbon::now()->format('h')
-                ]);
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $e->getMessage();
+            $im = InternalMemo::where('id', $memo->id_internal_memo)->update([
+                'flag' => 12
+            ]);
+
+            $hM = HistoryMemo::create([
+                'id_internal_memo' => $memo->id_internal_memo,
+                'user_id' => $uM->user_id,
+                'status' => 12,
+                'keterangan' => 'Maintenance Sudah Hadir',
+                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                "waktu" => Carbon::now()->format('h')
+            ]);
         }
 
-        return self::buildResponse(
-            Constants::HTTP_CODE_200,
-            Constants::HTTP_MESSAGE_200,
-            $memo
-        );
+        if ($memo) {
+            // return $this->successResponse($memo, Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $memo
+            );
+        } else {
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::ERROR_MESSAGE_403,
+                null
+            );
+        }
+
+        //            DB::commit();
+        //        } catch (\Exception $e) {
+        //            DB::rollback();
+        //            return $e->getMessage();
+        //        }
     }
 
     public function updateMemoRescheduleV1(Request $request)
@@ -706,38 +720,37 @@ Link Login : http://portal.pusatgadai.id
      */
     public function createUserMaitenance(Request $request)
     {
-//        DB::beginTransaction();
-//
-//        try {
-            $user = $request->id_user_maintenance;
-            $memo = $request->id_memo;
-            $imMainteance = [];
-            $array = [];
-            foreach ($memo as $key => $value){
-                foreach ($user as $keys => $values) {
-                    $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
+        //        DB::beginTransaction();
+        //
+        //        try {
+        $user = $request->id_user_maintenance;
+        $memo = $request->id_memo;
+        $imMainteance = [];
+        $array = [];
+        foreach ($memo as $key => $value) {
+            foreach ($user as $keys => $values) {
+                $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
 
-                    if ($update == null) {
-                        $imMainteance = InternalMemoMaintenance::create([
-                            'id_internal_memo' => $value,
-                            'id_user_maintenance' => $values,
-                            'date' => $request->date,
-                            'link' => $this->generateRandomString(6),
-                            'kode' => $this->generateRandomString(6),
-                            'flag' => 0,
-                            'created_by' => auth()->user()->id
-                        ]);
-                    } else if ($update->id_user_maintenance !== $values) {
-                        $array = $values;
-                    }else if (!empty($update)) {
-                        $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
+                if ($update == null) {
+                    $imMainteance = InternalMemoMaintenance::create([
+                        'id_internal_memo' => $value,
+                        'id_user_maintenance' => $values,
+                        'date' => $request->date,
+                        'link' => $this->generateRandomString(4),
+                        'kode' => $this->generateRandomString(4),
+                        'flag' => 0,
+                        'created_by' => auth()->user()->id
+                    ]);
+                } else if ($update->id_user_maintenance !== $values) {
+                    $array = $values;
+                } else if (!empty($update)) {
+                    $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
 
-                        $updates->update([
-                            'date' => $request->date,
-                            'created_by' => auth()->user()->id
-                        ]);
-                        $imMainteance[] = $updates->first();
-                    }
+                    $updates->update([
+                        'date' => $request->date,
+                        'created_by' => auth()->user()->id
+                    ]);
+                    $imMainteance[] = $updates->first();
                 }
             }
 
