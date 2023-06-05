@@ -53,32 +53,6 @@ class BarangStokController extends Controller
         );
     }
 
-    public function laporanStokBarang(Request $request)
-    {
-        $search = $request->search;
-        $id_kategori = $request->id_kategori;
-
-        $bStok = StokBarang::whereIn('pic', $this->cabangGlobal()->pluck('kode'))
-            ->whereHas('barangTipe', function ($q) use ($search) {
-                $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
-            })->whereHas('barangTipe.barangMerk.barangJeniss', function ($q) use ($id_kategori) {
-                $q->where('id_kategori', 'like', '%' . $id_kategori . '%');
-            })->paginate(15);
-
-        $bStok->map(function ($query) use ($search) {
-            $query->cabang;
-            $query->barangTipe->barangMerk->barangJeniss->barangKategori;
-
-            return $query;
-        });
-
-        return self::buildResponse(
-            Constants::HTTP_CODE_200,
-            Constants::HTTP_MESSAGE_200,
-            $bStok
-        );
-    }
-
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
