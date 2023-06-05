@@ -95,9 +95,19 @@ class PemakaianController extends Controller
     {
         //
     }
-
-    public function destroy($id)
+    public function delete($id)
     {
-        //
+        try {
+            $barangDel = Pemakaian::find($id);
+            $barangDel->delete();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $barangDel
+        );
     }
 }

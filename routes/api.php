@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Admin\Barang\BarangStokController;
 use App\Http\Controllers\Admin\Barang\BarangTipeController;
+use App\Http\Controllers\Admin\Laporan\LaporanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\InternalMemoController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceVendorController;
 use App\Http\Controllers\Transaksi\PemakaianController;
+use App\Http\Controllers\Transaksi\StokInventarisController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -244,12 +246,21 @@ Route::group([
             'prefix' => 'barang-stok'
         ], function ($router) {
             Route::get('/asset', [BarangStokController::class, 'assetByIdKategori']);
-            Route::get('/laporan-stok-barang', [BarangStokController::class, 'laporanStokBarang']);
-            Route::get('/history-barang', [BarangStokController::class, 'historyBarang']);
 
         });
     });
 
+    Route::group([
+        'namespace' => 'Laporan',
+        'prefix' => 'laporan'
+    ], function ($router) {
+        Route::get('/inventaris', [LaporanController::class, 'laporanInvetarisPerorangan']);
+        Route::get('/pembelian', [LaporanController::class, 'laporanPembelian']);
+        Route::get('/pengiriman', [LaporanController::class, 'laporanPengiriman']);
+        Route::get('/pemakaian', [LaporanController::class, 'laporanPemakaian']);
+        Route::get('/stokbarang', [LaporanController::class, 'laporanStokBarang']);
+        Route::get('/history-barang', [BarangStokController::class, 'historyBarang']);
+    });
 });
 
 
@@ -330,6 +341,15 @@ Route::group([
             Route::get('/all', [PemakaianController::class, 'all']);
             Route::get('/paginate', [PemakaianController::class, 'paginate']);
             Route::post('/', [PemakaianController::class, 'store']);
+            Route::delete('/{id}', [PemakaianController::class, 'delete']);
+
+        });
+
+        Route::group([
+            'prefix' => 'stok-inventaris'
+        ], function ($router) {
+            Route::get('/all', [StokInventarisController::class, 'all']);
+            Route::get('/paginate', [StokInventarisController::class, 'paginate']);
 
         });
     });
