@@ -26,22 +26,11 @@ class BarangMasukController extends Controller
             return $query->barangTipe;
         });
 
-        if ($query) {
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $collect
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $collect
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $collect
+        );
     }
 
     public function create()
@@ -58,8 +47,6 @@ class BarangMasukController extends Controller
     {
         $query = BarangMasuk::find($id);
         $query->barangTipe;
-
-        return $this->successResponse($query, 'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -100,22 +87,10 @@ class BarangMasukController extends Controller
             return $q;
         });
 
-        if ($query) {
-            // return $this->successResponse($query->setCollection($collect), 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $collect
+        );
     }
 }

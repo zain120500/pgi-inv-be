@@ -99,23 +99,11 @@ class InternalMemoController extends Controller
             })->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
         }
 
-        if ($internal) {
-            // return $this->successResponse($internal, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $internal
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $internal
+        );
     }
 
     public function create()
@@ -190,23 +178,11 @@ class InternalMemoController extends Controller
             }
         }
 
-        if ($internalMemo) {
-            // return $this->successResponse($internalMemo, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $internalMemo
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $internalMemo
+        );
 
         //            DB::commit();
         //        } catch (\Throwable $e) {
@@ -270,23 +246,11 @@ class InternalMemoController extends Controller
             }
         }
 
-        if ($query) {
-            // return $this->successResponse($query, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -314,23 +278,11 @@ class InternalMemoController extends Controller
             "created_by" => auth()->user()->id
         ]);
 
-        if ($query) {
-            // return $this->successResponse($query, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
 
 
         //            DB::commit();
@@ -384,23 +336,11 @@ class InternalMemoController extends Controller
             }
         }
 
-        if ($query) {
-            // return $this->successResponse($query, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
 
         //            DB::commit();
         //        } catch (\Throwable $e) {
@@ -455,23 +395,11 @@ class InternalMemoController extends Controller
             }
         }
 
-        if ($internal) {
-            // return $this->successResponse($internal, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $internal
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $internal
+        );
 
         //            DB::commit();
         //        } catch (\Throwable $e) {
@@ -489,24 +417,12 @@ class InternalMemoController extends Controller
         $imFile = InternalMemoFile::find($id);
 
         Storage::disk('sftp')->delete(basename($imFile->path));
-        if (!empty($imFile)) {
-            $imFile->delete();
-            // return $this->successResponse($imFile, Constants::HTTP_MESSAGE_200, 200);
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $imFile
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $imFile
+        );
 
         //            DB::commit();
         //        } catch (\Throwable $e) {
@@ -551,23 +467,20 @@ class InternalMemoController extends Controller
             ]);
         }
 
-        if ($create) {
-            // return $this->successResponse($create, Constants::HTTP_MESSAGE_200, 200);
+        $create = HistoryMemo::create([
+            "id_internal_memo" => $internalMemo->id,
+            "user_id" => auth()->user()->id,
+            "status" => 10,
+            "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name,
+            "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+            "waktu" => Carbon::now()->format('h')
+        ]);
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $create
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $create
+        );
 
         //            DB::commit();
         //        } catch (\Throwable $e) {
@@ -610,23 +523,11 @@ class InternalMemoController extends Controller
             ]);
         }
 
-        if ($array) {
-            // return $this->successResponse($array, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $array
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $array
+        );
 
         //            DB::commit();
         //        } catch (\Throwable $e) {
@@ -651,23 +552,11 @@ class InternalMemoController extends Controller
             'created_by' => auth()->user()->id,
         ]);
 
-        if ($create) {
-            // return $this->successResponse($create, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $create
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $create
+        );
 
         //            DB::commit();
         //        } catch (\Throwable $e) {
@@ -685,23 +574,11 @@ class InternalMemoController extends Controller
             return $query;
         });
 
-        if ($rating) {
-            // return $this->successResponse($rating, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $rating
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $rating
+        );
     }
 
     public function getMemoMaintenance($id)
@@ -714,23 +591,11 @@ class InternalMemoController extends Controller
             return $query;
         });
 
-        if ($internal) {
-            // return $this->successResponse($internal, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $internal
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $internal
+        );
     }
 
     /**
@@ -800,23 +665,11 @@ class InternalMemoController extends Controller
             }
         }
 
-        if ($memo) {
-            // return $this->successResponse($memo, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $memo
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $memo
+        );
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -1025,23 +878,11 @@ class InternalMemoController extends Controller
             ]);
         }
 
-        if ($array) {
-            // return $this->successResponse($array, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $array
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $array
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $array
+        );
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -1167,23 +1008,12 @@ class InternalMemoController extends Controller
             "waktu" => Carbon::now()->format('h')
         ]);
 
-        if ($create) {
-            // return $this->successResponse($create, Constants::HTTP_MESSAGE_200, 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $create
+        );
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $create
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $create
-            );
-        }
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -1250,23 +1080,11 @@ class InternalMemoController extends Controller
             })->get();
         }
 
-        if ($internal) {
-            // return $this->successResponse($internal, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $internal
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $internal
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $internal
+        );
     }
 
     public function dashboardKcImStatus()

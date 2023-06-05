@@ -23,23 +23,11 @@ class UserController extends Controller
             return $query;
         });
 
-        if ($users) {
-            // return $this->successResponse($users, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $users
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $users
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $users
+        );
     }
 
     public function index()
@@ -52,11 +40,6 @@ class UserController extends Controller
 
             return $query;
         });
-
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $users->setCollection($collect_user)
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -86,9 +69,6 @@ class UserController extends Controller
 
             return $q;
         });
-
-        return $this->successResponse($query, 'Success', 200);
-
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

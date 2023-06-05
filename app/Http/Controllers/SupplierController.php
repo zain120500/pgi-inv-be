@@ -69,23 +69,29 @@ class SupplierController extends Controller
     {
         $query = Supplier::find($id);
 
-        if (!empty($query)) {
-            // return $this->successResponse($query, 'Success', 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
+        // if (!empty($query)) {
+        //     // return $this->successResponse($query, 'Success', 200);
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
-        }
+        //     return self::buildResponse(
+        //         Constants::HTTP_CODE_200,
+        //         Constants::HTTP_MESSAGE_200,
+        //         $query
+        //     );
+        // } else {
+        //     // return $this->errorResponse('Data is Null', 403);
+
+        //     return self::buildResponse(
+        //         Constants::HTTP_CODE_403,
+        //         Constants::HTTP_MESSAGE_403,
+        //         'Data is Null'
+        //     );
+        // }
     }
 
 
@@ -105,11 +111,6 @@ class SupplierController extends Controller
                 "keterangan" => $request->keterangan
             ]);
 
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $query
-        // ]);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -121,11 +122,6 @@ class SupplierController extends Controller
     public function destroy($id)
     {
         $query = Supplier::find($id)->delete();
-
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $query
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

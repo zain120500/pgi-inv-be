@@ -16,11 +16,6 @@ class RoleController extends Controller
     {
         $query = Role::all();
 
-        // return response()->json([
-        //     'status' =>'success',
-        //     'data' => $query
-        // ], 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -41,10 +36,7 @@ class RoleController extends Controller
             "is_active" => $request->is_active
         ]);
 
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $query
-        // ]);
+
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -57,23 +49,11 @@ class RoleController extends Controller
     {
         $query = Role::find($id);
 
-        if (!empty($query)) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -90,11 +70,6 @@ class RoleController extends Controller
                 "is_active" => $request->is_active
             ]);
 
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $query
-        // ]);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -106,10 +81,6 @@ class RoleController extends Controller
     {
         $query = Role::find($id)->delete();
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $query
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

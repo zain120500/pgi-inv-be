@@ -120,23 +120,11 @@ class MaintenanceController extends Controller
             $this->createHistoryBarang($barangs[0]);
         }
 
-        if ($imMaintenance) {
-            // return $this->successResponse($imMaintenance, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $imMaintenance
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $imMaintenance
+        );
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -303,23 +291,11 @@ Link Login : http://portal.pusatgadai.id
             }
         }
 
-        if ($create) {
-            // return $this->successResponse($create, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $create
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $create
+        );
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -339,69 +315,33 @@ Link Login : http://portal.pusatgadai.id
             $cabang[] = Cabang::where('id', $im->id_cabang)->first();
         }
 
-        if ($cabang) {
-            // return $this->successResponse($cabang, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $cabang
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $cabang
+        );
     }
 
     public function getBarangMerk()
     {
         $bMerk = BarangMerk::orderBy('id', 'DESC')->get();
 
-        if ($bMerk) {
-            // return $this->successResponse($bMerk, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $bMerk
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $bMerk
+        );
     }
 
     public function getBarangTipe($id)
     {
         $bTipe = BarangTipe::where('id_merk', $id)->get();
 
-        if ($bTipe) {
-            // return $this->successResponse($bTipe, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $bTipe
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $bTipe
+        );
     }
 
     public function getBarangStock(Request $request)
@@ -430,46 +370,22 @@ Link Login : http://portal.pusatgadai.id
             );
         }
 
-        if ($bStock) {
-            // return $this->successResponse($bStock, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $bStock
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $bStock
+        );
     }
 
     public function getPusatStock(Request $request)
     {
         $bStock = StokBarang::where('pic', $request->pic)->get();
 
-        if ($bStock) {
-            // return $this->successResponse($bStock, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $bStock
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $bStock
+        );
     }
 
     public function attendanceMaintenance(Request $request, $id)
@@ -481,10 +397,10 @@ Link Login : http://portal.pusatgadai.id
             $memo = InternalMemoMaintenance::where('link', $id)->first();
             $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
 
-        if ($memo->kode == $request->kode) {
-            $memo->update([
-                'flag' => 1
-            ]);
+            if ($memo->kode == $request->kode) {
+                $memo->update([
+                    'flag' => 1
+                ]);
 
                 $im = InternalMemo::where('id', $memo->id_internal_memo)->first();
 
@@ -541,23 +457,12 @@ Link Login : http://portal.pusatgadai.id
             }
         }
 
-        if ($imMaintenance) {
-            // return $this->successResponse($imMaintenance, Constants::HTTP_MESSAGE_200, 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $imMaintenance
+        );
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $imMaintenance
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -595,23 +500,12 @@ Link Login : http://portal.pusatgadai.id
             }
         }
 
-        if ($arr) {
-            // return $this->successResponse($arr, Constants::HTTP_MESSAGE_200, 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $arr
+        );
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $arr
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -732,23 +626,12 @@ Link Login : http://portal.pusatgadai.id
             }
         }
 
-        if ($arr) {
-            // return $this->successResponse($arr, Constants::HTTP_MESSAGE_200, 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $arr
+        );
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $arr
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -807,23 +690,11 @@ Link Login : http://portal.pusatgadai.id
                 }
             }
 
-            if ($barang) {
-                // return $this->successResponse($barang, Constants::HTTP_MESSAGE_200, 200);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_200,
-                    Constants::HTTP_MESSAGE_200,
-                    $barang
-                );
-            } else {
-                // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_403,
-                    Constants::ERROR_MESSAGE_403,
-                    null
-                );
-            }
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $barang
+            );
 
             DB::commit();
         } catch (\Exception $e) {
@@ -906,6 +777,18 @@ Link Login : http://portal.pusatgadai.id
             //            return $e->getMessage();
             //        }
         }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $imMainteance
+        );
+
+        //            DB::commit();
+        //        } catch (\Exception $e) {
+        //            DB::rollback();
+        //            return $e->getMessage();
+        //        }
     }
 
     public function deleteUserMaintenance(Request $request)
@@ -930,23 +813,11 @@ Link Login : http://portal.pusatgadai.id
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
 
-        if ($user) {
-            // return $this->successResponse($user, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $user
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $user
+        );
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -1013,23 +884,13 @@ Link Login : http://portal.pusatgadai.id
             }
         }
 
-        if ($pemakaian) {
-            // return $this->successResponse($pemakaian, Constants::HTTP_MESSAGE_200, 200);
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $pemakaian
+        );
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $pemakaian
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -1079,23 +940,11 @@ Link Login : http://portal.pusatgadai.id
             return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
         }
 
-        if ($iBarang) {
-            // return $this->successResponse($iBarang, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $iBarang
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $iBarang
+        );
 
         //            DB::commit();
         //        } catch (\Exception $e) {
@@ -1115,23 +964,11 @@ Link Login : http://portal.pusatgadai.id
             $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe')->paginate(10);
         }
 
-        if ($stockBarang) {
-            // return $this->successResponse($stockBarang, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $stockBarang
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $stockBarang
+        );
     }
 
     public function getStockBarangV3(Request $request)
@@ -1145,46 +982,22 @@ Link Login : http://portal.pusatgadai.id
             $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe.barangMerk.barangJenis')->get();
         }
 
-        if ($stockBarang) {
-            // return $this->successResponse($stockBarang, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $stockBarang
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $stockBarang
+        );
     }
 
     public function getListMaintenance()
     {
         $listMaintenance = UserMaintenance::withCount('resultJob')->get();
 
-        if ($listMaintenance) {
-            // return $this->successResponse($listMaintenance, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $listMaintenance
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $listMaintenance
+        );
     }
 
     public function getDetailBarang(Request $request)
@@ -1198,23 +1011,11 @@ Link Login : http://portal.pusatgadai.id
             $stock[] = StokBarang::where('id_tipe', $barang[$key])->where('pic', $cab)->with('barangTipe')->first();
         }
 
-        if ($stock) {
-            // return $this->successResponse($stock, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $stock
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $stock
+        );
     }
 
     public function webhookTest()
@@ -1346,23 +1147,11 @@ Link Login : http://portal.pusatgadai.id
             return $query;
         });
 
-        if ($iMemo) {
-            // return $this->successResponse($iMemo, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $iMemo
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $iMemo
+        );
     }
 
     public function konfirmasiSelesai(Request $request)
@@ -1393,23 +1182,11 @@ Link Login : http://portal.pusatgadai.id
             return $e->getMessage();
         }
 
-        if ($iMemoMaintenance) {
-            // return $this->successResponse([$iMemoMaintenance, $hM, $im], Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                [$iMemoMaintenance, $hM, $im]
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            [$iMemoMaintenance, $hM, $im]
+        );
     }
 
     public function getFlagStatus($id)

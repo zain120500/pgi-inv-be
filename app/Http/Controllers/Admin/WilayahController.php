@@ -74,11 +74,6 @@ class WilayahController extends Controller
             $query = Provinsi::get();
         }
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $query
-        // ], 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,

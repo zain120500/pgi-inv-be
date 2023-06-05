@@ -20,11 +20,6 @@ class KategoriController extends Controller
             return $query;
         });
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $kategori->setCollection($collect)
-        // ], 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -44,48 +39,22 @@ class KategoriController extends Controller
             "kode" => $request->kode
         ]);
 
-        if ($query) {
-            return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function show($id)
     {
         $query = Kategori::find($id);
 
-        if (!empty($query)) {
-            $query->barangJenis;
-
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -102,8 +71,6 @@ class KategoriController extends Controller
                 "kode" => $request->kode
             ]);
 
-        // return $this->successResponse($query, 'Success', 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -114,7 +81,7 @@ class KategoriController extends Controller
     public function destroy($id)
     {
         $query = Kategori::find($id)->delete();
-        // return $this->successResponse($query, 'Success', 200);
+
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

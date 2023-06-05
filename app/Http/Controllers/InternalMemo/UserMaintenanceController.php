@@ -24,23 +24,11 @@ class UserMaintenanceController extends Controller
             $record = UserMaintenance::where('pekerjaan', 'LIKE', $request->pekerjaan)->get();
         }
 
-        if ($record) {
-            // return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $record
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $record
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 
     public function paginate(Request $request)
@@ -55,23 +43,11 @@ class UserMaintenanceController extends Controller
             $record = UserMaintenance::where('flag', 'like', '%' . $request->flag . '%')->with('user')->orderBy('id', 'DESC')->paginate(15);
         }
 
-        if ($record) {
-            // return $this->successResponse($record,Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $record
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $record
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 
     public function show($id)
@@ -79,23 +55,11 @@ class UserMaintenanceController extends Controller
         $record = UserMaintenance::find($id);
         $record->user;
 
-        if ($record) {
-            // return $this->successResponse($record, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $record
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $record
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 
     public function store(Request $request)
@@ -241,23 +205,11 @@ class UserMaintenanceController extends Controller
             ]);
         }
 
-        if ($record) {
-            // return $this->successResponse([$record, $user], Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                [$record, $user]
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            [$record, $user]
+        );
     }
 
     public function update(Request $request, $id)
@@ -396,23 +348,11 @@ class UserMaintenanceController extends Controller
             ]);
         }
 
-        if ($update) {
-            // return $this->successResponse($update, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $update
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $update
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $update
+        );
     }
 
     public function destroy($id)
@@ -427,45 +367,21 @@ class UserMaintenanceController extends Controller
             return $e->getMessage();
         }
 
-        if ($record && $uDel) {
-            // return $this->successResponse([$record, $uDel], Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                [$record, $uDel]
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                [$record, $uDel]
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            [$record, $uDel]
+        );
     }
 
     public function getInternalMemo()
     {
         $record = InternalMemo::orderBy('id', 'DESC')->get();
 
-        if ($record) {
-            // return $this->successResponse($record, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $record
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 }

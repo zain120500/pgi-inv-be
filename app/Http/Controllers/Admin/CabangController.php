@@ -17,11 +17,6 @@ class CabangController extends Controller
     {
         $cabang = Cabang::paginate(15);
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $cabang
-        // ], 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -33,23 +28,11 @@ class CabangController extends Controller
     {
         $cabang = Cabang::select('id', 'name', 'alamat', 'hp', 'kode')->get();
 
-        if ($cabang) {
-            // return $this->successResponse($cabang, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $cabang
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $cabang
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $cabang
+        );
     }
 
     public function create()
@@ -83,11 +66,6 @@ class CabangController extends Controller
             "latitude" => $request->latitude,
             "longitude" => $request->longitude
         ]);
-
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $cabang
-        // ]);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -148,11 +126,6 @@ class CabangController extends Controller
                 "longitude" => $request->longitude
             ]);
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $cabang
-        // ], 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -163,11 +136,6 @@ class CabangController extends Controller
     public function destroy($id)
     {
         $query = Cabang::find($id)->delete();
-
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $query
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
