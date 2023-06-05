@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Transaksi;
 
-use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\Cabang;
 use App\Model\StokBarang;
