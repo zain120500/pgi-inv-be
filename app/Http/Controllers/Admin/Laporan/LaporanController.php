@@ -15,7 +15,10 @@ use App\Model\PengirimanKategori;
 use App\Model\StokBarang;
 use App\Model\StokInventaris;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
@@ -123,5 +126,54 @@ class LaporanController extends Controller
             Constants::HTTP_MESSAGE_200,
             $bStok
         );
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function historyBarang(Request $request)
+    {
+        $nomer_barang = $request->nomer_barang;
+
+        $barangMasuk = DB::table('barang_masuk')
+            ->where('barang_masuk.nomer_barang', $nomer_barang)
+            ->join('barang_tipe', 'barang_masuk.id_tipe', '=', 'barang_tipe.id')
+            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
+            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
+            ->join('cabang', 'barang_masuk.pic', '=', 'cabang.kode')
+            ->selectRaw("*, 'Terima' AS keterangan, cabang.name");
+
+        $barangKeluar = DB::table('barang_keluar')
+            ->where('barang_keluar.nomer_barang', $nomer_barang)
+            ->join('barang_tipe', 'barang_keluar.id_tipe', '=', 'barang_tipe.id')
+            ->join('barang_merk', 'barang_tipe.id_merk', '=', 'barang_merk.id')
+            ->join('barang_jenis', 'barang_merk.id_jenis', '=', 'barang_jenis.id')
+            ->join('cabang', 'barang_keluar.pic', '=', 'cabang.kode')
+            ->selectRaw("*, 'Kirim' AS keterangan, cabang.name")
+            ->union($barangMasuk)
+            ->get();
+
+        $data = $this->paginate($barangKeluar);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $data
+        );
+    }
+
+    /**
+     * @param $items
+     * @param $perPage
+     * @param $page
+     * @param $options
+     * @return LengthAwarePaginator
+     */
+    public function paginate($items, $perPage = 10, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }
