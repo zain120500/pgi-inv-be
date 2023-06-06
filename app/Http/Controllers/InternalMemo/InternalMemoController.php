@@ -1253,20 +1253,24 @@ class InternalMemoController extends Controller
     {
         try {
             $kProses = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+            $dashboardIm = InternalMemo::get();
 
             if ($kProses == null) {
                 $dashboardIm = InternalMemo::whereIn('id_cabang', $this->cabangGlobal()->pluck('kode'))->get();
-            } else if ($kProses->kategori_proses == 1 || $kProses->kategori_proses == 2 || $kProses->kategori_proses == 3) {
-                $dashboardIm = InternalMemo::get();
+                $val = 0;
+            } else if ($kProses->kategori_proses == 1) {
+                $val = $dashboardIm->whereIn('flag', [1])->count();
+            } else if ($kProses->kategori_proses == 2) {
+                $val = $dashboardIm->whereIn('flag', [2])->count();
             }
 
             $res = ([
                 "belum_disetujui" => $dashboardIm->whereIn('flag', [0])->count(),
                 "total_memo" => $dashboardIm->whereIn('flag', [1, 2, 3, 10, 4])->count(),
-                "disetujui" => $dashboardIm->whereIn('flag', [1, 2])->count(),
-                "diproses" => $dashboardIm->where('flag', 3)->count(),
-                "ditolak" => $dashboardIm->where('flag', 10)->count(),
-                "diselesaikan" => $dashboardIm->where('flag', 4)->count(),
+                "disetujui" => $val,
+                "diproses" => $dashboardIm->whereIn('flag', [3])->count(),
+                "ditolak" => $dashboardIm->whereIn('flag', [10])->count(),
+                "diselesaikan" => $dashboardIm->whereIn('flag', [4])->count(),
             ]);
         } catch (\Exception $e) {
             return $e->getMessage();

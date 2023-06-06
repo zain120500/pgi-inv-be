@@ -350,6 +350,7 @@ Route::group([
         ], function ($router) {
             Route::get('/all', [StokInventarisController::class, 'all']);
             Route::get('/paginate', [StokInventarisController::class, 'paginate']);
+            Route::post('/', [StokInventarisController::class, 'create']);
 
         });
     });

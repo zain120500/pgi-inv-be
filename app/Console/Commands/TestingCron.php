@@ -69,7 +69,7 @@ class TestCron extends Command
             if(!empty($iMemo)) {
                 foreach ($iMemo as $key => $memo) {
                     $memo->update([
-                        'flag' => 12,
+                        'flag' => 11,
                     ]);
                     $arrs[] = $memo->first();
                 }
