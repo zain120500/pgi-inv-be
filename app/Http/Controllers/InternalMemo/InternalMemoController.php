@@ -950,19 +950,32 @@ class InternalMemoController extends Controller
 
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
-        if ($pic->kategori_proses == 1 || $pic->kategori_proses == 2) {
+        if ($pic->kategori_proses == 1) {
+            InternalMemo::where('id', $id)->update([
+                'flag' => $pic->kategori_proses
+            ]);
+
+            $create = HistoryMemo::create([
+                "id_internal_memo" => $internalMemo->id,
+                "user_id" => auth()->user()->id,
+                "status" => $pic->kategori_proses,
+                "catatan" => $request->catatan,
+                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+            ]);
+        } else if ($pic->kategori_proses == 2) {
             InternalMemo::where('id', $id)->update([
                 'flag' => $pic->kategori_proses,
                 'catatan_setuju' => $request->catatan_setuju
             ]);
-        }
 
-        $create = HistoryMemo::create([
-            "id_internal_memo" => $internalMemo->id,
-            "user_id" => auth()->user()->id,
-            "status" => $pic->kategori_proses,
-            "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
-        ]);
+            $create = HistoryMemo::create([
+                "id_internal_memo" => $internalMemo->id,
+                "user_id" => auth()->user()->id,
+                "status" => $pic->kategori_proses,
+                "catatan" => $request->catatan,
+                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+            ]);
+        }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

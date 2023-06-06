@@ -106,7 +106,7 @@ class BarangMasukController extends Controller
             return self::buildResponse(
                 Constants::HTTP_CODE_200,
                 Constants::HTTP_MESSAGE_200,
-                $collect
+                $query
             );
         } else {
             // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
@@ -114,7 +114,7 @@ class BarangMasukController extends Controller
             return self::buildResponse(
                 Constants::HTTP_CODE_403,
                 Constants::HTTP_MESSAGE_403,
-                $collect
+                null
             );
         }
     }
