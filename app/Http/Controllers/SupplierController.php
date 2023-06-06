@@ -74,24 +74,6 @@ class SupplierController extends Controller
             Constants::HTTP_MESSAGE_200,
             $query
         );
-
-        // if (!empty($query)) {
-        //     // return $this->successResponse($query, 'Success', 200);
-
-        //     return self::buildResponse(
-        //         Constants::HTTP_CODE_200,
-        //         Constants::HTTP_MESSAGE_200,
-        //         $query
-        //     );
-        // } else {
-        //     // return $this->errorResponse('Data is Null', 403);
-
-        //     return self::buildResponse(
-        //         Constants::HTTP_CODE_403,
-        //         Constants::HTTP_MESSAGE_403,
-        //         'Data is Null'
-        //     );
-        // }
     }
 
 
@@ -121,12 +103,21 @@ class SupplierController extends Controller
 
     public function destroy($id)
     {
-        $query = Supplier::find($id)->delete();
+        try {
+            $supplier = Supplier::findOrFail($id);
+            $supplier->delete();
 
-        return self::buildResponse(
-            Constants::HTTP_CODE_200,
-            Constants::HTTP_MESSAGE_200,
-            $query
-        );
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $supplier
+            );
+        } catch (ModelNotFoundException $e) {
+            return self::buildResponse(
+                Constants::HTTP_CODE_404,
+                Constants::HTTP_MESSAGE_404,
+                null
+            );
+        }
     }
 }

@@ -34,7 +34,6 @@ trait ApiResponser
 
     public static function buildResponse(int $code = Constants::HTTP_CODE_403, string $status = Constants::ERROR_MESSAGE_403, $data = [])
     {
-
         return response()->json(array(
             'code' => $code,
             'status' => $status,
