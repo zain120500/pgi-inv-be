@@ -259,7 +259,7 @@ Route::group([
         Route::get('/pengiriman', [LaporanController::class, 'laporanPengiriman']);
         Route::get('/pemakaian', [LaporanController::class, 'laporanPemakaian']);
         Route::get('/stokbarang', [LaporanController::class, 'laporanStokBarang']);
-        Route::get('/history-barang', [BarangStokController::class, 'historyBarang']);
+        Route::get('/history-barang', [LaporanController::class, 'historyBarang']);
     });
 });
 
