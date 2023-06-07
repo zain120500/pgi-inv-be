@@ -859,52 +859,53 @@ Link Login : http://portal.pusatgadai.id
                     ]);
                 } else if ($update->id_user_maintenance !== $values) {
                     $array = $values;
-                }else if (!empty($update)) {
+                } else if (!empty($update)) {
                     $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
                     $updates->update([
                         'date' => $request->date,
                         'created_by' => auth()->user()->id
                     ]);
                     $imMainteance[] = $updates->first();
-                  
-                $imMainteance = InternalMemoMaintenance::create([
-                    'id_internal_memo' => $value,
-                    'id_user_maintenance' => $array,
-                    'date' => $request->date,
-                    'link' => $this->generateRandomString(6),
-                    'kode' => $this->generateRandomString(6),
-                    'flag' => 0,
-                    'created_by' => auth()->user()->id
-                ]);
 
-                $this->whatsuppMessage($value);
+                    $imMainteance = InternalMemoMaintenance::create([
+                        'id_internal_memo' => $value,
+                        'id_user_maintenance' => $array,
+                        'date' => $request->date,
+                        'link' => $this->generateRandomString(6),
+                        'kode' => $this->generateRandomString(6),
+                        'flag' => 0,
+                        'created_by' => auth()->user()->id
+                    ]);
+
+                    $this->whatsuppMessage($value);
+                }
             }
+
+            if ($imMainteance) {
+                // return $this->successResponse($imMainteance, Constants::HTTP_MESSAGE_200, 200);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_200,
+                    Constants::HTTP_MESSAGE_200,
+                    $imMainteance
+                );
+            } else {
+                // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_403,
+                    Constants::ERROR_MESSAGE_403,
+                    null
+                );
+            }
+
+
+            //            DB::commit();
+            //        } catch (\Exception $e) {
+            //            DB::rollback();
+            //            return $e->getMessage();
+            //        }
         }
-
-        if ($imMainteance) {
-            // return $this->successResponse($imMainteance, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $imMainteance
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
-                null
-            );
-        }
-
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function deleteUserMaintenance(Request $request)
