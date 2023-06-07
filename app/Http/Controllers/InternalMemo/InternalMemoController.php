@@ -1273,7 +1273,7 @@ class InternalMemoController extends Controller
                 $val = 0;
             } else if ($kProses->kategori_proses == 1) {
                 $val = $dashboardIm->whereIn('flag', [1])->count();
-            } else if ($kProses->kategori_proses == 2) {
+            } else if ($kProses->kategori_proses == 2 || $kProses->kategori_proses == 3) {
                 $val = $dashboardIm->whereIn('flag', [2])->count();
             }
 
