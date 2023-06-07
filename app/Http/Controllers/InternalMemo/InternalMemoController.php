@@ -523,25 +523,33 @@ class InternalMemoController extends Controller
 
         $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        if (!empty($request->catatan_tolak)) {
+        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if ($pic->kategori_proses == 1) {
             $internalMemo->update([
-                'catatan_tolak' => $request->catatan_tolak,
                 'flag' => 10
             ]);
-        } else {
-            $internalMemo->update([
+
+            $create = HistoryMemo::create([
+                "id_internal_memo" => $internalMemo->id,
+                "user_id" => auth()->user()->id,
+                "status" => $pic->kategori_proses,
+                "catatan" => $request->catatan,
+                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+            ]);
+        } else if ($pic->kategori_proses == 2) {
+            InternalMemo::where('id', $id)->update([
                 'flag' => 10
+            ]);
+
+            $create = HistoryMemo::create([
+                "id_internal_memo" => $internalMemo->id,
+                "user_id" => auth()->user()->id,
+                "status" => $pic->kategori_proses,
+                "catatan" => $request->catatan,
+                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
             ]);
         }
-
-        $create = HistoryMemo::create([
-            "id_internal_memo" => $internalMemo->id,
-            "user_id" => auth()->user()->id,
-            "status" => 10,
-            "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name,
-            "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
-            "waktu" => Carbon::now()->format('h')
-        ]);
 
         if ($create) {
             // return $this->successResponse($create, Constants::HTTP_MESSAGE_200, 200);
@@ -964,8 +972,7 @@ class InternalMemoController extends Controller
             ]);
         } else if ($pic->kategori_proses == 2) {
             InternalMemo::where('id', $id)->update([
-                'flag' => $pic->kategori_proses,
-                'catatan_setuju' => $request->catatan_setuju
+                'flag' => $pic->kategori_proses
             ]);
 
             $create = HistoryMemo::create([
