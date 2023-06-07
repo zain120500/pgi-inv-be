@@ -535,7 +535,7 @@ class InternalMemoController extends Controller
                 "user_id" => auth()->user()->id,
                 "status" => $pic->kategori_proses,
                 "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+                "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name
             ]);
         } else if ($pic->kategori_proses == 2) {
             InternalMemo::where('id', $id)->update([
@@ -547,7 +547,7 @@ class InternalMemoController extends Controller
                 "user_id" => auth()->user()->id,
                 "status" => $pic->kategori_proses,
                 "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+                "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name
             ]);
         }
 

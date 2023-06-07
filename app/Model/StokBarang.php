@@ -11,7 +11,7 @@ class StokBarang extends Model
     protected $guarded = [''];
     public $timestamps = false;
 
-    protected $hidden = array('created_at', 'updated_at');
+//    protected $hidden = array('created_at', 'updated_at');
 
     function barangTipe()
     {
