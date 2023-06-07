@@ -866,8 +866,7 @@ Link Login : http://portal.pusatgadai.id
                         'created_by' => auth()->user()->id
                     ]);
                     $imMainteance[] = $updates->first();
-                }
-
+                  
                 $imMainteance = InternalMemoMaintenance::create([
                     'id_internal_memo' => $value,
                     'id_user_maintenance' => $array,

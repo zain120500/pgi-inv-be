@@ -31,7 +31,7 @@ class StokInventarisController extends Controller
             $record
         );
     }
-
+  
     public function create(Request $request)
     {
         $record = StokInventaris::create([
