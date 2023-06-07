@@ -259,11 +259,9 @@ Route::group([
         Route::get('/pengiriman', [LaporanController::class, 'laporanPengiriman']);
         Route::get('/pemakaian', [LaporanController::class, 'laporanPemakaian']);
         Route::get('/stokbarang', [LaporanController::class, 'laporanStokBarang']);
-        Route::get('/history-barang', [BarangStokController::class, 'historyBarang']);
+        Route::get('/history-barang', [LaporanController::class, 'historyBarang']);
     });
 });
-
-
 
 Route::group([
     // 'namespace' => 'Admin',
@@ -350,6 +348,7 @@ Route::group([
         ], function ($router) {
             Route::get('/all', [StokInventarisController::class, 'all']);
             Route::get('/paginate', [StokInventarisController::class, 'paginate']);
+            Route::post('/', [StokInventarisController::class, 'create']);
 
         });
     });

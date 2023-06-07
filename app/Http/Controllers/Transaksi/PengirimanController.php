@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Transaksi;
 
-use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\Cabang;
 use App\Model\StokBarang;
@@ -20,6 +19,8 @@ use App\Model\BarangTipe;
 use App\Model\BarangKeluar;
 use App\Model\UserStaffCabang;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\Constants;
+
 
 class PengirimanController extends Controller
 {
@@ -54,7 +55,7 @@ class PengirimanController extends Controller
     public function store(Request $request)
     {
         $query = Pengiriman::create([
-            "no_invoice"=> $this->getkodeinvoice2(),
+            "no_invoice" => $this->getkodeinvoice2(),
             "tanggal"   => $request->tanggal,
             "pengirim"  => $request->pengirim,
             "penerima"  => $request->penerima,
@@ -62,22 +63,34 @@ class PengirimanController extends Controller
             "kategori"  => $request->kategori,
             "flag"      => $request->flag,
             "status"    => $request->status,
-            "keterangan"=> $request->keterangan,
-            "user_input"=> auth()->user()->admin->username,
+            "keterangan" => $request->keterangan,
+            "user_input" => auth()->user()->admin->username,
             "last_update" => date('Y-m-d H:i:s', strtotime('now'))
         ]);
 
-        if(!empty($request->id_internal_memo)) {
+        if (!empty($request->id_internal_memo)) {
             InternalMemoPengiriman::create([
-                "id_internal_memo"=> $request->id_internal_memo,
+                "id_internal_memo" => $request->id_internal_memo,
                 "id_pengiriman"   => $request->id_pengiriman,
             ]);
         }
 
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            // return $this->successResponse($query,'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
@@ -93,7 +106,7 @@ class PengirimanController extends Controller
             'nomer_barang' => $query->nomer_barang
         ])->first();
 
-        $pengurangan = ($bStockPengirim->jumlah_stok-$request->jumlah);
+        $pengurangan = ($bStockPengirim->jumlah_stok - $request->jumlah);
 
         try {
             StokBarang::where('id', $bStockPengirim->id)->update([
@@ -112,28 +125,46 @@ class PengirimanController extends Controller
             return $e->getMessage();
         }
 
-        if(empty($barangTipe)){
-            return $this->errorResponse('Barang Tipe is Null', 403);
+        if (empty($barangTipe)) {
+            // return $this->errorResponse('Barang Tipe is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Barang Tipe is Null'
+            );
         } else {
             $query = PengirimanDetail::create([
-                "id_pengiriman"=> $request->id_pengiriman,
-                "id_tipe"=> $request->id_tipe,
-                "nomer_barang"=> $barangTipe->kode_barang,
-                "harga"=> $request->harga,
-                "jumlah"=> $request->jumlah,
-                "total_harga"=> (int)$request->harga * (int)$request->jumlah,
-                "satuan"=> $request->satuan,
-                "imei"=> $request->imei,
-                "detail_barang"=> $request->detail_barang,
-                "keterangan"=> $request->keterangan,
-                "id_gudang"=> ($request->kode_cabang) ? $request->kode_cabang : NULL,
-                "status"=> 0
+                "id_pengiriman" => $request->id_pengiriman,
+                "id_tipe" => $request->id_tipe,
+                "nomer_barang" => $barangTipe->kode_barang,
+                "harga" => $request->harga,
+                "jumlah" => $request->jumlah,
+                "total_harga" => (int)$request->harga * (int)$request->jumlah,
+                "satuan" => $request->satuan,
+                "imei" => $request->imei,
+                "detail_barang" => $request->detail_barang,
+                "keterangan" => $request->keterangan,
+                "id_gudang" => ($request->kode_cabang) ? $request->kode_cabang : NULL,
+                "status" => 0
             ]);
 
-            if($query){
-                return $this->successResponse($query,'Success', 200);
+            if ($query) {
+                // return $this->successResponse($query, 'Success', 200);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_200,
+                    Constants::HTTP_MESSAGE_200,
+                    $query
+                );
             } else {
-                return $this->errorResponse('Data is Null', 403);
+                // return $this->errorResponse('Data is Null', 403);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_403,
+                    Constants::HTTP_MESSAGE_403,
+                    'Data is Null'
+                );
             }
         }
     }
@@ -142,7 +173,7 @@ class PengirimanController extends Controller
     {
         $query = Pengiriman::find($id);
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $query['kategori'] = PengirimanKategori::where('id', $query->kategori)->first();
 
             $pengiriman_detail = $query->detail;
@@ -160,9 +191,21 @@ class PengirimanController extends Controller
 
             $query['detail'] = $pengiriman_detail;
 
-            return $this->successResponse($query,'Success', 200);
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Data is Null'
+            );
         }
     }
 
@@ -179,12 +222,24 @@ class PengirimanController extends Controller
                 "penerima"  => $request->penerima,
                 "kurir"     => $request->kurir,
                 "kategori"  => $request->kategori,
-                "keterangan"=> $request->keterangan
+                "keterangan" => $request->keterangan
             ]);
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Data is Null'
+            );
         }
     }
 
@@ -192,46 +247,57 @@ class PengirimanController extends Controller
     {
         $barangTipe = BarangTipe::find($request->id_tipe);
 
-        if(empty($barangTipe)){
+        if (empty($barangTipe)) {
             return $this->errorResponse('Barang Tipe is Null', 403);
         } else {
             $query = PengirimanDetail::where('id', $id)
                 ->update([
-                    "id_pengiriman"=> $request->id_pengiriman,
-                    "id_tipe"=> $request->id_tipe,
-                    "nomer_barang"=> $barangTipe->kode_barang,
-                    "harga"=> $request->harga,
-                    "jumlah"=> $request->jumlah,
-                    "total_harga"=> (int)$request->harga * (int)$request->jumlah,
-                    "satuan"=> $request->satuan,
-                    "imei"=> $request->imei,
-                    "detail_barang"=> $request->detail_barang,
-                    "keterangan"=> $request->keterangan
+                    "id_pengiriman" => $request->id_pengiriman,
+                    "id_tipe" => $request->id_tipe,
+                    "nomer_barang" => $barangTipe->kode_barang,
+                    "harga" => $request->harga,
+                    "jumlah" => $request->jumlah,
+                    "total_harga" => (int)$request->harga * (int)$request->jumlah,
+                    "satuan" => $request->satuan,
+                    "imei" => $request->imei,
+                    "detail_barang" => $request->detail_barang,
+                    "keterangan" => $request->keterangan
                 ]);
-            if($query){
-                return $this->successResponse($query,'Success', 200);
+            if ($query) {
+                // return $this->successResponse($query, 'Success', 200);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_200,
+                    Constants::HTTP_MESSAGE_200,
+                    $query
+                );
             } else {
-                return $this->errorResponse('Data is Null', 403);
+                // return $this->errorResponse('Data is Null', 403);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_403,
+                    Constants::HTTP_MESSAGE_403,
+                    'Data is Null'
+                );
             }
         }
     }
 
-    public function updatePengiriman(Request $request){ //merubah status pengiriman
+    public function updatePengiriman(Request $request)
+    { //merubah status pengiriman
         $id = $request->id;
         $flag = $request->flag;
         $status = $request->status;
 
         $pengiriman = Pengiriman::where('id', $id)->first();
 
-        if($flag == 1){  // Proses Pengiriman
-            $pengiriman->update(["status" => 2, "flag"=>1]);
-
-        } else if($status == 1){  // Terima barang pengiriman
-            $pengiriman->update(["status" => 1, "flag"=>0]);
-
-        } else if($status == 2){ //pengiriman dikirim
+        if ($flag == 1) {  // Proses Pengiriman
+            $pengiriman->update(["status" => 2, "flag" => 1]);
+        } else if ($status == 1) {  // Terima barang pengiriman
+            $pengiriman->update(["status" => 1, "flag" => 0]);
+        } else if ($status == 2) { //pengiriman dikirim
             $pengiriman->update(["status" => 2]);
-        } else if($status == 3){ //pengiriman dikirim
+        } else if ($status == 3) { //pengiriman dikirim
             $pengiriman->update(["status" => 3]);
 
             foreach ($pengiriman->detail as $key => $detail) {
@@ -249,18 +315,31 @@ class PengirimanController extends Controller
                     "user_input" => auth()->user()->admin->username,
                 ]);
 
-                $detail->update(['status'=>1]);
+                $detail->update(['status' => 1]);
             }
 
-            if($pengiriman){
-                return $this->successResponse($pengiriman,'Success', 200);
+            if ($pengiriman) {
+                // return $this->successResponse($pengiriman, 'Success', 200);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_200,
+                    Constants::HTTP_MESSAGE_200,
+                    $pengiriman
+                );
             } else {
-                return $this->errorResponse('Data is Null', 403);
+                // return $this->errorResponse('Data is Null', 403);
+
+                return self::buildResponse(
+                    Constants::HTTP_CODE_403,
+                    Constants::HTTP_MESSAGE_403,
+                    'Data is Null'
+                );
             }
         }
     }
 
-    public function updatePengirimanDetail(Request $request){ //merubah status pengiriman
+    public function updatePengirimanDetail(Request $request)
+    { //merubah status pengiriman
         $id = $request->id;
         $status = $request->status;
 
@@ -271,13 +350,13 @@ class PengirimanController extends Controller
             "status" => $status
         ]);
 
-        if($query->status == 1) { //jika barang pengiriman diterima
+        if ($query->status == 1) { //jika barang pengiriman diterima
             $bStockPenerima = StokBarang::where([
                 'pic' => $pengiriman->penerima,
                 'nomer_barang' => $query->nomer_barang
             ])->first();
 
-            $penambahan = ($bStockPenerima->jumlah_stok+$request->jumlah);
+            $penambahan = ($bStockPenerima->jumlah_stok + $request->jumlah);
 
             try {
                 StokBarang::where('id', $bStockPenerima->id)->update([
@@ -314,10 +393,22 @@ class PengirimanController extends Controller
             }
         }
 
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Data is Null'
+            );
         }
     }
 
@@ -326,20 +417,20 @@ class PengirimanController extends Controller
         $query = Pengiriman::find($id);
         $pengiriman = PengirimanDetail::where('id_pengiriman', $query->id)->first();
 
-        if(!empty($query && !empty($pengiriman))) {
+        if (!empty($query && !empty($pengiriman))) {
             DB::beginTransaction();
             try {
                 BarangKeluar::where('pic', $query->pengirim)->where('id_tipe', $pengiriman->id_tipe)->delete();
                 $query->delete();
 
                 PengirimanDetail::where('id_pengiriman', $query->id)->delete();
-//                InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
+                //                InternalMemoPengiriman::where("id_pengiriman", $query->id)->delete();
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollback();
                 return $e->getMessage();
             }
-        }else if(empty($pengiriman)){
+        } else if (empty($pengiriman)) {
             DB::beginTransaction();
             try {
                 $query->delete();
@@ -350,10 +441,22 @@ class PengirimanController extends Controller
             }
         }
 
-        if(!empty($query)){
-            return $this->successResponse($query,'Success', 200);
+        if (!empty($query)) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Data is Null'
+            );
         }
     }
 
@@ -362,7 +465,7 @@ class PengirimanController extends Controller
         $query = PengirimanDetail::find($id);
         $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
 
-        if(!empty($query)){
+        if (!empty($query)) {
 
             DB::beginTransaction();
             try {
@@ -374,9 +477,21 @@ class PengirimanController extends Controller
                 return $e->getMessage();
             }
 
-            return $this->successResponse($query,'Success', 200);
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Data is Null'
+            );
         }
     }
 
@@ -391,30 +506,42 @@ class PengirimanController extends Controller
         $bulan = $time = date("m");
         $tahun = $time = date("Y");
 
-        $nik = "K".$tahun.$bulan.$tanggal.sprintf("%04s", $max_nik);
+        $nik = "K" . $tahun . $bulan . $tanggal . sprintf("%04s", $max_nik);
         return $nik;
     }
 
     public function getCabang(Request $request)
     {
         $userCabang = Cabang::where('kepala_unit_id', auth()->user()->id)
-                ->orWhere('kepala_cabang_id', auth()->user()->id)
-                ->orWhere('kepala_cabang_senior_id', auth()->user()->id)
-                ->orWhere('area_manager_id', auth()->user()->id)
-                ->first();
+            ->orWhere('kepala_cabang_id', auth()->user()->id)
+            ->orWhere('kepala_cabang_senior_id', auth()->user()->id)
+            ->orWhere('area_manager_id', auth()->user()->id)
+            ->first();
 
-        if($userCabang->kepala_cabang_id == !null){
+        if ($userCabang->kepala_cabang_id == !null) {
             $cabang = Cabang::where('kepala_cabang_id', $userCabang->kepala_cabang_id)->get();
-        } else if ($userCabang->kepala_cabang_senior_id == !null){
+        } else if ($userCabang->kepala_cabang_senior_id == !null) {
             $cabang = Cabang::where('kepala_cabang_senior_id', $userCabang->kepala_cabang_senior_id)->get();
-        } else if ($userCabang->area_manager_id == !null){
+        } else if ($userCabang->area_manager_id == !null) {
             $cabang = Cabang::where('area_manager_id', $userCabang->area_manager_id)->get();
         }
 
-        if($cabang){
-            return $this->successResponse($cabang,Constants::HTTP_MESSAGE_200, 200);
+        if ($cabang) {
+            // return $this->successResponse($cabang, Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $cabang
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -422,10 +549,22 @@ class PengirimanController extends Controller
     {
         $cabang = Cabang::whereLike('name', $request->name)->get();
 
-        if($cabang){
-            return $this->successResponse($cabang,Constants::HTTP_MESSAGE_200, 200);
+        if ($cabang) {
+            // return $this->successResponse($cabang, Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $cabang
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -433,43 +572,55 @@ class PengirimanController extends Controller
     {
         $stokPusat = StokPusat::orderBy('id', 'ASC')->get();
 
-        if($stokPusat){
-            return $this->successResponse($stokPusat,Constants::HTTP_MESSAGE_200, 200);
+        if ($stokPusat) {
+            // return $this->successResponse($stokPusat, Constants::HTTP_MESSAGE_200, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $stokPusat
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
         }
     }
 
     public function getCodeFlag($id)
     {
-        if($id == 0){
+        if ($id == 0) {
             return "belum proses";
-        } else if($id == 1){
+        } else if ($id == 1) {
             return "sudah diproses";
-        } else if($id == 2){
+        } else if ($id == 2) {
             return "sudah dibayar";
-        } else if($id == 3){
+        } else if ($id == 3) {
             return "diterima";
-        } else if($id == 4){
+        } else if ($id == 4) {
             return "dibatalkan";
-        } else if($id == 5){
+        } else if ($id == 5) {
             return "barang selisih";
-        }else if($id == 6){
+        } else if ($id == 6) {
             return "request void";
         }
     }
 
     public function getCodeStatus($id)
     {
-        if($id == 0){
+        if ($id == 0) {
             return "Pending";
-        } else if($id == 1){
+        } else if ($id == 1) {
             return "Ok";
-        } else if($id == 2){
+        } else if ($id == 2) {
             return "Void";
-        } else if($id == 3){
+        } else if ($id == 3) {
             return "Selisih";
-        }else if($id == 4){
+        } else if ($id == 4) {
             return "request void";
         }
     }

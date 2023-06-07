@@ -29,10 +29,11 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register','submitForgetPasswordForm','submitResetPasswordForm']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'submitForgetPasswordForm', 'submitResetPasswordForm']]);
     }
 
-    public function register(ValidateUserRegistration $request){
+    public function register(ValidateUserRegistration $request)
+    {
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -51,18 +52,18 @@ class AuthController extends Controller
         $credentials = request(['username', 'password']);
         if (!$token = auth()->attempt($credentials)) {
             return $this->errorResponse('Incorrect username or password.', 401);
-        } else if(auth()->user()->is_active == 1) {
+        } else if (auth()->user()->is_active == 1) {
             $user = auth()->user();
             $access_menu = $user->role->roleMenu;
             $access_menu = $access_menu->map(function ($query) use ($id_top_menu) {
-                $query['menu'] = Menu::select(['id','code','name','parent_id'])->where('id', $query->menu_id)->first();
+                $query['menu'] = Menu::select(['id', 'code', 'name', 'parent_id'])->where('id', $query->menu_id)->first();
                 return $query;
             });
 
             //get Top Menu from Menu Model
             foreach ($user->role->roleMenu as $key => $val_menu) {
-                if(!empty($val_menu->menu->parent_id)){
-                    if( !in_array( $val_menu->menu->parent_id ,$id_top_menu ) ){
+                if (!empty($val_menu->menu->parent_id)) {
+                    if (!in_array($val_menu->menu->parent_id, $id_top_menu)) {
                         $id_top_menu[] = $val_menu->menu->parent_id;
                     }
                 }
@@ -76,7 +77,7 @@ class AuthController extends Controller
             //     $cabang = Cabang::select('id','name')->where('kepala_cabang_senior_id', $user->id)->get();
             // }
 
-            $cabang = UserStaffCabang::select('cabang.id','cabang.name', 'cabang.kode')
+            $cabang = UserStaffCabang::select('cabang.id', 'cabang.name', 'cabang.kode')
                 ->where('user_staff_id', auth()->user()->id)
                 ->join('cabang', 'cabang.id', '=', '_user_staff_cabang.cabang_id')
                 ->get();
@@ -86,16 +87,23 @@ class AuthController extends Controller
             $kategoriProses = KategoriPicFpp::where('user_id', auth()->user()->id)->get();
 
             return response()->json([
-                'type' =>'success',
+                'type' => 'success',
                 'message' => 'Logged in.',
                 'token' => $token,
                 'user' => $user,
-                'top_menu'=> $top_menu,
+                'top_menu' => $top_menu,
                 'cabang' => $cabang,
                 'kategori_proses' => $kategoriProses
             ]);
-        }else{
-            return $this->errorResponse(Constants::ERROR_MESSAGE_9007, 403);
+        } else {
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_9007, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                Constants::ERROR_MESSAGE_9007,
+                null
+            );
         }
     }
 
@@ -105,14 +113,14 @@ class AuthController extends Controller
 
         $roleMenu = $user->role->roleMenu;
         $roleMenu = $roleMenu->map(function ($query) {
-            $query['menu'] = Menu::select(['id','code','name'])->where('id', $query->menu_id)->first();
+            $query['menu'] = Menu::select(['id', 'code', 'name'])->where('id', $query->menu_id)->first();
 
             return $query;
         });
 
         return $user;
         // return auth()->user();
-       //return new UserResource(auth()->user());
+        //return new UserResource(auth()->user());
     }
 
     public function logout()
@@ -128,9 +136,9 @@ class AuthController extends Controller
 
     public function refreshToken()
     {
-        try{
+        try {
             $token = auth()->refresh(true, true);
-        }catch(TokenInvalidException $e){
+        } catch (TokenInvalidException $e) {
             throw new AccessDeniedHttpException('The token is invalid');
         }
 
@@ -155,10 +163,24 @@ class AuthController extends Controller
             'is_new_user' => 1
         ]);
 
-        if($user){
-            return $this->successResponse($user,Constants::ERROR_MESSAGE_9005, 200);
+        if ($user) {
+            // return $this->successResponse($user, Constants::ERROR_MESSAGE_9005, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                Constants::ERROR_MESSAGE_9005,
+                $user
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                Constants::ERROR_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -176,15 +198,29 @@ class AuthController extends Controller
             'created_at' => Carbon::now()
         ]);
 
-        Mail::send('email.forgetPassword', ['token' => $token], function($message) use($request){
+        Mail::send('email.forgetPassword', ['token' => $token], function ($message) use ($request) {
             $message->to($request->email);
             $message->subject('Reset Password');
         });
 
-        if($request->email){
-            return $this->successResponse($request->email,Constants::ERROR_MESSAGE_9004, 200);
+        if ($request->email) {
+            // return $this->successResponse($request->email, Constants::ERROR_MESSAGE_9004, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                Constants::ERROR_MESSAGE_9004,
+                $request->email
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                Constants::ERROR_MESSAGE_403,
+                null
+            );
         }
     }
 
@@ -203,19 +239,33 @@ class AuthController extends Controller
             ])
             ->first();
 
-        if(!$updatePassword){
+        if (!$updatePassword) {
             return back()->withInput()->with('error', 'Invalid token!');
         }
 
         $user = User::where('email', $request->email)
             ->update(['password' => bcrypt($request->password)]);
 
-        DB::table('password_resets')->where(['email'=> $request->email])->delete();
+        DB::table('password_resets')->where(['email' => $request->email])->delete();
 
-        if($user){
-            return $this->successResponse($user,Constants::ERROR_MESSAGE_9005, 200);
+        if ($user) {
+            // return $this->successResponse($user, Constants::ERROR_MESSAGE_9005, 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                Constants::ERROR_MESSAGE_9005,
+                $user
+            );
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                Constants::ERROR_MESSAGE_403,
+                null
+            );
         }
     }
 }

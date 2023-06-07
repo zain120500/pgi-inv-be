@@ -7,6 +7,7 @@ use App\User;
 use App\Model\RoleMenu;
 use App\Model\Menu;
 use App\Model\TopMenu;
+use App\Helpers\Constants;
 
 
 class MenuController extends Controller
@@ -22,10 +23,16 @@ class MenuController extends Controller
             return $query;
         });
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $getquery
-        ], 200);  
+        // return response()->json([
+        //     'status' =>'success',
+        //     'data' => $getquery
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $getquery
+        );
     }
 
     public function create()
@@ -36,30 +43,48 @@ class MenuController extends Controller
     public function store(Request $request)
     {
         $query = Menu::create([
-            "id"=> $request->id,
-            "code"=> $request->code,
-            "name"=> $request->name,
-            "parent_id"=> $request->parent_id,
-            "user_specific_menu"=> $request->user_specific_menu
+            "id" => $request->id,
+            "code" => $request->code,
+            "name" => $request->name,
+            "parent_id" => $request->parent_id,
+            "user_specific_menu" => $request->user_specific_menu
 
         ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $query
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $query
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function show($id)
     {
         $query = Menu::find($id);
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $query['top_menu'] = TopMenu::where('id', $query->parent_id)->get();
 
-            return $this->successResponse($query,'Success', 200);
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Data is Null'
+            );
         }
     }
 
@@ -72,25 +97,37 @@ class MenuController extends Controller
     {
         $query = Menu::where('id', $id)
             ->update([
-                "code"=> $request->code,
-                "name"=> $request->name,
-                "parent_id"=> $request->parent_id,
-                "user_specific_menu"=> $request->user_specific_menu
+                "code" => $request->code,
+                "name" => $request->name,
+                "parent_id" => $request->parent_id,
+                "user_specific_menu" => $request->user_specific_menu
             ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $query
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $query
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function destroy($id)
     {
         $query = Menu::find($id)->delete();
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $query
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 }

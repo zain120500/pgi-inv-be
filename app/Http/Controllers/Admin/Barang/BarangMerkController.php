@@ -7,15 +7,16 @@ use Illuminate\Http\Request;
 
 use App\Model\BarangTipe;
 use App\Model\BarangMerk;
+use App\Helpers\Constants;
 
 class BarangMerkController extends Controller
 {
-    
+
     public function index(Request $request)
     {
-        if(!empty($request->merk)){
-            $barang = BarangMerk::where('merk', 'like', '%'.$request->merk.'%')->paginate(15);
-        } else if(!empty($request->id_jenis)){
+        if (!empty($request->merk)) {
+            $barang = BarangMerk::where('merk', 'like', '%' . $request->merk . '%')->paginate(15);
+        } else if (!empty($request->id_jenis)) {
             $barang = BarangMerk::where('id_jenis', $request->id_jenis)->paginate(15);
         } else {
             $barang = BarangMerk::paginate(15);
@@ -26,27 +27,45 @@ class BarangMerkController extends Controller
             return $query;
         });
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $barang->setCollection($collect)
-        ], 200); 
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $barang->setCollection($collect)
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $barang->setCollection($collect)
+        );
     }
 
-    
+
     public function all(Request $request)
-    {        
-        if(!empty($request->merk)){
-            $query = BarangMerk::where('merk', 'like', '%'.$request->merk.'%')->get();
-        } else if(!empty($request->id_jenis)){
+    {
+        if (!empty($request->merk)) {
+            $query = BarangMerk::where('merk', 'like', '%' . $request->merk . '%')->get();
+        } else if (!empty($request->id_jenis)) {
             $query = BarangMerk::where('id_jenis', $request->id_jenis)->get();
         } else {
             $query = BarangMerk::get();
         }
 
-        if(!empty($query)){
-            return $this->successResponse($query,'Success', 200);
+        if (!empty($query)) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
@@ -54,26 +73,44 @@ class BarangMerkController extends Controller
     public function store(Request $request)
     {
         $merk = BarangMerk::create([
-            "merk"=> $request->merk,
-            "id_jenis"=> $request->id_jenis
+            "merk" => $request->merk,
+            "id_jenis" => $request->id_jenis
         ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $merk
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $merk
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $merk
+        );
     }
 
     public function show($id)
     {
         $query = BarangMerk::find($id);
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $query->barangJenis;
 
-            return $this->successResponse($query,'Success', 200);
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
@@ -87,23 +124,35 @@ class BarangMerkController extends Controller
     {
         $query = BarangMerk::where('id', $id)
             ->update([
-                "merk"=> $request->merk,
-                "id_jenis"=> $request->id_jenis
+                "merk" => $request->merk,
+                "id_jenis" => $request->id_jenis
             ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $query
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $query
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function destroy($id)
     {
         $query = BarangMerk::find($id)->delete();
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200); 
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $query
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 }

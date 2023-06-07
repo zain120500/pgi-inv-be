@@ -10,6 +10,7 @@ use App\User;
 use App\Model\KategoriPicFpp;
 use App\Model\KategoriJenisFpp;
 use App\Model\KategoriFpp;
+use App\Helpers\Constants;
 
 
 class KategoriPicController extends Controller
@@ -19,13 +20,19 @@ class KategoriPicController extends Controller
         $kategori = KategoriPicFpp::paginate(15);
 
         $collect = $kategori->getCollection()->map(function ($query) {
-            $query->user->makeHidden(['created_at','updated_at']);
+            $query->user->makeHidden(['created_at', 'updated_at']);
             $query->kategori->kategoriJenis;
-            $query->devisi->makeHidden(['created_at','updated_at']);
+            $query->devisi->makeHidden(['created_at', 'updated_at']);
             return $query;
         });
 
-        return $this->successResponse($kategori,'Success', 200);
+        // return $this->successResponse($kategori, 'Success', 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $kategori
+        );
     }
 
     public function all()
@@ -33,13 +40,19 @@ class KategoriPicController extends Controller
         $kategori = KategoriPicFpp::get();
 
         $collect = $kategori->map(function ($query) {
-            $query->user->makeHidden(['created_at','updated_at']);
+            $query->user->makeHidden(['created_at', 'updated_at']);
             $query->kategori->kategoriJenis;
-            $query->devisi->makeHidden(['created_at','updated_at']);
+            $query->devisi->makeHidden(['created_at', 'updated_at']);
             return $query;
         });
 
-        return $this->successResponse($kategori,'Success', 200);
+        // return $this->successResponse($kategori,'Success', 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $kategori
+        );
     }
 
     public function create()
@@ -53,23 +66,35 @@ class KategoriPicController extends Controller
         $kProses = $request->kategori_proses;
 
         try {
-            foreach ($kProses as $keys => $kP){
+            foreach ($kProses as $keys => $kP) {
                 $query = KategoriPicFpp::create([
-                    "user_id"=> $request->user_id,
-                    "devisi_id"=> $request->devisi_id,
-                    "id_kategori_jenis_fpp"=> $kategori,
-                    "kategori_proses"=> $kP,
-                    "created_by"=> auth()->user()->id
+                    "user_id" => $request->user_id,
+                    "devisi_id" => $request->devisi_id,
+                    "id_kategori_jenis_fpp" => $kategori,
+                    "kategori_proses" => $kP,
+                    "created_by" => auth()->user()->id
                 ]);
             }
         } catch (\Exception $e) {
             return $e->getMessage();
         }
 
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            // return $this->successResponse($query, 'Success', 200);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         } else {
-            return $this->errorResponse('Data is Null', 403);
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                $query
+            );
         }
     }
 
@@ -77,12 +102,12 @@ class KategoriPicController extends Controller
     {
         $query = KategoriPicFpp::find($id);
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $query->barangJenis;
-            $query->user->makeHidden(['created_at','updated_at']);
+            $query->user->makeHidden(['created_at', 'updated_at']);
             $query->kategori->kategoriJenis;
-            $query->devisi->makeHidden(['created_at','updated_at']);
-            return $this->successResponse($query,'Success', 200);
+            $query->devisi->makeHidden(['created_at', 'updated_at']);
+            return $this->successResponse($query, 'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
         }
@@ -97,15 +122,15 @@ class KategoriPicController extends Controller
     {
         $query = KategoriPicFpp::where('id', $id)
             ->update([
-                "user_id"=> $request->user_id,
-                "devisi_id"=> $request->devisi_id,
-                "id_kategori_jenis_fpp"=> $request->id_kategori_jenis_fpp,
-                "kategori_proses"=> $request->kategori_proses,
-                "created_by"=> auth()->user()->id
+                "user_id" => $request->user_id,
+                "devisi_id" => $request->devisi_id,
+                "id_kategori_jenis_fpp" => $request->id_kategori_jenis_fpp,
+                "kategori_proses" => $request->kategori_proses,
+                "created_by" => auth()->user()->id
             ]);
 
-        if($query){
-            return $this->successResponse($query,'Success', 200);
+        if ($query) {
+            return $this->successResponse($query, 'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
         }
@@ -115,9 +140,9 @@ class KategoriPicController extends Controller
     {
         $query = KategoriPicFpp::find($id);
 
-        if($query){
+        if ($query) {
             $query->delete();
-            return $this->successResponse($query,'Success', 200);
+            return $this->successResponse($query, 'Success', 200);
         } else {
             return $this->errorResponse('Data is Null', 403);
         }

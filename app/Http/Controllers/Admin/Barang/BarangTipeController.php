@@ -15,47 +15,57 @@ class BarangTipeController extends Controller
 
     public function index(Request $request)
     {
-        if(!empty($request->tipe)) {
-            $barang = BarangTipe::where('tipe', 'like', '%'.$request->tipe.'%')->paginate(15);
-        } else if(!empty($request->kode_barang)){
-            $barang = BarangTipe::where('kode_barang', 'like', '%'.$request->kode_barang.'%')->paginate(15);
+        if (!empty($request->tipe)) {
+            $barang = BarangTipe::where('tipe', 'like', '%' . $request->tipe . '%')->paginate(15);
+        } else if (!empty($request->kode_barang)) {
+            $barang = BarangTipe::where('kode_barang', 'like', '%' . $request->kode_barang . '%')->paginate(15);
         } else {
             $barang = BarangTipe::paginate(15);
         }
 
         $collect = $barang->getCollection()->map(function ($query) {
             $barangMerk = $query->barangMerk;
-            if(!empty($barangMerk)){
+            if (!empty($barangMerk)) {
                 $barangMerk->barangJenis;
             }
 
             return $query;
         });
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $barang->setCollection($collect)
-        ], 200);
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $barang->setCollection($collect)
+        // ], 200);
 
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $barang->setCollection($collect)
+        );
     }
 
     public function all(Request $request)
     {
-        if(!empty($request->tipe)) {
-            $barang = BarangTipe::where('tipe', 'like', '%'.$request->tipe.'%')->get();
-        } else if(!empty($request->kode_barang)){
-            $barang = BarangTipe::where('kode_barang', 'like', '%'.$request->kode_barang.'%')->get();
-        } else if(!empty($request->id_merk)){
+        if (!empty($request->tipe)) {
+            $barang = BarangTipe::where('tipe', 'like', '%' . $request->tipe . '%')->get();
+        } else if (!empty($request->kode_barang)) {
+            $barang = BarangTipe::where('kode_barang', 'like', '%' . $request->kode_barang . '%')->get();
+        } else if (!empty($request->id_merk)) {
             $barang = BarangTipe::where('id_merk', $request->id_merk)->get();
         } else {
             $barang = BarangTipe::all();
         }
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $barang
-        ], 200);
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $barang
+        // ], 200);
 
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $barang
+        );
     }
 
     public function create()
@@ -67,34 +77,51 @@ class BarangTipeController extends Controller
     public function store(Request $request)
     {
         $tipe = BarangTipe::create([
-            "tipe"=> $request->tipe,
-            "satuan"=> $request->satuan,
-            "harga"=> $request->harga,
-            "tipe_kode"=> $request->tipe_kode,
-            "kode_barang"=> $this->getkodebarang($request->id_jenis),
-            "id_merk"=> $request->id_merk
+            "tipe" => $request->tipe,
+            "satuan" => $request->satuan,
+            "harga" => $request->harga,
+            "tipe_kode" => $request->tipe_kode,
+            "kode_barang" => $this->getkodebarang($request->id_jenis),
+            "id_merk" => $request->id_merk
         ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $tipe
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $tipe
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $tipe
+        );
     }
 
     public function show($id)
     {
         $query = BarangTipe::find($id);
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $barangMerk = $query->barangMerk;
-            if(!empty($barangMerk)){
+            if (!empty($barangMerk)) {
                 $barangMerk->barangJenis;
             }
-            return $this->successResponse($query,'Success', 200);
-        } else {
-            return $this->errorResponse('Data is Null', 403);
-        }
+            return $this->successResponse($query, 'Success', 200);
 
+            // return self::buildResponse(
+            //     Constants::HTTP_CODE_200,
+            //     Constants::HTTP_MESSAGE_200,
+            //     $query
+            // );
+        } else {
+            // return $this->errorResponse('Data is Null', 403);
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                null
+            );
+        }
     }
 
     public function edit($id)
@@ -107,18 +134,24 @@ class BarangTipeController extends Controller
     {
         $query = BarangTipe::where('id', $id)
             ->update([
-            "tipe"=> $request->tipe,
-            "satuan"=> $request->satuan,
-            "harga"=> $request->harga,
-            "tipe_kode"=> $request->tipe_kode,
-            "kode_barang"=> $this->getkodebarang($request->id_jenis),
-            "id_merk"=> $request->id_merk
-        ]);
+                "tipe" => $request->tipe,
+                "satuan" => $request->satuan,
+                "harga" => $request->harga,
+                "tipe_kode" => $request->tipe_kode,
+                "kode_barang" => $this->getkodebarang($request->id_jenis),
+                "id_merk" => $request->id_merk
+            ]);
 
-        return response()->json([
-            'type' =>'success',
-            'data' => $query
-        ]);
+        // return response()->json([
+        //     'type' => 'success',
+        //     'data' => $query
+        // ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
 
@@ -126,10 +159,16 @@ class BarangTipeController extends Controller
     {
         $query = BarangTipe::find($id)->delete();
 
-        return response()->json([
-            'status' =>'success',
-            'data' => $query
-        ], 200);
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $query
+        // ], 200);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function getkodebarang($id_jenis) //oke
@@ -150,7 +189,7 @@ class BarangTipeController extends Controller
 
         $max_nik = $max_fix + 1;
 
-        $nik = $kode.sprintf("%07s", $max_nik);
+        $nik = $kode . sprintf("%07s", $max_nik);
         return $nik;
     }
 
