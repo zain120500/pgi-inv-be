@@ -22,8 +22,6 @@ class KategoriSubController extends Controller
             ->orWhere('sla', 'like', '%' . $value . '%')
             ->paginate(15);
 
-        // return $this->successResponse($query, 'Success', 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -33,8 +31,7 @@ class KategoriSubController extends Controller
 
     public function all()
     {
-        $query = KategoriSubFpp::all();
-        // return $this->successResponse($query, 'Success', 200);
+        $query = KategoriSubFpp::where('id_kategori_jenis', 1)->with('kategori')->get();
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -51,28 +48,17 @@ class KategoriSubController extends Controller
             "sla" => $request->sla
         ]);
 
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Process Data error', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function show($id)
     {
         $query = KategoriSubFpp::find($id);
+        $query->kategori;
 
         if (!empty($query)) {
             $query->kategori;

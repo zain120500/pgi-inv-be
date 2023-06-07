@@ -11,9 +11,8 @@ class KategoriSubFpp extends Model
     protected $guarded = [''];
     protected $hidden = array('created_at', 'updated_at');
 
-
     function kategori()
     {
-        return $this->hasOne('App\Model\KategoriFpp', 'id', 'id_kategori_fpp');
+        return $this->hasOne('App\Model\KategoriJenisFpp', 'id', 'id_kategori_jenis');
 	}
 }
