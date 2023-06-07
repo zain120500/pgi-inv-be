@@ -39,6 +39,19 @@ class BarangStokController extends Controller
             $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
         })->paginate(15);
 
+        if($request->startDate && $request->endDate){
+            $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+            $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+
+            $bStok = StokBarang::whereIn('id_tipe', $bTipe->pluck('id'))
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->whereHas('barangTipe', function ($q) use ($search) {
+                    $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })
+                ->whereBetween('last_update', [$startDate, $endDate])
+                ->paginate(15);
+        }
+
         $bStok->map(function ($query) use ($search) {
             $query->cabang;
             $query->barangTipe->barangMerk->barangJeniss->barangKategori;
