@@ -31,7 +31,7 @@ class KategoriSubController extends Controller
 
     public function all()
     {
-        $query = KategoriSubFpp::where('id_kategori_jenis', 1)->with('kategori')->get();
+        $query = KategoriSubFpp::with('kategori')->get();
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
