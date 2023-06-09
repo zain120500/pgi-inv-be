@@ -112,6 +112,7 @@ class MaintenanceController extends Controller
                     }
                 }
             }
+
             $this->whatsuppMessage($memos);
             $this->accMemoByPic($memos);
         }
@@ -163,15 +164,16 @@ class MaintenanceController extends Controller
      */
     public function whatsuppMessage($memos)
     {
+
+
         $test[] = $memos;
         $user = array();
         foreach ($test as $key => $value) {
+
             $memo = InternalMemo::where('id', $value)->first();
             $kjFpp = KategoriJenisFpp::where('id', $memo->id_kategori_jenis_fpp)->first();
             $cabang = Cabang::where('id', $memo->id_cabang)->first();
             $maintenanceUser = InternalMemoMaintenance::where(['id_internal_memo' =>  $memo->id])->get();
-
-
 
             foreach ($maintenanceUser as $keys => $values) {
                 $user = UserMaintenance::where('id', $values->id_user_maintenance)->first();
@@ -187,6 +189,7 @@ class MaintenanceController extends Controller
     public function  ProceesWaCabang($memo, $cabang, $user, $values, $kjFpp)
     {
         $token = env("FONTE_TOKEN");
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -201,14 +204,14 @@ class MaintenanceController extends Controller
             CURLOPT_POSTFIELDS => array(
                 'target' => $cabang->telepon,
                 'message' => "
-    No Memo : *$memo->im_number*
-    Kategori : *$kjFpp->name*
-    Status : *PROSES*
-    Maintenance : *$user->nama*
-    No Telp Maintenance : *$user->no_telp*
-    Tanggal Pekerjaan : *$values->date*
-    Kode Maintenance : *$values->kode*
-    ",
+                No Memo : *$memo->im_number*
+                Kategori : *$kjFpp->name*
+                Status : *PROSES*
+                Maintenance : *$user->nama*
+                No Telp Maintenance : *$user->no_telp*
+                Tanggal Pekerjaan : *$values->date*
+                Kode Maintenance : *$values->kode*
+                ",
             ),
             CURLOPT_HTTPHEADER => array(
                 "Authorization: $token"
@@ -218,6 +221,7 @@ class MaintenanceController extends Controller
         $response = curl_exec($curl);
 
         curl_close($curl);
+
         return $response;
     }
 
@@ -720,77 +724,103 @@ Link Login : http://portal.pusatgadai.id
      */
     public function createUserMaitenance(Request $request)
     {
-        //        DB::beginTransaction();
-        //
-        //        try {
-        $user = $request->id_user_maintenance;
-        $memo = $request->id_memo;
-        $imMainteance = [];
-        $array = [];
-        foreach ($memo as $key => $value) {
-            foreach ($user as $keys => $values) {
-                $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
+        // DB::beginTransaction();
 
-                if ($update == null) {
-                    $imMainteance = InternalMemoMaintenance::create([
-                        'id_internal_memo' => $value,
-                        'id_user_maintenance' => $values,
+        // try {
+
+        $userMaintenance = $request->id_user_maintenance;
+        $idMemo = $request->id_memo;
+
+        foreach ($idMemo as $key => $memo) {
+            foreach ($userMaintenance as $key => $um) {
+                $exist = InternalMemoMaintenance::where("id_user_maintenance", $um)->orderBy('id', 'DESC')->first();
+
+                if (empty($exist)) {
+                    InternalMemoMaintenance::create([
+                        'id_internal_memo' => $memo,
+                        'id_user_maintenance' => $um,
                         'date' => $request->date,
                         'link' => $this->generateRandomString(4),
                         'kode' => $this->generateRandomString(4),
                         'flag' => 0,
                         'created_by' => auth()->user()->id
                     ]);
-                } else if ($update->id_user_maintenance !== $values) {
-                    $array = $values;
-                } else if (!empty($update)) {
-                    $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
-
-                    $updates->update([
-                        'date' => $request->date,
-                        'created_by' => auth()->user()->id
-                    ]);
-                    $imMainteance[] = $updates->first();
+                } else {
+                    try {
+                        $exist->update([
+                            'date' => $request->date,
+                            'created_by' => auth()->user()->id
+                        ]);
+                    } catch (\Throwable $e) {
+                        return $e;
+                    }
                 }
             }
 
-            if ($imMainteance) {
-                // return $this->successResponse($imMainteance, Constants::HTTP_MESSAGE_200, 200);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_200,
-                    Constants::HTTP_MESSAGE_200,
-                    $imMainteance
-                );
-            } else {
-                // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_403,
-                    Constants::ERROR_MESSAGE_403,
-                    null
-                );
+            try {
+                $this->whatsuppMessage($memo);
+            } catch (\Throwable $e) {
+                return $e;
             }
-
-
-            //            DB::commit();
-            //        } catch (\Exception $e) {
-            //            DB::rollback();
-            //            return $e->getMessage();
-            //        }
         }
+
+
+        // old code
+
+        // foreach ($memo as $key => $value) {
+        //     foreach ($user as $keys => $values) {
+
+        //         $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
+
+        //         if ($update == null) {
+        //             $imMainteance = InternalMemoMaintenance::create([
+        //                 'id_internal_memo' => $value,
+        //                 'id_user_maintenance' => $values,
+        //                 'date' => $request->date,
+        //                 'link' => $this->generateRandomString(4),
+        //                 'kode' => $this->generateRandomString(4),
+        //                 'flag' => 0,
+        //                 'created_by' => auth()->user()->id
+        //             ]);
+        //         } else if ($update->id_user_maintenance !== $values) {
+        //             $array[$keys] = $values;
+        //         } else if (!empty($update)) {
+
+        //             $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
+
+        //             $updates->update([
+        //                 'date' => $request->date,
+        //                 'created_by' => auth()->user()->id
+        //             ]);
+
+        //             $imMainteance[] = $updates->first();
+        //         }
+        //     }
+
+        //     // $imMainteance = InternalMemoMaintenance::create([
+        //     //     'id_internal_memo' => $value,
+        //     //     'id_user_maintenance' => $array,
+        //     //     'date' => $request->date,
+        //     //     'link' => $this->generateRandomString(6),
+        //     //     'kode' => $this->generateRandomString(6),
+        //     //     'flag' => 0,
+        //     //     'created_by' => auth()->user()->id
+        //     // ]);
+
+        //     // $this->whatsuppMessage($value);
+        // }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
-            Constants::HTTP_MESSAGE_200,
-            $imMainteance
+            Constants::HTTP_MESSAGE_200
+            // $imMainteance
         );
 
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
+        //     DB::commit();
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     return $e->getMessage();
+        // }
     }
 
     public function deleteUserMaintenance(Request $request)

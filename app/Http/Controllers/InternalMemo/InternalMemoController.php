@@ -200,13 +200,14 @@ class InternalMemoController extends Controller
         $query->createdBy->makeHidden(['created_at', 'updated_at', 'email_verified_at']);
         $query->cabang;
         $query->devisi->makeHidden(['created_at', 'updated_at']);
-        //        $query->kategori->makeHidden(['created_at','updated_at']);
+        // $query->kategori->makeHidden(['created_at','updated_at']);
         $query->kategoriJenis->makeHidden(['created_at', 'updated_at']);
         $query->kategoriSub;
         $query->memoRating;
         $listHistoryMemo = $query->listHistoryMemo;
         $time_before = new DateTime($now);
         $barang_memo = InternalMemoBarang::where('id_internal_memo', $query->id)->get();
+
         if ($barang_memo->isEmpty()) {
             $query['barang'] = "";
         } else {
@@ -220,6 +221,7 @@ class InternalMemoController extends Controller
                     ->select('internal_memo_barang.*', 'stok_barang.*', 'barang_tipe.*')
                     ->first();
             }
+
             $query['barang'] = $value;
         }
 
@@ -245,6 +247,31 @@ class InternalMemoController extends Controller
                 $time_before = new DateTime($value->created_at);
             }
         }
+
+        $decode = json_decode($query, true);
+
+        $userMaintenanceArray = [];
+
+        // Menggabungkan user maintenance menjadi satu
+        foreach ($decode['memo_maintenance'] as $key => $mm) {
+            if (count($mm['user_maintenance']) > 0) {
+                $userMaintenanceArray[$key] = $mm['user_maintenance'][0]['id'];
+            }
+        }
+
+        // sort arraynya
+        sort($userMaintenanceArray);
+        $sortArray = array_values($userMaintenanceArray);
+
+        $userMaintenanceArrayUser = [];
+
+        // menemukan user berdasarkan id
+        foreach ($sortArray as $key => $sa) {
+            $userMaintenance = UserMaintenance::where("id", $sa)->first();
+            $userMaintenanceArrayUser[$key] = $userMaintenance;
+        }
+
+        $query['user_maintenance'] = $userMaintenanceArrayUser;
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
