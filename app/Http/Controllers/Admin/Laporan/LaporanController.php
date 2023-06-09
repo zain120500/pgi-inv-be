@@ -25,14 +25,27 @@ class LaporanController extends Controller
 {
     public function laporanInvetarisPerorangan(Request $request)
     {
-        $record = StokInventaris::with('barangTipe.barangMerk.barangJeniss', 'karyawan.jabatan')
-            ->orderBy('tanggal', 'DESC')
-            ->paginate(15);
+        $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+        $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+
+        $record = StokInventaris::query();
+
+        if(empty($request->startDate) && empty($request->endDate)){
+            $record = $record->with('barangTipe.barangMerk.barangJeniss', 'karyawan.jabatan')
+                ->orderBy('tanggal', 'DESC');
+        }
+        if ($request->startDate && $request->endDate) {
+            $record = $record->with('barangTipe.barangMerk.barangJeniss', 'karyawan.jabatan')
+                ->whereBetween('tanggal', [$startDate, $endDate])
+                ->orderBy('tanggal', 'DESC');
+        }
+
+        $result = $record->paginate(15);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $record
+            $result
         );
     }
 
@@ -41,29 +54,45 @@ class LaporanController extends Controller
         $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
         $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
-        $record = Pembelian::with('detail', 'supplier')
-            ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
-            ->orderBy('tanggal', 'DESC')
-            ->paginate(15);
+        $record = Pembelian::query();
 
+        if(empty($request->startDate) && empty($request->endDate)){
+            $record = $record->with('detail', 'supplier')
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->orderBy('tanggal', 'DESC');
+        }
         if ($request->startDate && $request->endDate) {
-            $record = Pembelian::with('detail', 'supplier')
+            $record = $record->with('detail', 'supplier')
                 ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
                 ->whereBetween('tanggal', [$startDate, $endDate])
-                ->orderBy('tanggal', 'DESC')
-                ->paginate(15);
+                ->orderBy('tanggal', 'DESC');
         }
+
+        $result = $record->paginate(15);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $record
+            $result
         );
     }
 
-    public function laporanPengiriman()
+    public function laporanPengiriman(Request $request)
     {
-        $record = Pengiriman::with('detail')->orderBy('tanggal', 'DESC')->paginate(15);
+        $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+        $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+
+        $record = Pengiriman::query();
+
+        if(empty($request->startDate) && empty($request->endDate)){
+            $record = $record->with('detail')->orderBy('tanggal', 'DESC')->paginate(15);
+        }
+        if ($request->startDate && $request->endDate) {
+            $record = $record->with('detail')
+                ->orderBy('tanggal', 'DESC')
+                ->whereBetween('tanggal', [$startDate, $endDate])
+                ->paginate(15);
+        }
 
         $record->getCollection()->map(function ($q) {
             $details = PengirimanDetail::where('id_pengiriman', $q->id);
@@ -87,13 +116,28 @@ class LaporanController extends Controller
     public function laporanPemakaian(Request $request)
     {
         $search = $request->search;
+        $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+        $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
-        $record = Pemakaian::with('barangTipe.barangMerk.barangJeniss')
-            ->whereHas('barangTipe', function ($q) use ($search) {
-                $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
-            })
-            ->orderBy('tanggal', 'DESC')
-            ->paginate(15);
+        $record = Pemakaian::query();
+
+        if(empty($request->startDate) && empty($request->endDate)){
+            $record = $record->with('barangTipe.barangMerk.barangJeniss')
+                ->whereHas('barangTipe', function ($q) use ($search) {
+                    $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })
+                ->orderBy('tanggal', 'DESC')
+                ->paginate(15);
+        }
+        if ($request->startDate && $request->endDate) {
+            $record = $record->with('barangTipe.barangMerk.barangJeniss')
+                ->whereHas('barangTipe', function ($q) use ($search) {
+                    $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })
+                ->whereBetween('tanggal', [$startDate, $endDate])
+                ->orderBy('tanggal', 'DESC')
+                ->paginate(15);
+        }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -107,14 +151,31 @@ class LaporanController extends Controller
         $search = $request->search;
         $id_kategori = $request->id_kategori;
 
-        $bStok = StokBarang::whereIn('pic', $this->cabangGlobal()->pluck('kode'))
-            ->whereHas('barangTipe', function ($q) use ($search) {
-                $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
-            })->whereHas('barangTipe.barangMerk.barangJeniss', function ($q) use ($id_kategori) {
-                $q->where('id_kategori', 'like', '%' . $id_kategori . '%');
-            })->paginate(15);
+        $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
+        $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
-        $bStok->map(function ($query) use ($search) {
+        $record = StokBarang::query();
+
+        if(empty($request->startDate) && empty($request->endDate)){
+            $record = $record->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->whereHas('barangTipe', function ($q) use ($search) {
+                    $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })->whereHas('barangTipe.barangMerk.barangJeniss', function ($q) use ($id_kategori) {
+                    $q->where('id_kategori', 'like', '%' . $id_kategori . '%');
+                })->paginate(15);
+        }
+        if ($request->startDate && $request->endDate) {
+            $record = $record->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->whereHas('barangTipe', function ($q) use ($search) {
+                    $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })->whereHas('barangTipe.barangMerk.barangJeniss', function ($q) use ($id_kategori) {
+                    $q->where('id_kategori', 'like', '%' . $id_kategori . '%');
+                })
+                ->whereBetween('last_update', [$startDate, $endDate])
+                ->paginate(15);
+        }
+
+        $record->map(function ($query) use ($search) {
             $query->cabang;
             $query->barangTipe->barangMerk->barangJeniss->barangKategori;
 
@@ -124,7 +185,7 @@ class LaporanController extends Controller
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $bStok
+            $record
         );
     }
 

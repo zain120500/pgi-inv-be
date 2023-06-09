@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Barang\BarangStokController;
 use App\Http\Controllers\Admin\Barang\BarangTipeController;
+use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\Laporan\LaporanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\InternalMemoController;
@@ -123,6 +124,13 @@ Route::group([
         Route::post('/', 'DevisiController@store');
         Route::post('/{id}', 'DevisiController@update');
         Route::delete('/delete/{id}', 'DevisiController@destroy');
+    });
+
+    Route::group([
+        'prefix' => 'karyawan'
+    ], function ($router) {
+        Route::get('/', [KaryawanController::class, 'all']);
+        Route::get('/all', [KaryawanController::class, 'getAllByDivisiId']);
     });
 
     Route::group([
@@ -348,7 +356,7 @@ Route::group([
         ], function ($router) {
             Route::get('/all', [StokInventarisController::class, 'all']);
             Route::get('/paginate', [StokInventarisController::class, 'paginate']);
-            Route::post('/', [StokInventarisController::class, 'create']);
+            Route::post('/create', [StokInventarisController::class, 'create']);
 
         });
     });
