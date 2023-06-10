@@ -46,8 +46,8 @@ class MaintenanceController extends Controller
                     'id_internal_memo' => $memos,
                     'id_user_maintenance' => $users,
                     'date' => $request->date,
-                    'link' => $this->generateRandomString(4),
-                    'kode' => $this->generateRandomString(4),
+                    'link' => $this->generateRandomString(6),
+                    'kode' => $this->generateRandomString(6),
                     'flag' => 0,
                     'created_by' => auth()->user()->id
                 ]);
