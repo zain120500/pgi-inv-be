@@ -5,23 +5,23 @@ namespace App\Http\Controllers\InternalMemo;
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Model\Cabang;
+use App\Model\HistoryMemo;
+use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
+use App\Model\InternalMemoFile;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
+use App\Model\KategoriPicFpp;
 use App\Model\KategoriProsesPic;
 use App\Model\StokBarang;
 use App\Model\UserMaintenance;
 use Barryvdh\DomPDF\Facade\Pdf;
+use DateTime;
 use Illuminate\Http\Request;
-use App\Model\KategoriPicFpp;
-use App\Model\InternalMemo;
-use App\Model\InternalMemoFile;
-use App\Model\HistoryMemo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Storage;
 use Str;
-use DateTime;
 
 class InternalMemoController extends Controller
 {
@@ -114,34 +114,39 @@ class InternalMemoController extends Controller
     public function store(Request $request)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
-
         $files = $request['files'];
         $videos = $request['videos'];
 
         $number = InternalMemo::count('id');
 
-        $internalMemo = InternalMemo::create([
-            "im_number" => "IM" . Carbon::now()->format('Ymd') . str_pad($number + 1, 3, 0, STR_PAD_LEFT),
-            //            "id_kategori_fpp"=> $request->id_kategori_fpp,
-            "id_kategori_jenis_fpp" => $request->id_kategori_jenis_fpp,
-            "id_kategori_sub_fpp" => $request->id_kategori_sub_fpp,
-            "id_devisi" => $request->id_devisi,
-            "id_cabang" => $request->id_cabang,
-            "qty" => $request->qty,
-            "flag" => 0,
-            "catatan" => $request->catatan,
-            "created_by" => auth()->user()->id
-        ]);
+        DB::beginTransaction();
 
-        HistoryMemo::create([
-            "id_internal_memo" => $internalMemo->id,
-            "user_id" => auth()->user()->id,
-            "status" => 0,
-            "keterangan" => "Internal memo baru dibuat oleh" . ' ' . auth()->user()->name
-        ]);
+        try {
+
+            $internalMemo = InternalMemo::create([
+                "im_number" => "IM" . Carbon::now()->format('Ymd') . str_pad($number + 1, 3, 0, STR_PAD_LEFT),
+                // "id_kategori_fpp"=> $request->id_kategori_fpp,
+                "id_kategori_jenis_fpp" => $request->id_kategori_jenis_fpp,
+                "id_kategori_sub_fpp" => $request->id_kategori_sub_fpp,
+                "id_devisi" => $request->id_devisi,
+                "id_cabang" => $request->id_cabang,
+                "qty" => $request->qty,
+                "flag" => 0,
+                "catatan" => $request->catatan,
+                "created_by" => auth()->user()->id
+            ]);
+
+            HistoryMemo::create([
+                "id_internal_memo" => $internalMemo->id,
+                "user_id" => auth()->user()->id,
+                "status" => 0,
+                "keterangan" => "Internal memo baru dibuat oleh" . ' ' . auth()->user()->name
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollback();
+        }
 
         if (!empty($files)) {
             foreach ($files as $key => $file) {
@@ -183,11 +188,6 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $internalMemo
         );
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function show($id)
@@ -235,6 +235,7 @@ class InternalMemoController extends Controller
         //            ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
         //            ->select('internal_memo_barang.*','barang_tipe.tipe', 'stok_barang.jumlah_stok', 'stok_barang.nomer_barang', 'stok_barang.pic')
         //            ->get();
+
         foreach ($listHistoryMemo as $key => $value) {
 
             if ($key == 0) {
@@ -288,14 +289,10 @@ class InternalMemoController extends Controller
     public function update(Request $request, $id)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
-
         $query = InternalMemo::where('id', $id)->first();
 
         $query->update([
-            //            "id_kategori_fpp"=> $request->id_kategori_fpp,
+            //"id_kategori_fpp"=> $request->id_kategori_fpp,
             "id_kategori_jenis_fpp" => $request->id_kategori_jenis_fpp,
             "id_kategori_sub_fpp" => $request->id_kategori_sub_fpp,
             "id_devisi" => $request->id_devisi,
@@ -310,20 +307,11 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $query
         );
-
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function updateFile(Request $request, $id)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
 
         $files = $request['files'];
         $videos = $request['videos'];
@@ -331,7 +319,9 @@ class InternalMemoController extends Controller
         $query = InternalMemoFile::where('id', $id)->first();
 
         if (!empty($files)) {
+
             foreach ($files as $key => $file) {
+
                 $image_64 = $file; //your base64 encoded data
                 $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
                 $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
@@ -368,19 +358,11 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $query
         );
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function addNewFile(Request $request, $id)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
 
         $files = $request['files'];
         $videos = $request['videos'];
@@ -427,19 +409,12 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $internal
         );
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function destroy($id)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
+
 
         $imFile = InternalMemoFile::find($id);
 
@@ -450,78 +425,69 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $imFile
         );
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function ignoreMemo(Request $request, $id)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
 
-        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+        DB::beginTransaction();
+        try {
 
-        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+            $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        if ($pic->kategori_proses == 1) {
-            $internalMemo->update([
-                'flag' => 10
-            ]);
+            $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+            if ($pic->kategori_proses == 1) {
+                $internalMemo->update([
+                    'flag' => 10
+                ]);
+
+                $create = HistoryMemo::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "user_id" => auth()->user()->id,
+                    "status" => $pic->kategori_proses,
+                    "catatan" => $request->catatan,
+                    "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name
+                ]);
+            } else if ($pic->kategori_proses == 2) {
+                InternalMemo::where('id', $id)->update([
+                    'flag' => 10
+                ]);
+
+                $create = HistoryMemo::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "user_id" => auth()->user()->id,
+                    "status" => $pic->kategori_proses,
+                    "catatan" => $request->catatan,
+                    "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name
+                ]);
+            }
 
             $create = HistoryMemo::create([
                 "id_internal_memo" => $internalMemo->id,
                 "user_id" => auth()->user()->id,
-                "status" => $pic->kategori_proses,
-                "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name
-            ]);
-        } else if ($pic->kategori_proses == 2) {
-            InternalMemo::where('id', $id)->update([
-                'flag' => 10
+                "status" => 10,
+                "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name,
+                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                "waktu" => Carbon::now()->format('h')
             ]);
 
-            $create = HistoryMemo::create([
-                "id_internal_memo" => $internalMemo->id,
-                "user_id" => auth()->user()->id,
-                "status" => $pic->kategori_proses,
-                "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name
-            ]);
+            DB::commit();
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $create
+            );
+        } catch (\Throwable $e) {
+            DB::rollback();
         }
-
-        $create = HistoryMemo::create([
-            "id_internal_memo" => $internalMemo->id,
-            "user_id" => auth()->user()->id,
-            "status" => 10,
-            "keterangan" => $this->getFlagStatus(10) . ' ' . auth()->user()->name,
-            "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
-            "waktu" => Carbon::now()->format('h')
-        ]);
-
-        return self::buildResponse(
-            Constants::HTTP_CODE_200,
-            Constants::HTTP_MESSAGE_200,
-            $create
-        );
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function ignoreMemoAll(Request $request)
     {
 
-
-        //        DB::beginTransaction();
-        //
-        //        try {
 
         $ids[] =  $request->id;
         $array = [];
@@ -555,19 +521,10 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $array
         );
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function createInternalRating(Request $request, $id)
     {
-
-        //        DB::beginTransaction();
-        //
-        //        try {
 
         $internal = InternalMemo::find($id);
 
@@ -584,11 +541,6 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $create
         );
-
-        //            DB::commit();
-        //        } catch (\Throwable $e) {
-        //            DB::rollback();
-        //        }
     }
 
     public function getRating($id)
@@ -831,80 +783,79 @@ class InternalMemoController extends Controller
 
     public function accMemo($id, Request $request)
     {
-        //        DB::beginTransaction();
-        //        try {
+        DB::beginTransaction();
+        try {
 
-        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+            $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+            $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
-        if ($pic->kategori_proses == 1) {
-<<<<<<< HEAD
-=======
-            InternalMemo::where('id', $id)->update([
-                'flag' => $pic->kategori_proses
-            ]);
+            if ($pic->kategori_proses == 1) {
+                InternalMemo::where('id', $id)->update([
+                    'flag' => $pic->kategori_proses
+                ]);
 
-            $create = HistoryMemo::create([
-                "id_internal_memo" => $internalMemo->id,
-                "user_id" => auth()->user()->id,
-                "status" => $pic->kategori_proses,
-                "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
-            ]);
-        } else if ($pic->kategori_proses == 2) {
->>>>>>> 12299c1 (barang masuk by cabang penerima)
-            InternalMemo::where('id', $id)->update([
-                'flag' => $pic->kategori_proses
-            ]);
+                $create = HistoryMemo::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "user_id" => auth()->user()->id,
+                    "status" => $pic->kategori_proses,
+                    "catatan" => $request->catatan,
+                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+                ]);
+            } else if ($pic->kategori_proses == 2) {
 
-            $create = HistoryMemo::create([
-                "id_internal_memo" => $internalMemo->id,
-                "user_id" => auth()->user()->id,
-                "status" => $pic->kategori_proses,
-                "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
-            ]);
-        } else if ($pic->kategori_proses == 2) {
-            InternalMemo::where('id', $id)->update([
-                'flag' => $pic->kategori_proses
-            ]);
+                InternalMemo::where('id', $id)->update([
+                    'flag' => $pic->kategori_proses
+                ]);
 
-            $create = HistoryMemo::create([
-                "id_internal_memo" => $internalMemo->id,
-                "user_id" => auth()->user()->id,
-                "status" => $pic->kategori_proses,
-                "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
-            ]);
+                $create = HistoryMemo::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "user_id" => auth()->user()->id,
+                    "status" => $pic->kategori_proses,
+                    "catatan" => $request->catatan,
+                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+                ]);
+            } else if ($pic->kategori_proses == 2) {
+                InternalMemo::where('id', $id)->update([
+                    'flag' => $pic->kategori_proses
+                ]);
 
-            $create = HistoryMemo::create([
-                "id_internal_memo" => $internalMemo->id,
-                "user_id" => auth()->user()->id,
-                "status" => $pic->kategori_proses,
-                "catatan" => $request->catatan,
-                "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
-            ]);
+                $create = HistoryMemo::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "user_id" => auth()->user()->id,
+                    "status" => $pic->kategori_proses,
+                    "catatan" => $request->catatan,
+                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+                ]);
+
+                $create = HistoryMemo::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "user_id" => auth()->user()->id,
+                    "status" => $pic->kategori_proses,
+                    "catatan" => $request->catatan,
+                    "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return self::buildResponse(
+                Constants::HTTP_CODE_500,
+                Constants::ERROR_MESSAGE_500,
+                $e->getMessage()
+            );
         }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $create
+            'Berhasil Acc Memo'
         );
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function accMemoAll(Request $request)
     {
-
-        //        DB::beginTransaction();
-        //        try {
 
         $ids[] =  $request->id;
         $array = [];
@@ -933,12 +884,6 @@ class InternalMemoController extends Controller
             Constants::HTTP_MESSAGE_200,
             $array
         );
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function paginateKuKc(Request $request)
@@ -1034,42 +979,41 @@ class InternalMemoController extends Controller
     public function cancelMemo(Request $request, $id)
     {
 
-        //        DB::beginTransaction();
-        //        try {
+        DB::beginTransaction();
+        try {
 
-        $internalMemo = InternalMemo::where('id', '=', $id)->first();
+            $internalMemo = InternalMemo::where('id', '=', $id)->first();
 
-        if (!empty($request->catatan_tolak)) {
-            $internalMemo->update([
-                'flag' => 8
+            if (!empty($request->catatan_tolak)) {
+                $internalMemo->update([
+                    'flag' => 8
+                ]);
+            } else {
+                $internalMemo->update([
+                    'flag' => 8
+                ]);
+            }
+
+            $create = HistoryMemo::create([
+                "id_internal_memo" => $internalMemo->id,
+                "user_id" => auth()->user()->id,
+                "status" => 8,
+                "keterangan" => $this->getFlagStatus(8) . ' ' . auth()->user()->name,
+                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                "waktu" => Carbon::now()->format('h')
             ]);
-        } else {
-            $internalMemo->update([
-                'flag' => 8
-            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $e->getMessage();
         }
-
-        $create = HistoryMemo::create([
-            "id_internal_memo" => $internalMemo->id,
-            "user_id" => auth()->user()->id,
-            "status" => 8,
-            "keterangan" => $this->getFlagStatus(8) . ' ' . auth()->user()->name,
-            "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
-            "waktu" => Carbon::now()->format('h')
-        ]);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
             $create
         );
-
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function imByCabangId(Request $request)
@@ -1139,7 +1083,9 @@ class InternalMemoController extends Controller
 
     public function dashboardKcImStatus()
     {
+
         try {
+
             $kProses = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
             $dashboardIm = InternalMemo::get();
 
