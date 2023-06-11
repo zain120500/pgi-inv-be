@@ -19,8 +19,6 @@ class KategoriController extends Controller
             return $query;
         });
 
-        // return $this->successResponse($kategori, 'Success', 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -31,7 +29,6 @@ class KategoriController extends Controller
     public function all()
     {
         $query = KategoriFpp::all();
-        // return $this->successResponse($query, 'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -49,23 +46,11 @@ class KategoriController extends Controller
             "created_by" => auth()->user()->id,
         ]);
 
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Process Data error', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function show($id)
@@ -73,26 +58,11 @@ class KategoriController extends Controller
 
         $query = KategoriFpp::find($id);
 
-        if (!empty($query)) {
-            // $query->kategoriJenis;
-            $query->kategoriSub;
-
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -110,46 +80,23 @@ class KategoriController extends Controller
                 "created_by" => auth()->user()->id,
             ]);
 
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Process Data error', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function destroy($id)
     {
         $query = KategoriFpp::find($id);
 
-        if (!empty($query)) {
-            $query->delete();
-            // return $this->successResponse($query, 'Success', 200);
+        $query->delete();
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 }

@@ -18,8 +18,6 @@ class DevisiController extends Controller
     {
         $getData = Devisi::paginate(15);
 
-        // return $this->successResponse($getData, 'Success', 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -34,8 +32,6 @@ class DevisiController extends Controller
         } else {
             $getData = Devisi::all()->makeHidden(['created_at', 'updated_at']);
         }
-
-        // return $this->successResponse($getData, 'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -57,8 +53,6 @@ class DevisiController extends Controller
             "UserInput" => $request->UserInput
         ]);
 
-        // return $this->successResponse($query, 'Success', 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -70,23 +64,11 @@ class DevisiController extends Controller
     {
         $query = Devisi::find($id);
 
-        if (!empty($query)) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -103,8 +85,6 @@ class DevisiController extends Controller
                 "UserInput" => $request->UserInput
             ]);
 
-        // return $this->successResponse($query, 'Success', 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -115,8 +95,6 @@ class DevisiController extends Controller
     public function destroy($id)
     {
         $query = Devisi::find($id)->delete();
-
-        // return $this->successResponse($query, 'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

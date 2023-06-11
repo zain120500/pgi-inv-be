@@ -66,26 +66,13 @@ class MenuController extends Controller
     public function show($id)
     {
         $query = Menu::find($id);
+        $query['top_menu'] = TopMenu::where('id', $query->parent_id)->get();
 
-        if (!empty($query)) {
-            $query['top_menu'] = TopMenu::where('id', $query->parent_id)->get();
-
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -103,10 +90,6 @@ class MenuController extends Controller
                 "user_specific_menu" => $request->user_specific_menu
             ]);
 
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $query
-        // ]);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -118,11 +101,6 @@ class MenuController extends Controller
     public function destroy($id)
     {
         $query = Menu::find($id)->delete();
-
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $query
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

@@ -17,10 +17,6 @@ class RoleMenuController extends Controller
     {
         $query = RoleMenu::paginate(15);
 
-        // return response()->json([
-        //     'status' =>'success',
-        //     'data' => $query
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -38,10 +34,6 @@ class RoleMenuController extends Controller
             return $query;
         });
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $getquery
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -68,23 +60,11 @@ class RoleMenuController extends Controller
             }
         }
 
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Process failed', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function show($id)

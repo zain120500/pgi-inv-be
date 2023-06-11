@@ -64,53 +64,75 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        
-        $response = $this->handleException($request, $exception);
-        return $response;
+
+        if ($request->wantsJson()) {   //add Accept: application/json in request
+            return $this->handleApiException($request, $exception);
+        } else {
+            $retval = parent::render($request, $exception);
+        }
+
+        return $retval;
     }
 
-    public function handleException($request, Exception $exception)
+    private function handleApiException($request, Exception $exception)
     {
+        $exception = $this->prepareException($exception);
 
-        if ($exception instanceof MethodNotAllowedHttpException) {
-            return $this->errorResponse('The specified method for the request is invalid', 405);
+        if ($exception instanceof \Illuminate\Http\Exception\HttpResponseException) {
+            $exception = $exception->getResponse();
         }
 
-        if ($exception instanceof NotFoundHttpException) {
-            return $this->errorResponse('The specified URL cannot be found', 404);
+        if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+            $exception = $this->unauthenticated($request, $exception);
         }
 
-        if ($exception instanceof HttpException) {
-            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+        if ($exception instanceof \Illuminate\Validation\ValidationException) {
+            $exception = $this->convertValidationExceptionToResponse($exception, $request);
         }
 
-        ///
-
-        
-        if ($exception instanceof HttpResponseException) {
-            // $exception = $exception->getResponse();
-            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
-
-        }
-    
-        if ($exception instanceof AuthenticationException) {
-            // $exception = $this->unauthenticated($request, $exception);
-            return $this->errorResponse($exception->getMessage(), 403);
-
-        }
-    
-        if ($exception instanceof ValidationException) {
-            // $exception = $this->convertValidationExceptionToResponse($exception, $request);
-            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
-        }
-
-        //
-        if (config('app.debug')) {
-            return parent::render($request, $exception);            
-        }
-
-        return $this->errorResponse('Unexpected Exception. Try later', 500);
+        return $this->customApiResponse($exception);
     }
 
+    private function customApiResponse($exception)
+    {
+        if (method_exists($exception, 'getStatusCode')) {
+            $statusCode = $exception->getStatusCode();
+        } else {
+            $statusCode = 500;
+        }
 
+        $response = [];
+
+        switch ($statusCode) {
+            case 401:
+                $response['message'] = 'Unauthorized';
+
+                break;
+            case 403:
+                $response['message'] = 'Forbidden';
+                break;
+            case 404:
+                $response['message'] = 'Not Found';
+                break;
+            case 405:
+                $response['message'] = 'Method Not Allowed';
+                break;
+            case 422:
+                $response['message'] = $exception->original['message'];
+                $response['errors'] = $exception->original['errors'];
+                break;
+            default:
+                $response['message'] = ($statusCode == 500) ? 'Whoops, looks like something went wrong' : $exception->getMessage();
+                break;
+        }
+
+        if (config('app.debug')) {
+            $response['status'] = "error";
+            $response['code'] = $statusCode;
+            $response['error_message'] = $exception->getMessage();
+            $response['trace'] = $exception->getTrace();
+        }
+
+        return response()->json($response, $statusCode);
+    }
 }

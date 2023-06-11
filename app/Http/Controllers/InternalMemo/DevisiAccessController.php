@@ -14,7 +14,6 @@ class DevisiAccessController extends Controller
     public function index()
     {
         $query = DevisiAccessFpp::paginate(15);
-        // return $this->successResponse($query, 'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -26,7 +25,6 @@ class DevisiAccessController extends Controller
     public function all()
     {
         $query = DevisiAccessFpp::all()->makeHidden(['created_at', 'updated_at']);
-        // return $this->successResponse($query,'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -58,23 +56,11 @@ class DevisiAccessController extends Controller
             }
         }
 
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Process failed', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function show($id)
@@ -102,22 +88,10 @@ class DevisiAccessController extends Controller
             "devisi_id" => $id
         ])->delete();
 
-        if (!empty($query)) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 }
