@@ -75,23 +75,11 @@ class PengirimanController extends Controller
             ]);
         }
 
-        if ($query) {
-            // return $this->successResponse($query,'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                $query
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function storeDetail(Request $request)
@@ -149,23 +137,11 @@ class PengirimanController extends Controller
                 "status" => 0
             ]);
 
-            if ($query) {
-                // return $this->successResponse($query, 'Success', 200);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_200,
-                    Constants::HTTP_MESSAGE_200,
-                    $query
-                );
-            } else {
-                // return $this->errorResponse('Data is Null', 403);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_403,
-                    Constants::HTTP_MESSAGE_403,
-                    'Data is Null'
-                );
-            }
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         }
     }
 
@@ -173,40 +149,28 @@ class PengirimanController extends Controller
     {
         $query = Pengiriman::find($id);
 
-        if (!empty($query)) {
-            $query['kategori'] = PengirimanKategori::where('id', $query->kategori)->first();
+        $query['kategori'] = PengirimanKategori::where('id', $query->kategori)->first();
 
-            $pengiriman_detail = $query->detail;
-            $collect = $pengiriman_detail->map(function ($q) {
-                $q['status_code'] = $this->getCodeStatus($q->status);
-                $q['barang_tipe'] = BarangTipe::where('id', $q->id_tipe)->get();
-                return $q;
-            });
+        $pengiriman_detail = $query->detail;
+        $collect = $pengiriman_detail->map(function ($q) {
+            $q['status_code'] = $this->getCodeStatus($q->status);
+            $q['barang_tipe'] = BarangTipe::where('id', $q->id_tipe)->get();
+            return $q;
+        });
 
-            $details = PengirimanDetail::where('id_pengiriman', $query->id);
-            $query['total_unit'] = $details->sum('jumlah');
-            $query['total_pembelian'] = $details->sum('total_harga');
-            $query->cabangPengirim;
-            $query->cabangPenerima;
+        $details = PengirimanDetail::where('id_pengiriman', $query->id);
+        $query['total_unit'] = $details->sum('jumlah');
+        $query['total_pembelian'] = $details->sum('total_harga');
+        $query->cabangPengirim;
+        $query->cabangPenerima;
 
-            $query['detail'] = $pengiriman_detail;
+        $query['detail'] = $pengiriman_detail;
 
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -224,23 +188,12 @@ class PengirimanController extends Controller
                 "kategori"  => $request->kategori,
                 "keterangan" => $request->keterangan
             ]);
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function updateDetail(Request $request, $id)
@@ -248,39 +201,33 @@ class PengirimanController extends Controller
         $barangTipe = BarangTipe::find($request->id_tipe);
 
         if (empty($barangTipe)) {
-            return $this->errorResponse('Barang Tipe is Null', 403);
-        } else {
-            $query = PengirimanDetail::where('id', $id)
-                ->update([
-                    "id_pengiriman" => $request->id_pengiriman,
-                    "id_tipe" => $request->id_tipe,
-                    "nomer_barang" => $barangTipe->kode_barang,
-                    "harga" => $request->harga,
-                    "jumlah" => $request->jumlah,
-                    "total_harga" => (int)$request->harga * (int)$request->jumlah,
-                    "satuan" => $request->satuan,
-                    "imei" => $request->imei,
-                    "detail_barang" => $request->detail_barang,
-                    "keterangan" => $request->keterangan
-                ]);
-            if ($query) {
-                // return $this->successResponse($query, 'Success', 200);
 
-                return self::buildResponse(
-                    Constants::HTTP_CODE_200,
-                    Constants::HTTP_MESSAGE_200,
-                    $query
-                );
-            } else {
-                // return $this->errorResponse('Data is Null', 403);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_403,
-                    Constants::HTTP_MESSAGE_403,
-                    'Data is Null'
-                );
-            }
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::HTTP_MESSAGE_403,
+                'Barang Tipe is Null'
+            );
         }
+
+        $query = PengirimanDetail::where('id', $id)
+            ->update([
+                "id_pengiriman" => $request->id_pengiriman,
+                "id_tipe" => $request->id_tipe,
+                "nomer_barang" => $barangTipe->kode_barang,
+                "harga" => $request->harga,
+                "jumlah" => $request->jumlah,
+                "total_harga" => (int)$request->harga * (int)$request->jumlah,
+                "satuan" => $request->satuan,
+                "imei" => $request->imei,
+                "detail_barang" => $request->detail_barang,
+                "keterangan" => $request->keterangan
+            ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function updatePengiriman(Request $request)
@@ -318,23 +265,11 @@ class PengirimanController extends Controller
                 $detail->update(['status' => 1]);
             }
 
-            if ($pengiriman) {
-                // return $this->successResponse($pengiriman, 'Success', 200);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_200,
-                    Constants::HTTP_MESSAGE_200,
-                    $pengiriman
-                );
-            } else {
-                // return $this->errorResponse('Data is Null', 403);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_403,
-                    Constants::HTTP_MESSAGE_403,
-                    'Data is Null'
-                );
-            }
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $pengiriman
+            );
         }
     }
 
@@ -393,23 +328,11 @@ class PengirimanController extends Controller
             }
         }
 
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function destroy($id)
@@ -441,23 +364,11 @@ class PengirimanController extends Controller
             }
         }
 
-        if (!empty($query)) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function destroyDetail($id)
@@ -465,34 +376,21 @@ class PengirimanController extends Controller
         $query = PengirimanDetail::find($id);
         $pengiriman = Pengiriman::where('id', $query->id_pengiriman)->first();
 
-        if (!empty($query)) {
-
-            DB::beginTransaction();
-            try {
-                BarangKeluar::where('id_tipe', $query->id_tipe)->where('pic', $pengiriman->pengirim)->delete();
-                $query->delete();
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollback();
-                return $e->getMessage();
-            }
-
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
+        DB::beginTransaction();
+        try {
+            BarangKeluar::where('id_tipe', $query->id_tipe)->where('pic', $pengiriman->pengirim)->delete();
+            $query->delete();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $e->getMessage();
         }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function getkodeinvoice2()
@@ -526,69 +424,33 @@ class PengirimanController extends Controller
             $cabang = Cabang::where('area_manager_id', $userCabang->area_manager_id)->get();
         }
 
-        if ($cabang) {
-            // return $this->successResponse($cabang, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $cabang
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $cabang
+        );
     }
 
     public function getCabangPusat(Request $request)
     {
         $cabang = Cabang::whereLike('name', $request->name)->get();
 
-        if ($cabang) {
-            // return $this->successResponse($cabang, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $cabang
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $cabang
+        );
     }
 
     public function dropdownRuangan()
     {
         $stokPusat = StokPusat::orderBy('id', 'ASC')->get();
 
-        if ($stokPusat) {
-            // return $this->successResponse($stokPusat, Constants::HTTP_MESSAGE_200, 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $stokPusat
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $stokPusat
+        );
     }
 
     public function getCodeFlag($id)

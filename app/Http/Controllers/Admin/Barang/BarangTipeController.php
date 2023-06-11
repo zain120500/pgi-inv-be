@@ -32,11 +32,6 @@ class BarangTipeController extends Controller
             return $query;
         });
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $barang->setCollection($collect)
-        // ], 200);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -55,11 +50,6 @@ class BarangTipeController extends Controller
         } else {
             $barang = BarangTipe::all();
         }
-
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $barang
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -85,11 +75,6 @@ class BarangTipeController extends Controller
             "id_merk" => $request->id_merk
         ]);
 
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $tipe
-        // ]);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -101,27 +86,11 @@ class BarangTipeController extends Controller
     {
         $query = BarangTipe::find($id);
 
-        if (!empty($query)) {
-            $barangMerk = $query->barangMerk;
-            if (!empty($barangMerk)) {
-                $barangMerk->barangJenis;
-            }
-            return $this->successResponse($query, 'Success', 200);
-
-            // return self::buildResponse(
-            //     Constants::HTTP_CODE_200,
-            //     Constants::HTTP_MESSAGE_200,
-            //     $query
-            // );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -142,10 +111,6 @@ class BarangTipeController extends Controller
                 "id_merk" => $request->id_merk
             ]);
 
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $query
-        // ]);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -158,11 +123,6 @@ class BarangTipeController extends Controller
     public function destroy($id)
     {
         $query = BarangTipe::find($id)->delete();
-
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $query
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

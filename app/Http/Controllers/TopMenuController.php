@@ -21,15 +21,11 @@ class TopMenuController extends Controller
             return $query;
         });
 
-        // return response()->json([
-        //     'status' =>'success',
-        //     'data' => $getquery
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $collect
+            $getquery
         );
     }
 
@@ -46,10 +42,6 @@ class TopMenuController extends Controller
             "name" => $request->name
         ]);
 
-        // return response()->json([
-        //     'type' =>'success',
-        //     'data' => $query
-        // ]);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -62,25 +54,13 @@ class TopMenuController extends Controller
     {
         $query = TopMenu::find($id);
 
-        if (!empty($query)) {
-            $query['menu'] = Menu::where('parent_id', $query->id)->get();
+        $query['menu'] = Menu::where('parent_id', $query->id)->get();
 
-            // return $this->successResponse($query,'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                'Data is Null'
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function edit($id)
@@ -96,11 +76,6 @@ class TopMenuController extends Controller
                 "name" => $request->name,
             ]);
 
-        // return response()->json([
-        //     'type' => 'success',
-        //     'data' => $query
-        // ]);
-
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -111,11 +86,6 @@ class TopMenuController extends Controller
     public function destroy($id)
     {
         $query = TopMenu::find($id)->delete();
-
-        // return response()->json([
-        //     'status' => 'success',
-        //     'data' => $query
-        // ], 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

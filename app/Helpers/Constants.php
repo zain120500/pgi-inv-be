@@ -5,7 +5,9 @@ namespace App\Helpers;
 class Constants
 {
     const HTTP_MESSAGE_200 = 'Success';
+    const HTTP_MESSAGE_204 = 'Data is Null';
     const HTTP_MESSAGE_403 = 'Error';
+    const HTTP_MESSAGE_404 = 'Not Found';
     const ERROR_MESSAGE_403 = 'Process Data error';
     const ERROR_MESSAGE_9000 = 'Anda Bukan Pic';
     const ERROR_MESSAGE_9001 = 'Anda Tidak Mendapatkan Hak Akses';
@@ -17,5 +19,7 @@ class Constants
     const ERROR_MESSAGE_9007 = 'Akun Anda Tidak Aktif Silahkan Hubungi Pihak Terkait';
 
     const HTTP_CODE_200 = 200;
+    const HTTP_CODE_204 = 204;
+    const HTTP_CODE_404 = 404;
     const HTTP_CODE_403 = 403;
 }

@@ -52,7 +52,6 @@ class PembelianController extends Controller
             return $q;
         });
 
-        // return $this->successResponse($query,'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -85,7 +84,6 @@ class PembelianController extends Controller
             return $q;
         });
 
-        // return $this->successResponse($query, 'Success', 200);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -114,23 +112,11 @@ class PembelianController extends Controller
             "user_input" => auth()->user()->admin->username
         ]);
 
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function storeDetail(Request $request)
@@ -194,23 +180,11 @@ class PembelianController extends Controller
                     "status" => 0
                 ]);
 
-                if ($query) {
-                    // return $this->successResponse($query, 'Success', 200);
-
-                    return self::buildResponse(
-                        Constants::HTTP_CODE_200,
-                        Constants::HTTP_MESSAGE_200,
-                        $query
-                    );
-                } else {
-                    // return $this->errorResponse('Data is Null', 403);
-
-                    return self::buildResponse(
-                        Constants::HTTP_CODE_403,
-                        Constants::HTTP_MESSAGE_403,
-                        null
-                    );
-                }
+                return self::buildResponse(
+                    Constants::HTTP_CODE_200,
+                    Constants::HTTP_MESSAGE_200,
+                    $query
+                );
             }
         }
     }
@@ -265,23 +239,12 @@ class PembelianController extends Controller
                 "keterangan" => $request->keterangan,
                 "user_input" => auth()->user()->admin->username
             ]);
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function updateDetail(Request $request, $id)
@@ -310,23 +273,12 @@ class PembelianController extends Controller
                     "keterangan" => $request->keterangan,
                     "id_gudang" => ($request->kode_cabang) ? $request->kode_cabang : NULL
                 ]);
-            if ($query) {
-                // return $this->successResponse($query, 'Success', 200);
 
-                return self::buildResponse(
-                    Constants::HTTP_CODE_200,
-                    Constants::HTTP_MESSAGE_200,
-                    $query
-                );
-            } else {
-                // return $this->errorResponse('Data is Null', 403);
-
-                return self::buildResponse(
-                    Constants::HTTP_CODE_403,
-                    Constants::HTTP_MESSAGE_403,
-                    null
-                );
-            }
+            return self::buildResponse(
+                Constants::HTTP_CODE_200,
+                Constants::HTTP_MESSAGE_200,
+                $query
+            );
         }
     }
 
@@ -386,23 +338,11 @@ class PembelianController extends Controller
 
         $pembelian->update(["flag" => $flag]);
 
-        if ($pembelian) {
-            // return $this->successResponse($pembelian, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $pembelian
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $pembelian
+        );
     }
 
     public function updatePembelianDetail(Request $request)
@@ -411,71 +351,37 @@ class PembelianController extends Controller
         $status = $request->status;
 
         $query = PembelianDetail::where('id', $id)->update(["status" => $status]);
-        if ($query) {
-            // return $this->successResponse($query, 'Success', 200);
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function destroy($id)
     {
         $query = Pembelian::find($id);
-        if (!empty($query)) {
-            $query->delete();
+        $query->delete();
+        PembelianDetail::where('id_pembelian', $query->id)->delete();
 
-            PembelianDetail::where('id_pembelian', $query->id)->delete();
-            // return $this->successResponse($query, 'Success', 200);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function destroyDetail($id)
     {
         $query = PembelianDetail::find($id);
-        if (!empty($query)) {
-            $query->delete();
-            // return $this->successResponse($query, 'Success', 200);
+        $query->delete();
 
-            return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $query
-            );
-        } else {
-            // return $this->errorResponse('Data is Null', 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::HTTP_MESSAGE_403,
-                null
-            );
-        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $query
+        );
     }
 
     public function getCodeFlag($id)
