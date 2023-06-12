@@ -839,8 +839,6 @@ class InternalMemoController extends Controller
         $pic = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
 
         if ($pic->kategori_proses == 1) {
-<<<<<<< HEAD
-=======
             InternalMemo::where('id', $id)->update([
                 'flag' => $pic->kategori_proses
             ]);
@@ -853,7 +851,6 @@ class InternalMemoController extends Controller
                 "keterangan" => $this->getFlagStatus($pic->kategori_proses) . ' ' . auth()->user()->name
             ]);
         } else if ($pic->kategori_proses == 2) {
->>>>>>> 12299c1 (barang masuk by cabang penerima)
             InternalMemo::where('id', $id)->update([
                 'flag' => $pic->kategori_proses
             ]);
