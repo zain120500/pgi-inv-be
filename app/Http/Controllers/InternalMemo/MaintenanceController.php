@@ -690,106 +690,107 @@ class MaintenanceController extends Controller
      */
     public function createUserMaitenance(Request $request)
     {
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
-        try {
+        // try {
 
-            $userMaintenance = $request->id_user_maintenance;
-            $idMemo = $request->id_memo;
+        $userMaintenance = $request->id_user_maintenance;
+        $idMemo = $request->id_memo;
 
-            foreach ($idMemo as $key => $memo) {
-                foreach ($userMaintenance as $key => $um) {
-                    $exist = InternalMemoMaintenance::where("id_user_maintenance", $um)->orderBy('id', 'DESC')->first();
+        foreach ($idMemo as $key => $memo) {
+            foreach ($userMaintenance as $key => $um) {
 
-                    if (empty($exist)) {
-                        InternalMemoMaintenance::create([
-                            'id_internal_memo' => $memo,
-                            'id_user_maintenance' => $um,
+                $exist = InternalMemoMaintenance::where("id_user_maintenance", $um)->where("id_internal_memo", $memo)->orderBy('id', 'DESC')->first();
+
+                if (empty($exist)) {
+                    InternalMemoMaintenance::create([
+                        'id_internal_memo' => $memo,
+                        'id_user_maintenance' => $um,
+                        'date' => $request->date,
+                        'link' => $this->generateRandomString(4),
+                        'kode' => $this->generateRandomString(4),
+                        'flag' => 0,
+                        'created_by' => auth()->user()->id
+                    ]);
+                } else {
+
+                    try {
+                        $exist->update([
                             'date' => $request->date,
-                            'link' => $this->generateRandomString(4),
-                            'kode' => $this->generateRandomString(4),
-                            'flag' => 0,
                             'created_by' => auth()->user()->id
                         ]);
-                    } else {
-                        try {
-                            $exist->update([
-                                'date' => $request->date,
-                                'created_by' => auth()->user()->id
-                            ]);
-                        } catch (\Throwable $e) {
-                            return $e;
-                        }
+                    } catch (\Throwable $e) {
+                        return $e;
                     }
-                }
-
-                try {
-                    $this->whatsuppMessage($memo);
-                } catch (\Throwable $e) {
-                    return self::buildResponse(
-                        Constants::HTTP_CODE_500,
-                        Constants::ERROR_MESSAGE_500,
-                        $e->getMessage()
-                    );
                 }
             }
 
 
-
-            // old code
-
-            // foreach ($memo as $key => $value) {
-            //     foreach ($user as $keys => $values) {
-
-            //         $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
-
-            //         if ($update == null) {
-            //             $imMainteance = InternalMemoMaintenance::create([
-            //                 'id_internal_memo' => $value,
-            //                 'id_user_maintenance' => $values,
-            //                 'date' => $request->date,
-            //                 'link' => $this->generateRandomString(4),
-            //                 'kode' => $this->generateRandomString(4),
-            //                 'flag' => 0,
-            //                 'created_by' => auth()->user()->id
-            //             ]);
-            //         } else if ($update->id_user_maintenance !== $values) {
-            //             $array[$keys] = $values;
-            //         } else if (!empty($update)) {
-
-            //             $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
-
-            //             $updates->update([
-            //                 'date' => $request->date,
-            //                 'created_by' => auth()->user()->id
-            //             ]);
-
-            //             $imMainteance[] = $updates->first();
-            //         }
-            //     }
-
-            //     // $imMainteance = InternalMemoMaintenance::create([
-            //     //     'id_internal_memo' => $value,
-            //     //     'id_user_maintenance' => $array,
-            //     //     'date' => $request->date,
-            //     //     'link' => $this->generateRandomString(6),
-            //     //     'kode' => $this->generateRandomString(6),
-            //     //     'flag' => 0,
-            //     //     'created_by' => auth()->user()->id
-            //     // ]);
-
-            //     // $this->whatsuppMessage($value);
-            // }
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return self::buildResponse(
-                Constants::HTTP_CODE_500,
-                Constants::ERROR_MESSAGE_500,
-                $e->getMessage()
-            );
+            try {
+                $this->whatsuppMessage($memo);
+            } catch (\Throwable $e) {
+                return self::buildResponse(
+                    Constants::HTTP_CODE_500,
+                    Constants::ERROR_MESSAGE_500,
+                    $e->getMessage()
+                );
+            }
         }
+
+        // old code
+
+        // foreach ($memo as $key => $value) {
+        //     foreach ($user as $keys => $values) {
+
+        //         $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
+
+        //         if ($update == null) {
+        //             $imMainteance = InternalMemoMaintenance::create([
+        //                 'id_internal_memo' => $value,
+        //                 'id_user_maintenance' => $values,
+        //                 'date' => $request->date,
+        //                 'link' => $this->generateRandomString(4),
+        //                 'kode' => $this->generateRandomString(4),
+        //                 'flag' => 0,
+        //                 'created_by' => auth()->user()->id
+        //             ]);
+        //         } else if ($update->id_user_maintenance !== $values) {
+        //             $array[$keys] = $values;
+        //         } else if (!empty($update)) {
+
+        //             $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
+
+        //             $updates->update([
+        //                 'date' => $request->date,
+        //                 'created_by' => auth()->user()->id
+        //             ]);
+
+        //             $imMainteance[] = $updates->first();
+        //         }
+        //     }
+
+        //     // $imMainteance = InternalMemoMaintenance::create([
+        //     //     'id_internal_memo' => $value,
+        //     //     'id_user_maintenance' => $array,
+        //     //     'date' => $request->date,
+        //     //     'link' => $this->generateRandomString(6),
+        //     //     'kode' => $this->generateRandomString(6),
+        //     //     'flag' => 0,
+        //     //     'created_by' => auth()->user()->id
+        //     // ]);
+
+        //     // $this->whatsuppMessage($value);
+        // }
+
+        //     DB::commit();
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     return self::buildResponse(
+        //         Constants::HTTP_CODE_500,
+        //         Constants::ERROR_MESSAGE_500,
+        //         $e->getMessage()
+        //     );
+        // }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
