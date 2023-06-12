@@ -39,29 +39,13 @@ class MaintenanceController extends Controller
         $barangs[] = $request->id_barang;
         $quantity = $request->quantity;
         $pic = $request->pic;
+        $vendorType = $request->vendor_type;
 
         foreach ($iMemo[0] as $key => $memos) {
-            foreach ($user[0] as $keys => $users) {
-                $imMaintenance = InternalMemoMaintenance::create([
-                    'id_internal_memo' => $memos,
-                    'id_user_maintenance' => $users,
-                    'date' => $request->date,
-                    'link' => $this->generateRandomString(6),
-                    'kode' => $this->generateRandomString(6),
-                    'flag' => 0,
-                    'created_by' => auth()->user()->id
-                ]);
-
-                $userMaintenance = UserMaintenance::where('id', $users)->first();
-                $userMaintenance->update(['flag' => 1]); //update pic sedang bertugas
-            }
-
-            if (count(array_filter($barangs)) > 0) {
-                foreach ($barangs[0] as $i => $barang) {
-                    $imBarang = InternalMemoBarang::create([
+            if($vendorType == null){
+                foreach ($user[0] as $keys => $users) {
+                    $imMaintenance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $memos,
-                        'id_maintenance' => $imMaintenance->id,
-                        'id_barang' => $barang,
                         'id_user_maintenance' => $users,
                         'date' => $request->date,
                         'link' => $this->generateRandomString(6),
@@ -70,51 +54,80 @@ class MaintenanceController extends Controller
                         'created_by' => auth()->user()->id
                     ]);
 
-                    BarangHistory::create([
-                        'id_barang_tipe' => $barang
-                    ]);
+                    $userMaintenance = UserMaintenance::where('id', $users)->first();
+                    $userMaintenance->update(['flag' => 1]); //update pic sedang bertugas
+                }
 
-                    if ($pic == !null) {
-                        if ($quantity == !null) {
-                            $cab1 = Cabang::where('kode', $pic[$i])->get()->pluck('id');
-                            foreach ($cab1 as $cab2) {
-                                InternalMemoBarang::where('id_barang', $barang)->update([
-                                    'quantity' => $quantity[$i],
-                                    'cabang_id' => $cab2
-                                ]);
+                if (count(array_filter($barangs)) > 0) {
+                    foreach ($barangs[0] as $i => $barang) {
+                        $imBarang = InternalMemoBarang::create([
+                            'id_internal_memo' => $memos,
+                            'id_maintenance' => $imMaintenance->id,
+                            'id_barang' => $barang,
+                            'id_user_maintenance' => $users,
+                            'date' => $request->date,
+                            'link' => $this->generateRandomString(6),
+                            'kode' => $this->generateRandomString(6),
+                            'flag' => 0,
+                            'created_by' => auth()->user()->id
+                        ]);
+
+                        BarangHistory::create([
+                            'id_barang_tipe' => $barang
+                        ]);
+
+                        if ($pic == !null) {
+                            if ($quantity == !null) {
+                                $cab1 = Cabang::where('kode', $pic[$i])->get()->pluck('id');
+                                foreach ($cab1 as $cab2) {
+                                    InternalMemoBarang::where('id_barang', $barang)->update([
+                                        'quantity' => $quantity[$i],
+                                        'cabang_id' => $cab2
+                                    ]);
+                                }
+
+                                $cabs = Cabang::where('kode', $pic[$i])->get()->pluck('kode');
+
+                                foreach ($cabs as $ca) {
+                                    $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+
+                                    Pemakaian::create([
+                                        'tanggal' => Carbon::now()->format('Y-m-d'),
+                                        'pic' => $stockBarang->pic,
+                                        'nomer_barang' => $stockBarang->nomer_barang,
+                                        'id_tipe' => $stockBarang->id_tipe,
+                                        'jumlah' => $quantity[$i],
+                                        'satuan' => $stockBarang->satuan,
+                                        'harga' => 0,
+                                        'total_harga' => 0,
+                                        'imei' => $stockBarang->imei,
+                                        'detail_barang' => $stockBarang->detail_barang,
+                                        'keperluan' => 'Kebutuhan Cabang',
+                                        'pemakai' => 'Cabang',
+                                        'user_input' => $stockBarang->user_input,
+                                        'last_update' => $stockBarang->last_update
+                                    ]);
+                                }
+                            } else {
+                                return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
                             }
-
-                            $cabs = Cabang::where('kode', $pic[$i])->get()->pluck('kode');
-
-                            foreach ($cabs as $ca) {
-                                $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
-
-                                Pemakaian::create([
-                                    'tanggal' => Carbon::now()->format('Y-m-d'),
-                                    'pic' => $stockBarang->pic,
-                                    'nomer_barang' => $stockBarang->nomer_barang,
-                                    'id_tipe' => $stockBarang->id_tipe,
-                                    'jumlah' => $quantity[$i],
-                                    'satuan' => $stockBarang->satuan,
-                                    'harga' => 0,
-                                    'total_harga' => 0,
-                                    'imei' => $stockBarang->imei,
-                                    'detail_barang' => $stockBarang->detail_barang,
-                                    'keperluan' => 'Kebutuhan Cabang',
-                                    'pemakai' => 'Cabang',
-                                    'user_input' => $stockBarang->user_input,
-                                    'last_update' => $stockBarang->last_update
-                                ]);
-                            }
-                        } else {
-                            return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
                         }
                     }
                 }
-            }
 
-            $this->whatsuppMessage($memos);
-            $this->accMemoByPic($memos);
+                $this->whatsuppMessage($memos);
+                $this->accMemoByPic($memos);
+            }else{
+                $imMaintenance = InternalMemoMaintenance::create([
+                    'id_internal_memo' => $memos,
+                    'vendor_name' => $request->vendor_name,
+                    'date' => $request->date,
+                    'link' => $this->generateRandomString(6),
+                    'kode' => $this->generateRandomString(6),
+                    'flag' => 0,
+                    'created_by' => auth()->user()->id
+                ]);
+            }
         }
 
         if (count(array_filter($barangs)) > 0) {
