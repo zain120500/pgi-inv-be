@@ -13,6 +13,7 @@ use App\Model\HistoryMemo;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
+use App\Model\InternalMemoVendor;
 use App\Model\KategoriJenisFpp;
 use App\Model\KategoriPicFpp;
 use App\Model\Pemakaian;
@@ -29,18 +30,19 @@ class MaintenanceController extends Controller
 {
     public function newInternalMaintenance(Request $request)
     {
+               DB::beginTransaction();
+        
+               try {
 
-        try {
+        $user[] = $request->id_user_maintenance;
+        $iMemo[] = $request->id_memo;
+        $barangs[] = $request->id_barang;
+        $quantity = $request->quantity;
+        $pic = $request->pic;
+        $vendorType = $request->vendor_type;
 
-            DB::beginTransaction();
-
-            $user[] = $request->id_user_maintenance;
-            $iMemo[] = $request->id_memo;
-            $barangs[] = $request->id_barang;
-            $quantity = $request->quantity;
-            $pic = $request->pic;
-
-            foreach ($iMemo[0] as $key => $memos) {
+        foreach ($iMemo[0] as $key => $memos) {
+            if($vendorType == 0){
                 foreach ($user[0] as $keys => $users) {
                     $imMaintenance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $memos,
@@ -115,11 +117,16 @@ class MaintenanceController extends Controller
 
                 $this->whatsuppMessage($memos);
                 $this->accMemoByPic($memos);
+            }else if($vendorType == 1){
+                $imMaintenance = InternalMemoVendor::create([
+                    'id_internal_memo' => $memos,
+                    'vendor_name' => $request->vendor_name,
+                    'date' => $request->date,
+                    'flag' => 0,
+                    'created_by' => auth()->user()->id
+                ]);
             }
-
-            if (count(array_filter($barangs)) > 0) {
-                $this->createHistoryBarang($barangs[0]);
-            }
+        }
 
             DB::commit();
         } catch (\Exception $e) {
