@@ -30,10 +30,9 @@ class MaintenanceController extends Controller
 {
     public function newInternalMaintenance(Request $request)
     {
-
-        //        DB::beginTransaction();
-        //
-        //        try {
+               DB::beginTransaction();
+        
+               try {
 
         $user[] = $request->id_user_maintenance;
         $iMemo[] = $request->id_memo;
@@ -49,8 +48,8 @@ class MaintenanceController extends Controller
                         'id_internal_memo' => $memos,
                         'id_user_maintenance' => $users,
                         'date' => $request->date,
-                        'link' => $this->generateRandomString(6),
-                        'kode' => $this->generateRandomString(6),
+                        'link' => $this->generateRandomString(4),
+                        'kode' => $this->generateRandomString(4),
                         'flag' => 0,
                         'created_by' => auth()->user()->id
                     ]);
@@ -129,8 +128,14 @@ class MaintenanceController extends Controller
             }
         }
 
-        if (count(array_filter($barangs)) > 0) {
-            $this->createHistoryBarang($barangs[0]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return self::buildResponse(
+                Constants::HTTP_CODE_500,
+                Constants::ERROR_MESSAGE_500,
+                $e->getMessage()
+            );
         }
 
         return self::buildResponse(
@@ -138,21 +143,10 @@ class MaintenanceController extends Controller
             Constants::HTTP_MESSAGE_200,
             $imMaintenance
         );
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function createHistoryBarang($id)
     {
-
-        //        DB::beginTransaction();
-        //
-        //        try {
-
 
         $barang[] = $id;
 
@@ -163,12 +157,6 @@ class MaintenanceController extends Controller
                 'id_barang_tipe' => $value
             ]);
         }
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     /**
@@ -176,7 +164,6 @@ class MaintenanceController extends Controller
      */
     public function whatsuppMessage($memos)
     {
-
 
         $test[] = $memos;
         $user = array();
@@ -257,12 +244,12 @@ class MaintenanceController extends Controller
             CURLOPT_POSTFIELDS => array(
                 'target' => $user->no_telp,
                 'message' => "
-No Memo : *$memo->im_number*
-Status : *PROSES*
-No Telp Cabang : $cabang->telepon
-Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
-Info Lebih Lanjut Silahkan Klik Link Dibawah Ini
-Link Login : http://portal.pusatgadai.id
+                    No Memo : *$memo->im_number*
+                    Status : *PROSES*
+                    No Telp Cabang : $cabang->telepon
+                    Maps : https://maps.google.com/?q=$cabang->latitude,$cabang->longitude
+                    Info Lebih Lanjut Silahkan Klik Link Dibawah Ini
+                    Link Login : http://portal.pusatgadai.id
                 ",
             ),
             CURLOPT_HTTPHEADER => array(
@@ -279,9 +266,6 @@ Link Login : http://portal.pusatgadai.id
     public function accMemoByPic($id)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
 
 
         $internalMemo[] = $id;
@@ -312,12 +296,6 @@ Link Login : http://portal.pusatgadai.id
             Constants::HTTP_MESSAGE_200,
             $create
         );
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function cabangByMemoId(Request $request)
@@ -407,63 +385,52 @@ Link Login : http://portal.pusatgadai.id
     public function attendanceMaintenance(Request $request, $id)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
+        DB::beginTransaction();
 
-        $memo = InternalMemoMaintenance::where('link', $id)->first();
-        $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
+        try {
 
-        if ($memo->kode == $request->kode) {
-            $memo->update([
-                'flag' => 1
-            ]);
 
-            $im = InternalMemo::where('id', $memo->id_internal_memo)->update([
-                'flag' => 12
-            ]);
+            $memo = InternalMemoMaintenance::where('link', $id)->first();
+            $uM = UserMaintenance::where('id', $memo->id_user_maintenance)->first();
 
-            $hM = HistoryMemo::create([
-                'id_internal_memo' => $memo->id_internal_memo,
-                'user_id' => $uM->user_id,
-                'status' => 12,
-                'keterangan' => 'Maintenance Sudah Hadir',
-                "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
-                "waktu" => Carbon::now()->format('h')
-            ]);
-        }
+            if ($memo->kode == $request->kode) {
+                $memo->update([
+                    'flag' => 1
+                ]);
 
-        if ($memo) {
-            // return $this->successResponse($memo, Constants::HTTP_MESSAGE_200, 200);
+                $im = InternalMemo::where('id', $memo->id_internal_memo)->update([
+                    'flag' => 12
+                ]);
 
+                $hM = HistoryMemo::create([
+                    'id_internal_memo' => $memo->id_internal_memo,
+                    'user_id' => $uM->user_id,
+                    'status' => 12,
+                    'keterangan' => 'Maintenance Sudah Hadir',
+                    "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
+                    "waktu" => Carbon::now()->format('h')
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
             return self::buildResponse(
-                Constants::HTTP_CODE_200,
-                Constants::HTTP_MESSAGE_200,
-                $memo
-            );
-        } else {
-            // return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
-
-            return self::buildResponse(
-                Constants::HTTP_CODE_403,
-                Constants::ERROR_MESSAGE_403,
+                Constants::HTTP_CODE_500,
+                Constants::ERROR_MESSAGE_500,
                 null
             );
         }
 
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $memo
+        );
     }
 
     public function updateMemoRescheduleV1(Request $request)
     {
-
-        //        DB::beginTransaction();
-        //
-        //        try {
 
         $user = $request->id_user_maintenance;
         $memo = $request->id_memo;
@@ -490,22 +457,13 @@ Link Login : http://portal.pusatgadai.id
             Constants::HTTP_MESSAGE_200,
             $imMaintenance
         );
-
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function updateMemoRescheduleV2(Request $request)
     {
 
 
-        //        DB::beginTransaction();
-        //
-        //        try {
+
 
         $user[] = $request->id_user_maintenance;
         $iMemo[] = $request->id_memo;
@@ -533,125 +491,128 @@ Link Login : http://portal.pusatgadai.id
             Constants::HTTP_MESSAGE_200,
             $arr
         );
-
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function updateMemoRescheduleV3(Request $request)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
+        DB::beginTransaction();
 
-        $user[] = $request->id_user_maintenance;
-        $iMemo[] = $request->id_memo;
-        $barang[] = $request->id_barang;
-        $quantity = $request->quantity;
-        $cabang = $request->cabang;
+        try {
 
-        $arr = [];
+            $user[] = $request->id_user_maintenance;
+            $iMemo[] = $request->id_memo;
+            $barang[] = $request->id_barang;
+            $quantity = $request->quantity;
+            $cabang = $request->cabang;
 
-        foreach ($iMemo[0] as $key => $memos) {
-            $internalMemo = InternalMemo::where('id', $memos)->get()->pluck('id_cabang');
-            $cab = Cabang::where('id', $internalMemo)->get()->pluck('kode');
-            $imMaintenance = InternalMemoMaintenance::where('id_internal_memo', $memos);
-            $iBarang = InternalMemoBarang::where('id_internal_memo', $memos);
+            $arr = [];
 
-            if (!empty($imMaintenance)) {
-                foreach ($user[0] as $keys => $users) {
+            foreach ($iMemo[0] as $key => $memos) {
+                $internalMemo = InternalMemo::where('id', $memos)->get()->pluck('id_cabang');
+                $cab = Cabang::where('id', $internalMemo)->get()->pluck('kode');
+                $imMaintenance = InternalMemoMaintenance::where('id_internal_memo', $memos);
+                $iBarang = InternalMemoBarang::where('id_internal_memo', $memos);
 
-                    $imMaintenance->update([
-                        'id_user_maintenance' => $users,
-                        'date' => Carbon::now(),
-                        'created_by' => auth()->user()->id
-                    ]);
-                    $arr[] = $imMaintenance->first();
+                if (!empty($imMaintenance)) {
+                    foreach ($user[0] as $keys => $users) {
+
+                        $imMaintenance->update([
+                            'id_user_maintenance' => $users,
+                            'date' => Carbon::now(),
+                            'created_by' => auth()->user()->id
+                        ]);
+                        $arr[] = $imMaintenance->first();
+                    }
                 }
-            }
 
-            if (!empty($iBarang)) {
-                foreach ($barang[0] as $i => $barangs) {
+                if (!empty($iBarang)) {
+                    foreach ($barang[0] as $i => $barangs) {
 
-                    $iBarang->update([
-                        'id_barang' => $barangs,
-                        'created_by' => auth()->user()->id
-                    ]);
-                    $arr[] = $iBarang->first();
+                        $iBarang->update([
+                            'id_barang' => $barangs,
+                            'created_by' => auth()->user()->id
+                        ]);
+                        $arr[] = $iBarang->first();
 
-                    if ($cabang == !null) {
-                        if ($quantity == !null) {
-                            InternalMemoBarang::where('id_barang', $barang)->update([
-                                'quantity' => $quantity[$i],
-                                'cabang_id' => $cabang[$i]
-                            ]);
+                        if ($cabang == !null) {
+                            if ($quantity == !null) {
+                                InternalMemoBarang::where('id_barang', $barang)->update([
+                                    'quantity' => $quantity[$i],
+                                    'cabang_id' => $cabang[$i]
+                                ]);
 
-                            $cabs = Cabang::where('id', $cabang[$i])->get()->pluck('kode');
+                                $cabs = Cabang::where('id', $cabang[$i])->get()->pluck('kode');
 
-                            foreach ($cabs as $ca) {
-                                $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+                                foreach ($cabs as $ca) {
+                                    $stockBarang = StokBarang::where('id_tipe', $barang)->where('pic', $ca)->first();
+
+                                    Pemakaian::create([
+                                        'tanggal' => Carbon::now()->format('Y-m-d'),
+                                        'pic' => $stockBarang->pic,
+                                        'nomer_barang' => $stockBarang->nomer_barang,
+                                        'id_tipe' => $stockBarang->id_tipe,
+                                        'jumlah' => $quantity[$i],
+                                        'satuan' => $stockBarang->satuan,
+                                        'harga' => $stockBarang->total_asset,
+                                        'total_harga' => $stockBarang->total_asset,
+                                        'imei' => $stockBarang->imei,
+                                        'detail_barang' => $stockBarang->detail_barang,
+                                        'keperluan' => 'Kebutuhan Cabang',
+                                        'pemakai' => 'Cabang',
+                                        'user_input' => $stockBarang->user_input,
+                                        'last_update' => $stockBarang->last_update
+                                    ]);
+                                }
+                            } else {
+                                return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
+                            }
+                        } else {
+                            if ($quantity == !null) {
+                                $c = Cabang::where('id', $internalMemo)->first();
+
+                                InternalMemoBarang::where('id_barang', $barang)->update([
+                                    'quantity' => $quantity[$i]
+                                ]);
+
+                                InternalMemoBarang::where('id_internal_memo', $memos)->update([
+                                    'cabang_id' => $c->id
+                                ]);
+
+                                $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
 
                                 Pemakaian::create([
                                     'tanggal' => Carbon::now()->format('Y-m-d'),
-                                    'pic' => $stockBarang->pic,
-                                    'nomer_barang' => $stockBarang->nomer_barang,
-                                    'id_tipe' => $stockBarang->id_tipe,
+                                    'pic' => $stockBarangs->pic,
+                                    'nomer_barang' => $stockBarangs->nomer_barang,
+                                    'id_tipe' => $stockBarangs->id_tipe,
                                     'jumlah' => $quantity[$i],
-                                    'satuan' => $stockBarang->satuan,
-                                    'harga' => $stockBarang->total_asset,
-                                    'total_harga' => $stockBarang->total_asset,
-                                    'imei' => $stockBarang->imei,
-                                    'detail_barang' => $stockBarang->detail_barang,
+                                    'satuan' => $stockBarangs->satuan,
+                                    'harga' => $stockBarangs->total_asset,
+                                    'total_harga' => $stockBarangs->total_asset,
+                                    'imei' => $stockBarangs->imei,
+                                    'detail_barang' => $stockBarangs->detail_barang,
                                     'keperluan' => 'Kebutuhan Cabang',
                                     'pemakai' => 'Cabang',
-                                    'user_input' => $stockBarang->user_input,
-                                    'last_update' => $stockBarang->last_update
+                                    'user_input' => $stockBarangs->user_input,
+                                    'last_update' => $stockBarangs->last_update
                                 ]);
+                            } else {
+                                return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
                             }
-                        } else {
-                            return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
-                        }
-                    } else {
-                        if ($quantity == !null) {
-                            $c = Cabang::where('id', $internalMemo)->first();
-
-                            InternalMemoBarang::where('id_barang', $barang)->update([
-                                'quantity' => $quantity[$i]
-                            ]);
-
-                            InternalMemoBarang::where('id_internal_memo', $memos)->update([
-                                'cabang_id' => $c->id
-                            ]);
-
-                            $stockBarangs = StokBarang::where('id_tipe', $barang)->where('pic', $cab)->first();
-
-                            Pemakaian::create([
-                                'tanggal' => Carbon::now()->format('Y-m-d'),
-                                'pic' => $stockBarangs->pic,
-                                'nomer_barang' => $stockBarangs->nomer_barang,
-                                'id_tipe' => $stockBarangs->id_tipe,
-                                'jumlah' => $quantity[$i],
-                                'satuan' => $stockBarangs->satuan,
-                                'harga' => $stockBarangs->total_asset,
-                                'total_harga' => $stockBarangs->total_asset,
-                                'imei' => $stockBarangs->imei,
-                                'detail_barang' => $stockBarangs->detail_barang,
-                                'keperluan' => 'Kebutuhan Cabang',
-                                'pemakai' => 'Cabang',
-                                'user_input' => $stockBarangs->user_input,
-                                'last_update' => $stockBarangs->last_update
-                            ]);
-                        } else {
-                            return $this->errorResponse(Constants::ERROR_MESSAGE_9002, 403);
                         }
                     }
                 }
             }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return self::buildResponse(
+                Constants::HTTP_CODE_500,
+                Constants::ERROR_MESSAGE_500,
+                $e->getMessage()
+            );
         }
 
         return self::buildResponse(
@@ -659,13 +620,6 @@ Link Login : http://portal.pusatgadai.id
             Constants::HTTP_MESSAGE_200,
             $arr
         );
-
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function updateMemoMaintenance(Request $request)
@@ -718,13 +672,13 @@ Link Login : http://portal.pusatgadai.id
                 }
             }
 
+            DB::commit();
+
             return self::buildResponse(
                 Constants::HTTP_CODE_200,
                 Constants::HTTP_MESSAGE_200,
                 $barang
             );
-
-            DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             return $e->getMessage();
@@ -736,111 +690,117 @@ Link Login : http://portal.pusatgadai.id
      */
     public function createUserMaitenance(Request $request)
     {
-        // DB::beginTransaction();
+        DB::beginTransaction();
 
-        // try {
+        try {
 
-        $userMaintenance = $request->id_user_maintenance;
-        $idMemo = $request->id_memo;
+            $userMaintenance = $request->id_user_maintenance;
+            $idMemo = $request->id_memo;
 
-        foreach ($idMemo as $key => $memo) {
-            foreach ($userMaintenance as $key => $um) {
-                $exist = InternalMemoMaintenance::where("id_user_maintenance", $um)->orderBy('id', 'DESC')->first();
+            foreach ($idMemo as $key => $memo) {
+                foreach ($userMaintenance as $key => $um) {
+                    $exist = InternalMemoMaintenance::where("id_user_maintenance", $um)->orderBy('id', 'DESC')->first();
 
-                if (empty($exist)) {
-                    InternalMemoMaintenance::create([
-                        'id_internal_memo' => $memo,
-                        'id_user_maintenance' => $um,
-                        'date' => $request->date,
-                        'link' => $this->generateRandomString(4),
-                        'kode' => $this->generateRandomString(4),
-                        'flag' => 0,
-                        'created_by' => auth()->user()->id
-                    ]);
-                } else {
-                    try {
-                        $exist->update([
+                    if (empty($exist)) {
+                        InternalMemoMaintenance::create([
+                            'id_internal_memo' => $memo,
+                            'id_user_maintenance' => $um,
                             'date' => $request->date,
+                            'link' => $this->generateRandomString(4),
+                            'kode' => $this->generateRandomString(4),
+                            'flag' => 0,
                             'created_by' => auth()->user()->id
                         ]);
-                    } catch (\Throwable $e) {
-                        return $e;
+                    } else {
+                        try {
+                            $exist->update([
+                                'date' => $request->date,
+                                'created_by' => auth()->user()->id
+                            ]);
+                        } catch (\Throwable $e) {
+                            return $e;
+                        }
                     }
+                }
+
+                try {
+                    $this->whatsuppMessage($memo);
+                } catch (\Throwable $e) {
+                    return self::buildResponse(
+                        Constants::HTTP_CODE_500,
+                        Constants::ERROR_MESSAGE_500,
+                        $e->getMessage()
+                    );
                 }
             }
 
-            try {
-                $this->whatsuppMessage($memo);
-            } catch (\Throwable $e) {
-                return $e;
-            }
+
+
+            // old code
+
+            // foreach ($memo as $key => $value) {
+            //     foreach ($user as $keys => $values) {
+
+            //         $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
+
+            //         if ($update == null) {
+            //             $imMainteance = InternalMemoMaintenance::create([
+            //                 'id_internal_memo' => $value,
+            //                 'id_user_maintenance' => $values,
+            //                 'date' => $request->date,
+            //                 'link' => $this->generateRandomString(4),
+            //                 'kode' => $this->generateRandomString(4),
+            //                 'flag' => 0,
+            //                 'created_by' => auth()->user()->id
+            //             ]);
+            //         } else if ($update->id_user_maintenance !== $values) {
+            //             $array[$keys] = $values;
+            //         } else if (!empty($update)) {
+
+            //             $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
+
+            //             $updates->update([
+            //                 'date' => $request->date,
+            //                 'created_by' => auth()->user()->id
+            //             ]);
+
+            //             $imMainteance[] = $updates->first();
+            //         }
+            //     }
+
+            //     // $imMainteance = InternalMemoMaintenance::create([
+            //     //     'id_internal_memo' => $value,
+            //     //     'id_user_maintenance' => $array,
+            //     //     'date' => $request->date,
+            //     //     'link' => $this->generateRandomString(6),
+            //     //     'kode' => $this->generateRandomString(6),
+            //     //     'flag' => 0,
+            //     //     'created_by' => auth()->user()->id
+            //     // ]);
+
+            //     // $this->whatsuppMessage($value);
+            // }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return self::buildResponse(
+                Constants::HTTP_CODE_500,
+                Constants::ERROR_MESSAGE_500,
+                $e->getMessage()
+            );
         }
-
-
-        // old code
-
-        // foreach ($memo as $key => $value) {
-        //     foreach ($user as $keys => $values) {
-
-        //         $update = InternalMemoMaintenance::where('id_internal_memo', $value)->first();
-
-        //         if ($update == null) {
-        //             $imMainteance = InternalMemoMaintenance::create([
-        //                 'id_internal_memo' => $value,
-        //                 'id_user_maintenance' => $values,
-        //                 'date' => $request->date,
-        //                 'link' => $this->generateRandomString(4),
-        //                 'kode' => $this->generateRandomString(4),
-        //                 'flag' => 0,
-        //                 'created_by' => auth()->user()->id
-        //             ]);
-        //         } else if ($update->id_user_maintenance !== $values) {
-        //             $array[$keys] = $values;
-        //         } else if (!empty($update)) {
-
-        //             $updates = InternalMemoMaintenance::where('id_internal_memo', $value);
-
-        //             $updates->update([
-        //                 'date' => $request->date,
-        //                 'created_by' => auth()->user()->id
-        //             ]);
-
-        //             $imMainteance[] = $updates->first();
-        //         }
-        //     }
-
-        //     // $imMainteance = InternalMemoMaintenance::create([
-        //     //     'id_internal_memo' => $value,
-        //     //     'id_user_maintenance' => $array,
-        //     //     'date' => $request->date,
-        //     //     'link' => $this->generateRandomString(6),
-        //     //     'kode' => $this->generateRandomString(6),
-        //     //     'flag' => 0,
-        //     //     'created_by' => auth()->user()->id
-        //     // ]);
-
-        //     // $this->whatsuppMessage($value);
-        // }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
-            Constants::HTTP_MESSAGE_200
-            // $imMainteance
+            Constants::HTTP_MESSAGE_200,
+            'success'
         );
-
-        //     DB::commit();
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     return $e->getMessage();
-        // }
     }
 
     public function deleteUserMaintenance(Request $request)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
 
         $memo = $request->id_memo;
         $user = $request->id_user_maintenance;
@@ -854,7 +814,11 @@ Link Login : http://portal.pusatgadai.id
                 }
             }
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::ERROR_MESSAGE_403,
+                'error'
+            );
         }
 
         return self::buildResponse(
@@ -862,70 +826,75 @@ Link Login : http://portal.pusatgadai.id
             Constants::HTTP_MESSAGE_200,
             $user
         );
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function createBarangMaintenance(Request $request)
     {
 
-        //        DB::beginTransaction();
-        //
-        //        try {
+        DB::beginTransaction();
 
-        $memo = $request->id_memo;
-        $barang = $request->id_barang;
-        $quantity = $request->quantity;
-        $kode = $request->cabang_kode;
+        try {
 
-        foreach ($memo as $key => $value) {
-            foreach ($barang as $keys => $values) {
-                $cabang = Cabang::where('kode', $kode[$keys])->first();
-                $iBarang = InternalMemoBarang::where('id_barang', $values)->where('id_internal_memo', $value)->first();
+            $memo = $request->id_memo;
+            $barang = $request->id_barang;
+            $quantity = $request->quantity;
+            $kode = $request->cabang_kode;
 
-                if (empty($iBarang)) {
-                    InternalMemoBarang::create([
-                        'id_internal_memo' => $value,
-                        'id_barang' => $values,
-                        'quantity' => $quantity[$keys],
-                        'cabang_id' => $cabang->id,
-                        'created_by' => auth()->user()->id
+            foreach ($memo as $key => $value) {
+                foreach ($barang as $keys => $values) {
+                    $cabang = Cabang::where('kode', $kode[$keys])->first();
+                    $iBarang = InternalMemoBarang::where('id_barang', $values)->where('id_internal_memo', $value)->first();
+
+                    if (empty($iBarang)) {
+                        InternalMemoBarang::create([
+                            'id_internal_memo' => $value,
+                            'id_barang' => $values,
+                            'quantity' => $quantity[$keys],
+                            'cabang_id' => $cabang->id,
+                            'created_by' => auth()->user()->id
+                        ]);
+                    } else {
+                        $vBarang = ($iBarang->quantity) + $quantity[$keys];
+                        $iBarang->update([
+                            'id_internal_memo' => $value,
+                            'id_barang' => $values,
+                            'quantity' => $vBarang,
+                            'cabang_id' => $cabang->id,
+                            'created_by' => auth()->user()->id
+                        ]);
+                        $arr[] = $iBarang->first();
+                    }
+
+                    $stockBarangs = StokBarang::where('id_tipe', $values)->where('pic', $kode[$keys])->first();
+
+                    $pemakaian = Pemakaian::create([
+                        'tanggal' => Carbon::now()->format('Y-m-d'),
+                        'pic' => $kode[$keys],
+                        'nomer_barang' => $stockBarangs->nomer_barang,
+                        'id_tipe' => $stockBarangs->id_tipe,
+                        'jumlah' => $quantity[$keys],
+                        'satuan' => $stockBarangs->satuan,
+                        'harga' => $stockBarangs->total_asset,
+                        'total_harga' => $stockBarangs->total_asset,
+                        'imei' => $stockBarangs->imei,
+                        'detail_barang' => $stockBarangs->detail_barang,
+                        'keperluan' => 'Kebutuhan Cabang',
+                        'pemakai' => 'Cabang',
+                        'user_input' => $stockBarangs->user_input,
+                        'last_update' => $stockBarangs->last_update
                     ]);
-                } else {
-                    $vBarang = ($iBarang->quantity) + $quantity[$keys];
-                    $iBarang->update([
-                        'id_internal_memo' => $value,
-                        'id_barang' => $values,
-                        'quantity' => $vBarang,
-                        'cabang_id' => $cabang->id,
-                        'created_by' => auth()->user()->id
-                    ]);
-                    $arr[] = $iBarang->first();
                 }
-
-                $stockBarangs = StokBarang::where('id_tipe', $values)->where('pic', $kode[$keys])->first();
-
-                $pemakaian = Pemakaian::create([
-                    'tanggal' => Carbon::now()->format('Y-m-d'),
-                    'pic' => $kode[$keys],
-                    'nomer_barang' => $stockBarangs->nomer_barang,
-                    'id_tipe' => $stockBarangs->id_tipe,
-                    'jumlah' => $quantity[$keys],
-                    'satuan' => $stockBarangs->satuan,
-                    'harga' => $stockBarangs->total_asset,
-                    'total_harga' => $stockBarangs->total_asset,
-                    'imei' => $stockBarangs->imei,
-                    'detail_barang' => $stockBarangs->detail_barang,
-                    'keperluan' => 'Kebutuhan Cabang',
-                    'pemakai' => 'Cabang',
-                    'user_input' => $stockBarangs->user_input,
-                    'last_update' => $stockBarangs->last_update
-                ]);
             }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return self::buildResponse(
+                Constants::HTTP_CODE_500,
+                Constants::ERROR_MESSAGE_500,
+                $e->getMessage()
+            );
         }
 
         return self::buildResponse(
@@ -933,23 +902,10 @@ Link Login : http://portal.pusatgadai.id
             Constants::HTTP_MESSAGE_200,
             $pemakaian
         );
-
-
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function deleteBarangMaintenance(Request $request)
     {
-
-        //        DB::beginTransaction();
-        //
-        //        try {
-
 
         $memo = $request->id_memo;
         $barang = $request->id_barang;
@@ -964,7 +920,11 @@ Link Login : http://portal.pusatgadai.id
                 }
             }
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::ERROR_MESSAGE_403,
+                'error'
+            );
         }
 
         if (!empty($barang) && !empty($cabang)) {
@@ -981,7 +941,11 @@ Link Login : http://portal.pusatgadai.id
                 }
             }
         } else {
-            return $this->errorResponse(Constants::ERROR_MESSAGE_403, 403);
+            return self::buildResponse(
+                Constants::HTTP_CODE_403,
+                Constants::ERROR_MESSAGE_403,
+                'error'
+            );
         }
 
         return self::buildResponse(
@@ -989,12 +953,6 @@ Link Login : http://portal.pusatgadai.id
             Constants::HTTP_MESSAGE_200,
             $iBarang
         );
-
-        //            DB::commit();
-        //        } catch (\Exception $e) {
-        //            DB::rollback();
-        //            return $e->getMessage();
-        //        }
     }
 
     public function getStockBarangV2(Request $request)
@@ -1200,10 +1158,14 @@ Link Login : http://portal.pusatgadai.id
 
     public function konfirmasiSelesai(Request $request)
     {
-        $uMaintenance = UserMaintenance::where('user_id', auth()->user()->id)->first();
+
+        $uMaintenance = UserMaintenance::where('user_id', 56)->first();
         $iMemoMaintenance = InternalMemoMaintenance::where('id_internal_memo', $request->id_internal_memo)->where('id_user_maintenance', $uMaintenance->id)->first();
 
         try {
+
+            DB::beginTransaction();
+
             $iMemoMaintenance->update([
                 'flag' => 3
             ]);
@@ -1222,8 +1184,14 @@ Link Login : http://portal.pusatgadai.id
                 "tanggal" => Carbon::now()->addDays(1)->format('Y-m-d'),
                 "waktu" => Carbon::now()->format('h')
             ]);
+
+            DB::commit();
         } catch (\Exception $e) {
-            return $e->getMessage();
+            return self::buildResponse(
+                Constants::HTTP_CODE_500,
+                Constants::ERROR_MESSAGE_500,
+                $e->getMessage()
+            );
         }
 
         return self::buildResponse(
