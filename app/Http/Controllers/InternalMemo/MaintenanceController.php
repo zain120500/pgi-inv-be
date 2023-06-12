@@ -13,6 +13,7 @@ use App\Model\HistoryMemo;
 use App\Model\InternalMemo;
 use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoMaintenance;
+use App\Model\InternalMemoVendor;
 use App\Model\KategoriJenisFpp;
 use App\Model\KategoriPicFpp;
 use App\Model\Pemakaian;
@@ -42,7 +43,7 @@ class MaintenanceController extends Controller
         $vendorType = $request->vendor_type;
 
         foreach ($iMemo[0] as $key => $memos) {
-            if($vendorType == null){
+            if($vendorType == 0){
                 foreach ($user[0] as $keys => $users) {
                     $imMaintenance = InternalMemoMaintenance::create([
                         'id_internal_memo' => $memos,
@@ -117,13 +118,11 @@ class MaintenanceController extends Controller
 
                 $this->whatsuppMessage($memos);
                 $this->accMemoByPic($memos);
-            }else{
-                $imMaintenance = InternalMemoMaintenance::create([
+            }else if($vendorType == 1){
+                $imMaintenance = InternalMemoVendor::create([
                     'id_internal_memo' => $memos,
                     'vendor_name' => $request->vendor_name,
                     'date' => $request->date,
-                    'link' => $this->generateRandomString(6),
-                    'kode' => $this->generateRandomString(6),
                     'flag' => 0,
                     'created_by' => auth()->user()->id
                 ]);
