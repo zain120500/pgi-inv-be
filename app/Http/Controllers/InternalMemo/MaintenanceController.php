@@ -30,10 +30,9 @@ class MaintenanceController extends Controller
 {
     public function newInternalMaintenance(Request $request)
     {
-               DB::beginTransaction();
-        
-               try {
+       DB::beginTransaction();
 
+       try {
         $user[] = $request->id_user_maintenance;
         $iMemo[] = $request->id_memo;
         $barangs[] = $request->id_barang;
@@ -128,7 +127,7 @@ class MaintenanceController extends Controller
             }
         }
 
-            DB::commit();
+        DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             return self::buildResponse(
