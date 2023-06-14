@@ -27,7 +27,7 @@ class LaporanController extends Controller
     {
         $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
         $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
-        $month = Carbon::parse($request->month)->format('m');
+        $month = $request->month;
 
         $record = StokInventaris::query();
 
@@ -42,7 +42,7 @@ class LaporanController extends Controller
         }
         if ($request->month) {
             $record = $record->with('barangTipe.barangMerk.barangJeniss', 'karyawan.jabatan')
-                ->where('tanggal', '=', '%' . $month . '%')
+                ->whereMonth('tanggal', $month)
                 ->orderBy('tanggal', 'DESC');
         }
 
@@ -59,6 +59,7 @@ class LaporanController extends Controller
     {
         $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
         $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+        $month = $request->month;
 
         $record = Pembelian::query();
 
@@ -71,6 +72,12 @@ class LaporanController extends Controller
             $record = $record->with('detail', 'supplier')
                 ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
                 ->whereBetween('tanggal', [$startDate, $endDate])
+                ->orderBy('tanggal', 'DESC');
+        }
+        if ($request->month) {
+            $record = $record->with('detail', 'supplier')
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->whereMonth('tanggal', $month)
                 ->orderBy('tanggal', 'DESC');
         }
 
@@ -87,6 +94,7 @@ class LaporanController extends Controller
     {
         $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
         $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+        $month = $request->month;
 
         $record = Pengiriman::query();
 
@@ -103,6 +111,12 @@ class LaporanController extends Controller
             $query = $record->with('detail')
                 ->orderBy('tanggal', 'DESC')
                 ->where('status', $request->status)
+                ->paginate(15);
+        }
+        if ($request->month) {
+            $query = $record->with('detail')
+                ->whereMonth('tanggal', $month)
+                ->orderBy('tanggal', 'DESC')
                 ->paginate(15);
         }
 
@@ -128,6 +142,7 @@ class LaporanController extends Controller
     public function laporanPemakaian(Request $request)
     {
         $search = $request->search;
+        $month = $request->month;
         $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
         $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
 
@@ -150,6 +165,15 @@ class LaporanController extends Controller
                 ->orderBy('tanggal', 'DESC')
                 ->paginate(15);
         }
+        if ($request->month) {
+            $record = $record->with('barangTipe.barangMerk.barangJeniss')
+                ->whereHas('barangTipe', function ($q) use ($search) {
+                    $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })
+                ->whereMonth('tanggal', $month)
+                ->orderBy('tanggal', 'DESC')
+                ->paginate(15);
+        }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -162,6 +186,7 @@ class LaporanController extends Controller
     {
         $search = $request->search;
         $id_kategori = $request->id_kategori;
+        $month = $request->month;
 
         $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
         $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
@@ -184,6 +209,16 @@ class LaporanController extends Controller
                     $q->where('id_kategori', 'like', '%' . $id_kategori . '%');
                 })
                 ->whereBetween('last_update', [$startDate, $endDate])
+                ->paginate(15);
+        }
+        if ($request->month) {
+            $record = $record->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->whereHas('barangTipe', function ($q) use ($search) {
+                    $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
+                })->whereHas('barangTipe.barangMerk.barangJeniss', function ($q) use ($id_kategori) {
+                    $q->where('id_kategori', 'like', '%' . $id_kategori . '%');
+                })
+                ->whereMonth('last_update', $month)
                 ->paginate(15);
         }
 
