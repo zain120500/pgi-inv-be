@@ -1092,14 +1092,20 @@ class InternalMemoController extends Controller
             if ($kProses == null) {
                 $dashboardIm = InternalMemo::whereIn('id_cabang', $this->cabangGlobal()->pluck('kode'))->get();
                 $val = 0;
+                $belum_disetujui = 0;
             } else if ($kProses->kategori_proses == 1) {
                 $val = $dashboardIm->whereIn('flag', [1])->count();
-            } else if ($kProses->kategori_proses == 2 || $kProses->kategori_proses == 3) {
+                $belum_disetujui = $dashboardIm->whereIn('flag', [0])->count();
+            } else if ($kProses->kategori_proses == 2) {
                 $val = $dashboardIm->whereIn('flag', [2])->count();
+                $belum_disetujui = $dashboardIm->whereIn('flag', [1])->count();
+            } else if ($kProses->kategori_proses == 3) {
+                $val = 0;
+                $belum_disetujui = $dashboardIm->whereIn('flag', [2])->count();
             }
 
             $res = ([
-                "belum_disetujui" => $dashboardIm->whereIn('flag', [0])->count(),
+                "belum_disetujui" => $belum_disetujui,
                 "total_memo" => $dashboardIm->whereIn('flag', [1, 2, 3, 10, 4])->count(),
                 "disetujui" => $val,
                 "diproses" => $dashboardIm->whereIn('flag', [3])->count(),
