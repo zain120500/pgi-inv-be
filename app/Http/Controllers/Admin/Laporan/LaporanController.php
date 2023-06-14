@@ -85,16 +85,22 @@ class LaporanController extends Controller
         $record = Pengiriman::query();
 
         if(empty($request->startDate) && empty($request->endDate)){
-            $record = $record->with('detail')->orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $record->with('detail')->orderBy('tanggal', 'DESC')->paginate(15);
         }
         if ($request->startDate && $request->endDate) {
-            $record = $record->with('detail')
+            $query = $record->with('detail')
                 ->orderBy('tanggal', 'DESC')
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->paginate(15);
         }
+        if ($request->status) {
+            $query = $record->with('detail')
+                ->orderBy('tanggal', 'DESC')
+                ->where('status', $request->status)
+                ->paginate(15);
+        }
 
-        $record->getCollection()->map(function ($q) {
+        $query->getCollection()->map(function ($q) {
             $details = PengirimanDetail::where('id_pengiriman', $q->id);
 
             $q['total_unit'] = $details->sum('jumlah');
@@ -109,7 +115,7 @@ class LaporanController extends Controller
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $record
+            $query
         );
     }
 

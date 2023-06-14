@@ -124,6 +124,9 @@ class MaintenanceController extends Controller
                     'flag' => 0,
                     'created_by' => auth()->user()->id
                 ]);
+
+                $this->whatsuppMessage($memos);
+                $this->accMemoByPic($memos);
             }
         }
 

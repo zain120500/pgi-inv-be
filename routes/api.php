@@ -438,6 +438,7 @@ Route::group([
             Route::get('/all', 'InternalMemoController@all');
             Route::get('/{id}', 'InternalMemoController@show');
             Route::post('/', 'InternalMemoController@store');
+            Route::post('/store-2/test', 'InternalMemoController@store2');
             Route::post('/{id}', 'InternalMemoController@update');
             Route::delete('/delete/{id}', 'InternalMemoController@destroy');
 

@@ -1230,6 +1230,75 @@ class InternalMemoController extends Controller
         );
     }
 
+    public function store2(Request $request)
+    {
+
+        $files = $request['files'];
+        $videos = $request['videos'];
+
+        $number = InternalMemo::count('id');
+
+        DB::beginTransaction();
+
+        try {
+
+            $internalMemo = InternalMemo::create([
+                "im_number" => "IM" . Carbon::now()->format('Ymd') . str_pad($number + 1, 3, 0, STR_PAD_LEFT),
+                // "id_kategori_fpp"=> $request->id_kategori_fpp,
+                "id_kategori_jenis_fpp" => $request->id_kategori_jenis_fpp,
+                "id_kategori_sub_fpp" => $request->id_kategori_sub_fpp,
+                "id_devisi" => $request->id_devisi,
+                "id_cabang" => $request->id_cabang,
+                "qty" => $request->qty,
+                "flag" => 0,
+                "catatan" => $request->catatan,
+                "created_by" => auth()->user()->id
+            ]);
+
+            HistoryMemo::create([
+                "id_internal_memo" => $internalMemo->id,
+                "user_id" => auth()->user()->id,
+                "status" => 0,
+                "keterangan" => "Internal memo baru dibuat oleh" . ' ' . auth()->user()->name
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollback();
+        }
+
+        if (!empty($files)) {
+            foreach ($files as $key => $file) {
+                $imageName = Str::random(10). '.' .time().'.'.$request->file->extension();
+                Storage::disk('sftp')->put($imageName, $file);
+
+                InternalMemoFile::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "path" => $imageName,
+                    "flag" => "foto"
+                ]);
+            }
+        }
+        if (!empty($videos)) {
+            foreach ($videos as $key => $video) {
+                $videoName = Str::random(10). '.' .time().'.'.$request->$video->extension();
+                Storage::disk('sftp')->put($videoName, $video);
+
+                InternalMemoFile::create([
+                    "id_internal_memo" => $internalMemo->id,
+                    "path" => $videoName,
+                    "flag" => "video"
+                ]);
+            }
+        }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $internalMemo
+        );
+    }
+
     //1. disetujui, 2.diproses, 3. diselesaikan, 4.dikonfirmasi, 5.selesai, 6.request batal, 7.batal, 10.dihapus
     public function getFlagStatus($id)
     {
