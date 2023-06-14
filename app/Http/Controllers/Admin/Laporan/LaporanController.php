@@ -27,6 +27,7 @@ class LaporanController extends Controller
     {
         $startDate = Carbon::parse($request->startDate)->format('Y/m/d');
         $endDate = Carbon::parse($request->endDate)->format('Y/m/d');
+        $month = Carbon::parse($request->month)->format('m');
 
         $record = StokInventaris::query();
 
@@ -37,6 +38,11 @@ class LaporanController extends Controller
         if ($request->startDate && $request->endDate) {
             $record = $record->with('barangTipe.barangMerk.barangJeniss', 'karyawan.jabatan')
                 ->whereBetween('tanggal', [$startDate, $endDate])
+                ->orderBy('tanggal', 'DESC');
+        }
+        if ($request->month) {
+            $record = $record->with('barangTipe.barangMerk.barangJeniss', 'karyawan.jabatan')
+                ->where('tanggal', '=', '%' . $month . '%')
                 ->orderBy('tanggal', 'DESC');
         }
 

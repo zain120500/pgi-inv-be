@@ -1161,8 +1161,7 @@ class MaintenanceController extends Controller
 
     public function konfirmasiSelesai(Request $request)
     {
-
-        $uMaintenance = UserMaintenance::where('user_id', 56)->first();
+        $uMaintenance = UserMaintenance::where('user_id', auth()->user()->id)->first();
         $iMemoMaintenance = InternalMemoMaintenance::where('id_internal_memo', $request->id_internal_memo)->where('id_user_maintenance', $uMaintenance->id)->first();
 
         try {

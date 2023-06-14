@@ -75,7 +75,7 @@ class BarangMasukController extends Controller
     {
         $query = Pengiriman::whereIn('penerima', $this->cabangGlobal()->pluck('kode'))->where('status', 2)->orderBy('id', 'DESC')->paginate(15);
 
-        $collect = $query->getCollection()->map(function ($q) {
+        $query->getCollection()->map(function ($q) {
             $details = PengirimanDetail::where('id_pengiriman', $q->id);
 
             $q['total_unit'] = $details->sum('jumlah');
@@ -90,7 +90,7 @@ class BarangMasukController extends Controller
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $collect
+            $query
         );
     }
 }
