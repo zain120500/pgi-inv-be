@@ -9,6 +9,7 @@ use App\Model\BarangMerk;
 use App\Model\BarangTipe;
 use App\Model\Pemakaian;
 use App\Model\Pembelian;
+use App\Model\PembelianDetail;
 use App\Model\Pengiriman;
 use App\Model\PengirimanDetail;
 use App\Model\PengirimanKategori;
@@ -66,27 +67,36 @@ class LaporanController extends Controller
         if(empty($request->startDate) && empty($request->endDate)){
             $record = $record->with('detail', 'supplier')
                 ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
-                ->orderBy('tanggal', 'DESC');
+                ->orderBy('tanggal', 'DESC')
+                ->paginate(15);
         }
         if ($request->startDate && $request->endDate) {
             $record = $record->with('detail', 'supplier')
                 ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
                 ->whereBetween('tanggal', [$startDate, $endDate])
-                ->orderBy('tanggal', 'DESC');
+                ->orderBy('tanggal', 'DESC')
+                ->paginate(15);
         }
         if ($request->month) {
             $record = $record->with('detail', 'supplier')
                 ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
                 ->whereMonth('tanggal', $month)
-                ->orderBy('tanggal', 'DESC');
+                ->orderBy('tanggal', 'DESC')
+                ->paginate(15);
         }
 
-        $result = $record->paginate(15);
+        $record->getCollection()->map(function ($q) {
+            $details = PembelianDetail::where('id_pembelian', $q->id);
+
+            $q['total_unit'] = $details->sum('jumlah');
+            $q['total_pembelian'] = $details->sum('total_harga');
+            return $q;
+        });
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $result
+            $record
         );
     }
 
