@@ -21,23 +21,34 @@ class PembelianController extends Controller
     {
         if (!empty($request->from) and !empty($request->to)) {
             $query = Pembelian::orderBy('tanggal', 'DESC')
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
                 ->whereBetween('tanggal', [$request->from, $request->to]);
         } else {
             $query = Pembelian::orderBy('tanggal', 'DESC');
         }
 
         if (!empty($request->no_invoice)) {
-            $query = $query->where('no_invoice', 'like', '%' . $request->no_invoice . '%')->paginate(15);
+            $query = $query->where('no_invoice', 'like', '%' . $request->no_invoice . '%')
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->paginate(15);
         } else if (!empty($request->user_input)) {
-            $query = $query->where('user_input', 'like', '%' . $request->user_input . '%')->paginate(15);
+            $query = $query->where('user_input', 'like', '%' . $request->user_input . '%')
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->paginate(15);
         } else if (!empty($request->flag)) {
-            $query = $query->where('flag', $request->flag)->paginate(15);
+            $query = $query->where('flag', $request->flag)
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->paginate(15);
         } else if (!empty($request->from) and !empty($request->to)) {
-            $query = $query->whereBetween('tanggal', [$request->from, $request->to])->paginate(15);
+            $query = $query->whereBetween('tanggal', [$request->from, $request->to])
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->paginate(15);
         } else if (!empty($request->id_supplier)) {
-            $query = $query->where('id_supplier', $request->id_supplier)->paginate(15);
+            $query = $query->where('id_supplier', $request->id_supplier)
+                ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
+                ->paginate(15);
         } else {
-            $query = $query->paginate(15);
+            $query = $query->where('pic', $this->cabangGlobal()->pluck('kode'))->paginate(15);
         }
 
         $collect = $query->getCollection()->map(function ($q) {

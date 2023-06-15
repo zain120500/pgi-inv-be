@@ -109,22 +109,28 @@ class LaporanController extends Controller
         $record = Pengiriman::query();
 
         if(empty($request->startDate) && empty($request->endDate)){
-            $query = $record->with('detail')->orderBy('tanggal', 'DESC')->paginate(15);
+            $query = $record->with('detail')
+                ->whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))
+                ->orderBy('tanggal', 'DESC')
+                ->paginate(15);
         }
         if ($request->startDate && $request->endDate) {
             $query = $record->with('detail')
+                ->whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))
                 ->orderBy('tanggal', 'DESC')
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->paginate(15);
         }
         if ($request->status) {
             $query = $record->with('detail')
+                ->whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))
                 ->orderBy('tanggal', 'DESC')
                 ->where('status', $request->status)
                 ->paginate(15);
         }
         if ($request->month) {
             $query = $record->with('detail')
+                ->whereIn('pengirim', $this->cabangGlobal()->pluck('kode'))
                 ->whereMonth('tanggal', $month)
                 ->orderBy('tanggal', 'DESC')
                 ->paginate(15);
