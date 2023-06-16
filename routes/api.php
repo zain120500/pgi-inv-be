@@ -427,21 +427,6 @@ Route::group([
             Route::post('/whatsuppMessage', 'MaintenanceController@whatsuppMessage');
             Route::get('/im-cabang-id', 'InternalMemoController@imByCabangId');
 
-            /**
-             * Internal Memo
-             */
-            Route::get('/dashboard-kc', [InternalMemoController::class, 'dashboardKcImStatus']);
-            Route::get('/dashboard-mt', [InternalMemoController::class, 'dashboardMtImStatus']);
-            Route::get('/', [InternalMemoController::class, 'index']);
-            Route::get('/create', [InternalMemoController::class, 'create']);
-            Route::post('/updateFile/{id}', [InternalMemoController::class, 'updateFile']);
-            Route::post('/addNewFile/{id}', [InternalMemoController::class, 'addNewFile']);
-            Route::get('/{id}', [InternalMemoController::class, 'show']);
-            Route::post('/', [InternalMemoController::class, 'store']);
-            Route::post('/store-2/test', [InternalMemoController::class, 'store2']);
-            Route::post('/{id}', [InternalMemoController::class, 'update']);
-            Route::delete('/delete/{id}', [InternalMemoController::class, 'destroy']);
-
         });
 
         Route::group([
