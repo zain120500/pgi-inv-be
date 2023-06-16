@@ -194,85 +194,103 @@ class InternalMemoController extends Controller
     {
         $query = InternalMemo::where('id', $id)->with('memoMaintenance.userMaintenance')->withCount('memoMaintenanceCount', 'totalUserMaintenance')->first();
 
-        $now = date('Y-m-d H:i:s', strtotime('now'));
+        if($query->vendor_type == 0 || $query->vendor_type == null){
+            $now = date('Y-m-d H:i:s', strtotime('now'));
 
-        $query->MemoFile->makeHidden(['created_at', 'updated_at']);
-        $query->createdBy->makeHidden(['created_at', 'updated_at', 'email_verified_at']);
-        $query->cabang;
-        $query->devisi->makeHidden(['created_at', 'updated_at']);
-        // $query->kategori->makeHidden(['created_at','updated_at']);
-        $query->kategoriJenis->makeHidden(['created_at', 'updated_at']);
-        $query->kategoriSub;
-        $query->memoRating;
-        $listHistoryMemo = $query->listHistoryMemo;
-        $time_before = new DateTime($now);
-        $barang_memo = InternalMemoBarang::where('id_internal_memo', $query->id)->get();
+            $query->MemoFile->makeHidden(['created_at', 'updated_at']);
+            $query->createdBy->makeHidden(['created_at', 'updated_at', 'email_verified_at']);
+            $query->cabang;
+            $query->devisi->makeHidden(['created_at', 'updated_at']);
+            // $query->kategori->makeHidden(['created_at','updated_at']);
+            $query->kategoriJenis->makeHidden(['created_at', 'updated_at']);
+            $query->kategoriSub;
+            $query->memoRating;
+            $listHistoryMemo = $query->listHistoryMemo;
+            $time_before = new DateTime($now);
+            $barang_memo = InternalMemoBarang::where('id_internal_memo', $query->id)->get();
 
-        if ($barang_memo->isEmpty()) {
-            $query['barang'] = "";
-        } else {
-            foreach ($barang_memo as $b) {
-                $cabang = Cabang::where('id', $b->cabang_id)->first();
-                $value[] = DB::table('internal_memo_barang')
-                    ->join("stok_barang", "stok_barang.id_tipe", "=", "internal_memo_barang.id_barang")
-                    ->where('stok_barang.id_tipe', $b->id_barang)
-                    ->where('stok_barang.pic', $cabang->kode)
-                    ->join("barang_tipe", "barang_tipe.id", "=", "stok_barang.id_tipe")
-                    ->select('internal_memo_barang.*', 'stok_barang.*', 'barang_tipe.*')
-                    ->first();
-            }
-
-            $query['barang'] = $value;
-        }
-
-        //        $query['barang'] = DB::table('internal_memo_barang')
-        //            ->where('id_internal_memo', '=', $query->id)
-        //            ->join("cabang", "cabang.id", "=", "internal_memo_barang.cabang_id")
-        //            ->join("stok_barang",function($join){
-        //                $join->on("stok_barang.id_tipe","=","internal_memo_barang.id_barang")
-        //                    ->on("stok_barang.pic","=","cabang.kode");
-        //            })
-        //            ->join("barang_tipe","barang_tipe.id","=","stok_barang.id_tipe")
-        //            ->select('internal_memo_barang.*','barang_tipe.tipe', 'stok_barang.jumlah_stok', 'stok_barang.nomer_barang', 'stok_barang.pic')
-        //            ->get();
-
-        foreach ($listHistoryMemo as $key => $value) {
-
-            if ($key == 0) {
-                $value['waktu_proses'] = "00:00";
-                $time_before = new DateTime($value->created_at);
+            if ($barang_memo->isEmpty()) {
+                $query['barang'] = "";
             } else {
-                $time_after = new DateTime($value->created_at);
-                $interval = $time_before->diff($time_after);
-                $value['waktu_proses'] = $interval->format('%H:%i');
-                $time_before = new DateTime($value->created_at);
+                foreach ($barang_memo as $b) {
+                    $cabang = Cabang::where('id', $b->cabang_id)->first();
+                    $value[] = DB::table('internal_memo_barang')
+                        ->join("stok_barang", "stok_barang.id_tipe", "=", "internal_memo_barang.id_barang")
+                        ->where('stok_barang.id_tipe', $b->id_barang)
+                        ->where('stok_barang.pic', $cabang->kode)
+                        ->join("barang_tipe", "barang_tipe.id", "=", "stok_barang.id_tipe")
+                        ->select('internal_memo_barang.*', 'stok_barang.*', 'barang_tipe.*')
+                        ->first();
+                }
+
+                $query['barang'] = $value;
+            }
+
+            foreach ($listHistoryMemo as $key => $value) {
+
+                if ($key == 0) {
+                    $value['waktu_proses'] = "00:00";
+                    $time_before = new DateTime($value->created_at);
+                } else {
+                    $time_after = new DateTime($value->created_at);
+                    $interval = $time_before->diff($time_after);
+                    $value['waktu_proses'] = $interval->format('%H:%i');
+                    $time_before = new DateTime($value->created_at);
+                }
+            }
+
+            $decode = json_decode($query, true);
+
+            $userMaintenanceArray = [];
+
+            // Menggabungkan user maintenance menjadi satu
+            foreach ($decode['memo_maintenance'] as $key => $mm) {
+                if (count($mm['user_maintenance']) > 0) {
+                    $userMaintenanceArray[$key] = $mm['user_maintenance'][0]['id'];
+                }
+            }
+
+            // sort arraynya
+            sort($userMaintenanceArray);
+            $sortArray = array_values($userMaintenanceArray);
+
+            $userMaintenanceArrayUser = [];
+
+            // menemukan user berdasarkan id
+            foreach ($sortArray as $key => $sa) {
+                $userMaintenance = UserMaintenance::where("id", $sa)->first();
+                $userMaintenanceArrayUser[$key] = $userMaintenance;
+            }
+
+            $query['user_maintenance'] = $userMaintenanceArrayUser;
+        }else if($query->vendor_type == 1){
+            $now = date('Y-m-d H:i:s', strtotime('now'));
+
+            $query->MemoFile->makeHidden(['created_at', 'updated_at']);
+            $query->createdBy->makeHidden(['created_at', 'updated_at', 'email_verified_at']);
+            $query->cabang;
+            $query->devisi->makeHidden(['created_at', 'updated_at']);
+            // $query->kategori->makeHidden(['created_at','updated_at']);
+            $query->kategoriJenis->makeHidden(['created_at', 'updated_at']);
+            $query->kategoriSub;
+            $query->memoRating;
+            $query->internalMemoVendor;
+            $listHistoryMemo = $query->listHistoryMemo;
+            $time_before = new DateTime($now);
+
+            foreach ($listHistoryMemo as $key => $value) {
+
+                if ($key == 0) {
+                    $value['waktu_proses'] = "00:00";
+                    $time_before = new DateTime($value->created_at);
+                } else {
+                    $time_after = new DateTime($value->created_at);
+                    $interval = $time_before->diff($time_after);
+                    $value['waktu_proses'] = $interval->format('%H:%i');
+                    $time_before = new DateTime($value->created_at);
+                }
             }
         }
-
-        $decode = json_decode($query, true);
-
-        $userMaintenanceArray = [];
-
-        // Menggabungkan user maintenance menjadi satu
-        foreach ($decode['memo_maintenance'] as $key => $mm) {
-            if (count($mm['user_maintenance']) > 0) {
-                $userMaintenanceArray[$key] = $mm['user_maintenance'][0]['id'];
-            }
-        }
-
-        // sort arraynya
-        sort($userMaintenanceArray);
-        $sortArray = array_values($userMaintenanceArray);
-
-        $userMaintenanceArrayUser = [];
-
-        // menemukan user berdasarkan id
-        foreach ($sortArray as $key => $sa) {
-            $userMaintenance = UserMaintenance::where("id", $sa)->first();
-            $userMaintenanceArrayUser[$key] = $userMaintenance;
-        }
-
-        $query['user_maintenance'] = $userMaintenanceArrayUser;
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
