@@ -432,16 +432,15 @@ Route::group([
              */
             Route::get('/dashboard-kc', [InternalMemoController::class, 'dashboardKcImStatus']);
             Route::get('/dashboard-mt', [InternalMemoController::class, 'dashboardMtImStatus']);
-            Route::get('/', 'InternalMemoController@index');
-            Route::get('/create', 'InternalMemoController@create');
-            Route::post('/updateFile/{id}', 'InternalMemoController@updateFile');
-            Route::post('/addNewFile/{id}', 'InternalMemoController@addNewFile');
-            Route::get('/all', 'InternalMemoController@all');
-            Route::get('/{id}', 'InternalMemoController@show');
-            Route::post('/', 'InternalMemoController@store');
-            Route::post('/store-2/test', 'InternalMemoController@store2');
-            Route::post('/{id}', 'InternalMemoController@update');
-            Route::delete('/delete/{id}', 'InternalMemoController@destroy');
+            Route::get('/', [InternalMemoController::class, 'index']);
+            Route::get('/create', [InternalMemoController::class, 'create']);
+            Route::post('/updateFile/{id}', [InternalMemoController::class, 'updateFile']);
+            Route::post('/addNewFile/{id}', [InternalMemoController::class, 'addNewFile']);
+            Route::get('/{id}', [InternalMemoController::class, 'show']);
+            Route::post('/', [InternalMemoController::class, 'store']);
+            Route::post('/store-2/test', [InternalMemoController::class, 'store2']);
+            Route::post('/{id}', [InternalMemoController::class, 'update']);
+            Route::delete('/delete/{id}', [InternalMemoController::class, 'destroy']);
 
         });
 
