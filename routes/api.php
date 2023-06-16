@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\Laporan\LaporanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\InternalMemoController;
+use App\Http\Controllers\InternalMemo\MaintenanceController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceController;
 use App\Http\Controllers\InternalMemo\UserMaintenanceVendorController;
 use App\Http\Controllers\Transaksi\PemakaianController;
@@ -406,7 +407,7 @@ Route::group([
             Route::get('/getStockBarangV2', 'MaintenanceController@getStockBarangV2');
             Route::get('/stock-barang-v3', 'MaintenanceController@getStockBarangV3');
             Route::get('/getListMaintenance', 'MaintenanceController@getListMaintenance');
-            Route::post('/newInternalMaintenance/test', 'MaintenanceController@newInternalMaintenance');
+            Route::post('/surat-tugas-maintenance', [MaintenanceController::class, 'newInternalMaintenance']);
             Route::get('/getDetailBarang', 'MaintenanceController@getDetailBarang');
 
             /**
