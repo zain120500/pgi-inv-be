@@ -11,6 +11,7 @@ use App\Model\InternalMemoBarang;
 use App\Model\InternalMemoFile;
 use App\Model\InternalMemoMaintenance;
 use App\Model\InternalMemoRating;
+use App\Model\InternalMemoVendor;
 use App\Model\KategoriPicFpp;
 use App\Model\KategoriProsesPic;
 use App\Model\StokBarang;
@@ -84,7 +85,7 @@ class InternalMemoController extends Controller
 
         $collect = $internal->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
-            $query->cabang->kabupatenKota;
+//            $query->cabang->kabupatenKota;
             $query->devisi;
             $query->kategori;
             $query->kategoriJenis;
@@ -605,27 +606,45 @@ class InternalMemoController extends Controller
 
         //        DB::beginTransaction();
         //        try {
-        $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
-        foreach ($userMaintenance as $key => $value) {
-            UserMaintenance::where('id', $value)->update([
-                'flag' => 0
+        $im = InternalMemo::where('id', $id)->first();
+        if($im->vendor_type == 0){
+            $userMaintenance = InternalMemoMaintenance::where('id_internal_memo', $id)->get()->pluck('id_user_maintenance');
+            foreach ($userMaintenance as $key => $value) {
+                UserMaintenance::where('id', $value)->update([
+                    'flag' => 0
+                ]);
+            }
+
+            InternalMemoMaintenance::where('id_internal_memo', $id)->update([
+                'flag' => 4
+            ]);
+
+            $memo = InternalMemo::where('id', $id)->update([
+                'flag' => 4
+            ]);
+
+            HistoryMemo::create([
+                "id_internal_memo" => $id,
+                "user_id" => auth()->user()->id,
+                "status" => 4,
+                "keterangan" => $this->getFlagStatus(4) . ' ' . auth()->user()->name
+            ]);
+        }else if($im->vendor_type == 1){
+            InternalMemoVendor::where('id_internal_memo', $id)->update([
+                'flag' => 1
+            ]);
+
+            $memo = InternalMemo::where('id', $id)->update([
+                'flag' => 4
+            ]);
+
+            HistoryMemo::create([
+                "id_internal_memo" => $id,
+                "user_id" => auth()->user()->id,
+                "status" => 4,
+                "keterangan" => $this->getFlagStatus(4) . ' ' . auth()->user()->name
             ]);
         }
-
-        InternalMemoMaintenance::where('id_internal_memo', $id)->update([
-            'flag' => 4
-        ]);
-
-        $memo = InternalMemo::where('id', $id)->update([
-            'flag' => 4
-        ]);
-
-        HistoryMemo::create([
-            "id_internal_memo" => $id,
-            "user_id" => auth()->user()->id,
-            "status" => 4,
-            "keterangan" => $this->getFlagStatus(4) . ' ' . auth()->user()->name
-        ]);
 
         if (!empty($files)) {
             foreach ($files as $key => $file) {
