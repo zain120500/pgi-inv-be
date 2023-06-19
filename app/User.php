@@ -46,4 +46,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo('App\Model\Role');
     }
+
+    public function userStaffCabang()
+    {
+        return $this->hasMany('App\Model\UserStaffCabang', 'user_staff_id', 'id');
+    }
 }
