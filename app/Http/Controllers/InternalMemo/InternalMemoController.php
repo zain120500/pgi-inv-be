@@ -1006,7 +1006,7 @@ class InternalMemoController extends Controller
 
         $record = $record->paginate(15);
 
-        $record = $record->getCollection()->map(function ($query) {
+        $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
             $query['cabang'] = Cabang::where('id', $query->id_cabang)->first();
             $query['kabupaten_kota'] = Kabupaten::where('id', $query['cabang']->kabupaten_kota_id)->first();
@@ -1276,7 +1276,7 @@ class InternalMemoController extends Controller
 
         $record = $record->paginate(15);
 
-        $record = $record->getCollection()->map(function ($query) {
+        $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
             $query['cabang'] = Cabang::where('id', $query->id_cabang)->first();
             $query['kabupaten_kota'] = Kabupaten::where('id', $query['cabang']->kabupaten_kota_id)->first();
