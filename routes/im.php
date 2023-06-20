@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InternalMemo\InternalMemoController;
+use App\Http\Controllers\InternalMemo\LaporanInternalMemo;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,5 +39,11 @@ Route::group([
         Route::post('/store-2/test', [InternalMemoController::class, 'store2']);
         Route::post('/{id}', [InternalMemoController::class, 'update']);
         Route::delete('/delete/{id}', [InternalMemoController::class, 'destroy']);
+
+        Route::group([
+            'prefix' => 'laporan'
+        ], function ($router) {
+            Route::get('/perbaikan', [LaporanInternalMemo::class, 'laporanPerbaikan']);
+        });
     });
 });
