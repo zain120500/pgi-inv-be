@@ -80,8 +80,10 @@ class InternalMemoController extends Controller
 
         $internal->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
-            $query['cabang'] = Cabang::where('id', $query->id_cabang)->first();
-            $query['kabupaten_kota'] = Kabupaten::where('id', $query['cabang']->kabupaten_kota_id)->first();
+            $query['cabang'] = DB::table('cabang')
+                ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
+                ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
             $query->devisi;
             $query->kategori;
@@ -817,8 +819,10 @@ class InternalMemoController extends Controller
 
         $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
-            $query['cabang'] = Cabang::where('id', $query->id_cabang)->first();
-            $query['kabupaten_kota'] = Kabupaten::where('id', $query['cabang']->kabupaten_kota_id)->first();
+            $query['cabang'] = DB::table('cabang')
+                ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
+                ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
             $query->devisi;
             $query->kategori;
@@ -1008,8 +1012,10 @@ class InternalMemoController extends Controller
 
         $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
-            $query['cabang'] = Cabang::where('id', $query->id_cabang)->first();
-            $query['kabupaten_kota'] = Kabupaten::where('id', $query['cabang']->kabupaten_kota_id)->first();
+            $query['cabang'] = DB::table('cabang')
+                ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
+                ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
             $query->devisi;
             $query->kategori;
@@ -1278,8 +1284,10 @@ class InternalMemoController extends Controller
 
         $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
-            $query['cabang'] = Cabang::where('id', $query->id_cabang)->first();
-            $query['kabupaten_kota'] = Kabupaten::where('id', $query['cabang']->kabupaten_kota_id)->first();
+            $query['cabang'] = DB::table('cabang')
+                ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
+                ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
             $query->devisi;
             $query->kategori;
