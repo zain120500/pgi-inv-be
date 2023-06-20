@@ -80,6 +80,18 @@ class InternalMemoController extends Controller
             })->withCount('memoMaintenanceCount', 'totalUserMaintenance');
         }
 
+        $kProses = KategoriPicFpp::where('user_id', auth()->user()->id)->first();
+
+        if(!empty($kProses)){
+            if($kProses->kategori_proses == 1){
+                $internal = $internal->whereIn('flag', [0, 1, 2]);
+            }else if ($kProses->kategori_proses == 2){
+                $internal = $internal->whereIn('flag', [1, 2]);
+            }else if ($kProses->kategori_proses == 3){
+                $internal = $internal->whereIn('flag', [2, 3, 11]);
+            }
+        }
+
         $internal = $internal->get();
 
         $internal->map(function ($query) {
