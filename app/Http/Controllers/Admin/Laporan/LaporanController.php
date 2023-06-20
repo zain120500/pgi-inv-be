@@ -64,7 +64,7 @@ class LaporanController extends Controller
 
         $record = Pembelian::query();
 
-        if(empty($request->startDate) && empty($request->endDate)){
+        if(empty($request->startDate) && empty($request->month)){
             $record = $record->with('detail', 'supplier')
                 ->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
                 ->orderBy('tanggal', 'DESC')
@@ -164,7 +164,7 @@ class LaporanController extends Controller
 
         $record = Pemakaian::query();
 
-        if(empty($request->startDate) && empty($request->endDate)){
+        if(empty($request->startDate) && empty($request->month)){
             $record = $record->with('barangTipe.barangMerk.barangJeniss')
                 ->whereHas('barangTipe', function ($q) use ($search) {
                     $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');
@@ -209,7 +209,7 @@ class LaporanController extends Controller
 
         $record = StokBarang::query();
 
-        if(empty($request->startDate) && empty($request->endDate)){
+        if(empty($request->startDate) && empty($request->month)){
             $record = $record->whereIn('pic', $this->cabangGlobal()->pluck('kode'))
                 ->whereHas('barangTipe', function ($q) use ($search) {
                     $q->where('tipe', 'like', '%' . $search . '%')->orWhere('kode_barang', 'like', '%' . $search . '%');

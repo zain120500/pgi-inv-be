@@ -80,8 +80,10 @@ class InternalMemoController extends Controller
 
         $internal->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
+            $cab = Cabang::where('id', $query->id_cabang)->get()->pluck('kabupaten_kota_id');
             $query['cabang'] = DB::table('cabang')
                 ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->whereIn('kabupaten_kota.id', $cab)
                 ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
                 ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
@@ -819,8 +821,10 @@ class InternalMemoController extends Controller
 
         $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
+            $cab = Cabang::where('id', $query->id_cabang)->get()->pluck('kabupaten_kota_id');
             $query['cabang'] = DB::table('cabang')
                 ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->whereIn('kabupaten_kota.id', $cab)
                 ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
                 ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
@@ -1012,8 +1016,10 @@ class InternalMemoController extends Controller
 
         $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
+            $cab = Cabang::where('id', $query->id_cabang)->get()->pluck('kabupaten_kota_id');
             $query['cabang'] = DB::table('cabang')
                 ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->whereIn('kabupaten_kota.id', $cab)
                 ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
                 ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
@@ -1284,8 +1290,10 @@ class InternalMemoController extends Controller
 
         $record->getCollection()->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
+            $cab = Cabang::where('id', $query->id_cabang)->get()->pluck('kabupaten_kota_id');
             $query['cabang'] = DB::table('cabang')
                 ->join("kabupaten_kota", "cabang.kabupaten_kota_id", "=", "kabupaten_kota.id")
+                ->whereIn('kabupaten_kota.id', $cab)
                 ->select('cabang.*', 'kabupaten_kota.name as kabupaten_name')
                 ->first();
             $query['kepala_cabang'] = User::where('id', $query->created_by)->first();
