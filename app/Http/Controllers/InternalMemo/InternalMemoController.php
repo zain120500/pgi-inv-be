@@ -74,6 +74,10 @@ class InternalMemoController extends Controller
             $internal = $internal->orderBy('created_at', 'DESC')
                 ->where('created_by', $request->created_by)
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance');
+        } else if ($request->kabupaten_kota_id) {
+            $internal = InternalMemo::whereHas('cabang', function ($query) use ($request) {
+                $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
+            })->withCount('memoMaintenanceCount', 'totalUserMaintenance');
         }
 
         $internal = $internal->get();
@@ -94,12 +98,6 @@ class InternalMemoController extends Controller
 
             return $query;
         });
-
-        if ($request->kabupaten_kota_id) {
-            $internal = InternalMemo::with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function ($query) use ($request) {
-                $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
-            })->withCount('memoMaintenanceCount', 'totalUserMaintenance')->get();
-        }
 
 //        if ($request->kc_kcs) {
 //            $internal = InternalMemo::whereHas('createdBy.userStaffCabang', function ($query) use ($request) {
@@ -815,6 +813,11 @@ class InternalMemoController extends Controller
             $record = $internal->orderBy('created_at', 'DESC')
                 ->where('created_by', $request->created_by)
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance');
+        } else if ($request->kabupaten_kota_id) {
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')->whereHas('cabang', function ($query) use ($request) {
+                    $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
+                });
         }
 
         $record = $record->paginate(15);
@@ -835,14 +838,6 @@ class InternalMemoController extends Controller
 
             return $query;
         });
-
-        if ($request->kabupaten_kota_id) {
-            $record = InternalMemo::whereIn('flag', $archiveFlag)
-                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
-                ->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function ($query) use ($request) {
-                    $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
-                })->paginate(15);
-        }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -1010,6 +1005,12 @@ class InternalMemoController extends Controller
             $record = $internal->orderBy('created_at', 'DESC')
                 ->where('created_by', $request->created_by)
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance');
+        } else if ($request->kabupaten_kota_id) {
+            $record = InternalMemo::whereHas('cabang', function ($query) use ($request) {
+                    $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
+                })
+                ->whereIn('id_cabang', $this->cabangGlobal()->pluck('id'))
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance');
         }
 
         $record = $record->paginate(15);
@@ -1030,16 +1031,6 @@ class InternalMemoController extends Controller
 
             return $query;
         });
-
-        if ($request->kabupaten_kota_id) {
-            $record = InternalMemo::with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')
-                ->whereHas('cabang', function ($query) use ($request) {
-                    $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
-                })
-                ->whereIn('id_cabang', $this->cabangGlobal()->pluck('id'))
-                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
-                ->paginate(15);
-        }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
@@ -1284,6 +1275,11 @@ class InternalMemoController extends Controller
             $record = $internal->orderBy('created_at', 'DESC')
                 ->where('created_by', $request->created_by)
                 ->withCount('memoMaintenanceCount', 'totalUserMaintenance');
+        } else if ($request->kabupaten_kota_id) {
+            $record = InternalMemo::whereIn('flag', $archiveFlag)
+                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')->whereHas('cabang', function ($query) use ($request) {
+                    $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
+                });
         }
 
         $record = $record->paginate(15);
@@ -1304,15 +1300,6 @@ class InternalMemoController extends Controller
 
             return $query;
         });
-
-        if ($request->kabupaten_kota_id) {
-            $record = InternalMemo::whereIn('flag', $archiveFlag)
-                ->with('cabang.kabupatenKota')
-                ->withCount('memoMaintenanceCount', 'totalUserMaintenance')
-                ->with('cabang.kabupatenKota', 'devisi', 'kategoriJenis', 'kategoriSub')->whereHas('cabang', function ($query) use ($request) {
-                    $query->where('kabupaten_kota_id', $request->kabupaten_kota_id);
-                })->paginate(15);
-        }
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
