@@ -92,7 +92,7 @@ class InternalMemoController extends Controller
             }
         }
 
-        $internal = $internal->get();
+        $internal = $internal->paginate(30);
 
         $internal->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
