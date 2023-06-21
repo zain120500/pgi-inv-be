@@ -44,6 +44,7 @@ Route::group([
             'prefix' => 'laporan'
         ], function ($router) {
             Route::get('/perbaikan', [LaporanInternalMemo::class, 'laporanPerbaikan']);
+            Route::get('/print-detail-memo/{id}', [LaporanInternalMemo::class, 'printMemoDetail']);
         });
     });
 });

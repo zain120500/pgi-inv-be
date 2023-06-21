@@ -23,8 +23,8 @@ use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Storage;
-use Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class InternalMemoController extends Controller
 {
@@ -724,24 +724,6 @@ class InternalMemoController extends Controller
         return view('InternalMemo.internalMemoPdf', ['query' => $query, 'memo' => $query->MemoFile, 'history' => $query->listHistoryMemo]);
     }
 
-    public function pdfMemo($id)
-    {
-        $query = InternalMemo::find($id);
-
-        $query->MemoFile->makeHidden(['created_at', 'updated_at']);
-        $query->createdBy->makeHidden(['created_at', 'updated_at', 'email_verified_at']);
-        $query->cabang;
-        $query->devisi->makeHidden(['created_at', 'updated_at']);
-        $query->kategoriJenis->makeHidden(['created_at', 'updated_at']);
-        $query->kategoriSub;
-        $query->listHistoryMemo;
-        $query->memoMaintenance;
-
-        $customPaper = array(360, 360, 360, 360);
-        $pdf = PDF::loadView('InternalMemo.internalMemoPdf', ['query' => $query, 'memo' => $query->MemoFile, 'history' => $query->listHistoryMemo])->setPaper('a4');
-        return $pdf->download('internal-memo');
-    }
-
     public function menuArchive(Request $request)
     {
         $archiveFlag = [4, 3, 8, 7, 10, 12, 13];
@@ -1303,8 +1285,8 @@ class InternalMemoController extends Controller
     public function store2(Request $request)
     {
 
-        $files = $request['files'];
-        $videos = $request['videos'];
+        $files = $request->file('files');
+        $videos = $request->file('videos');
 
         $number = InternalMemo::count('id');
 
@@ -1339,8 +1321,8 @@ class InternalMemoController extends Controller
 
         if (!empty($files)) {
             foreach ($files as $key => $file) {
-                $imageName = Str::random(10). '.' .time().'.'.$request->file->extension();
-                Storage::disk('sftp')->put($imageName, $file);
+                $imageName = Str::random(10). '.' .time().'.'.$file->extension();
+                Storage::disk('sftp')->put($imageName, fopen($file, 'r+'));
 
                 InternalMemoFile::create([
                     "id_internal_memo" => $internalMemo->id,
@@ -1351,8 +1333,8 @@ class InternalMemoController extends Controller
         }
         if (!empty($videos)) {
             foreach ($videos as $key => $video) {
-                $videoName = Str::random(10). '.' .time().'.'.$request->$video->extension();
-                Storage::disk('sftp')->put($videoName, $video);
+                $videoName = Str::random(10). '.' .time().'.'.$video->extension();
+                Storage::disk('sftp')->put($videoName, fopen($video, 'r+'));
 
                 InternalMemoFile::create([
                     "id_internal_memo" => $internalMemo->id,

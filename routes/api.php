@@ -420,7 +420,6 @@ Route::group([
              * Testing Route
              */
             Route::get('/paginateKuKc', 'InternalMemoController@paginateKuKc');
-            Route::get('/pdfMemo/{id}', 'InternalMemoController@pdfMemo');
             Route::get('/menuArchive', 'InternalMemoController@menuArchive');
             Route::get('/menu-archive-pic', [InternalMemoController::class, 'menuArchivePic']);
             Route::post('/createHistoryBarang', 'MaintenanceController@createHistoryBarang');

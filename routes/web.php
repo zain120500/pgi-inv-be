@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InternalMemo\LaporanInternalMemo;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,5 +21,5 @@ Route::get('/', function () {
 Route::group([
     'namespace' => 'InternalMemo'
 ], function ($router) {
-    Route::get('/internalmemo/{id}', 'InternalMemoController@pdfLetter');
+    Route::get('/print-internal-memo/{id}', [LaporanInternalMemo::class, 'printMemoDetail']);
 });
