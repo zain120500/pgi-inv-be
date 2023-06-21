@@ -84,15 +84,15 @@ class InternalMemoController extends Controller
 
         if(!empty($kProses)){
             if($kProses->kategori_proses == 1){
-                $internal = $internal->whereIn('flag', [0, 1, 2]);
+                $internal = $internal->whereIn('flag', [0, 1, 2])->orderBy('flag', 'ASC');
             }else if ($kProses->kategori_proses == 2){
-                $internal = $internal->whereIn('flag', [1, 2]);
+                $internal = $internal->whereIn('flag', [1, 2])->orderBy('flag', 'ASC');
             }else if ($kProses->kategori_proses == 3){
-                $internal = $internal->whereIn('flag', [2, 3, 11]);
+                $internal = $internal->whereIn('flag', [2, 3, 11])->orderBy('flag', 'ASC');
             }
         }
 
-        $internal = $internal->paginate(30);
+        $internal = $internal->paginate(25);
 
         $internal->map(function ($query) {
             $query['flag_status'] = $this->getFlagStatus($query->flag);
