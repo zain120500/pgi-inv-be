@@ -64,7 +64,7 @@ class PengirimanController extends Controller
             "flag"      => $request->flag,
             "status"    => $request->status,
             "keterangan" => $request->keterangan,
-            "user_input" => auth()->user()->admin->username,
+            "user_input" => auth()->user()->username,
             "last_update" => date('Y-m-d H:i:s', strtotime('now'))
         ]);
 
@@ -259,7 +259,7 @@ class PengirimanController extends Controller
                     "satuan" => $detail->satuan,
                     "total_harga" => $detail->total_harga,
                     "imei" => $detail->imei,
-                    "user_input" => auth()->user()->admin->username,
+                    "user_input" => auth()->user()->username,
                 ]);
 
                 $detail->update(['status' => 1]);
@@ -321,7 +321,7 @@ class PengirimanController extends Controller
                     "satuan" => $query->satuan,
                     "total_harga" => $query->total_harga,
                     "imei" => $query->imei,
-                    "user_input" => auth()->user()->admin->username,
+                    "user_input" => auth()->user()->username,
                 ]);
             } catch (\Exception $e) {
                 return $e->getMessage();

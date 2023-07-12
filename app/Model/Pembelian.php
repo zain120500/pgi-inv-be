@@ -25,4 +25,12 @@ class Pembelian extends Model
     {
         return $this->hasMany('App\Model\PembelianDetail', 'id_pembelian', 'id');
 	}
+
+    function pembelianFile()
+    {
+        return $this->hasOne('App\Model\PembelianFile', 'id_pembelian', 'id');
+	}
+
+
+
 }

@@ -1001,6 +1001,42 @@ class MaintenanceController extends Controller
         );
     }
 
+    public function getStockBarangInvent(Request $request)
+    {
+        $value = $request->search;
+        if (!empty($value)) {
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe.barangMerk.barangJenis')->whereHas('barangTipe', function ($q) use ($value) {
+                $q->where('tipe_kode' , 1)->where('tipe', 'like', '%' . $value . '%')->orWhere('kode_barang', 'like', '%' . $value . '%');
+            })->get();
+        } else {
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe.barangMerk.barangJenis')->get();
+        }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $stockBarang
+        );
+    }
+
+    public function getStockBarangPemakaian(Request $request)
+    {
+        $value = $request->search;
+        if (!empty($value)) {
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe.barangMerk.barangJenis')->whereHas('barangTipe', function ($q) use ($value) {
+                $q->where('tipe_kode' , 0)->where('tipe', 'like', '%' . $value . '%')->orWhere('kode_barang', 'like', '%' . $value . '%');
+            })->get();
+        } else {
+            $stockBarang = StokBarang::where('pic', $request->kode_cabang)->with('barangTipe.barangMerk.barangJenis')->get();
+        }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $stockBarang
+        );
+    }
+
     public function getListMaintenance()
     {
         $listMaintenance = UserMaintenance::withCount('resultJob')->get();

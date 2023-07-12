@@ -11,12 +11,12 @@ class BarangMasuk extends Model
     protected $guarded = [''];
 
 
-    public function barangTipe()
-    {
-        return $this->hasMany('App\Model\BarangTipe', 'id', 'id_tipe');
-    }
+    // public function barangTipe()
+    // {
+    //     return $this->hasMany('App\Model\BarangTipe', 'id', 'id_tipe');
+    // }
 
-    public function barangTipee()
+    public function barangTipe()
     {
         return $this->hasOne('App\Model\BarangTipe', 'id', 'id_tipe');
     }

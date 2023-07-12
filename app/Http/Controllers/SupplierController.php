@@ -10,9 +10,14 @@ use App\Helpers\Constants;
 class SupplierController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $supplier = Supplier::paginate(15);
+        if(!empty($request->search)){
+            $supplier = Supplier::where('nama', 'like', '%' . $request->search . '%')->paginate(15);
+        }
+        else{
+            $supplier = Supplier::paginate(15);
+        }
 
         // return response()->json([
         //     'status' =>'success',

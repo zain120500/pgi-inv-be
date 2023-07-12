@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Users\UserRequest;
 use Illuminate\Http\Request;
 use App\User;
 use Paginator;
@@ -12,11 +13,19 @@ use App\Model\Menu;
 
 class UserController extends Controller
 {
-    public function all()
+    public function all(Request $request)
     {
-        $users = User::orderBy('created_at', 'ASC')->get();
+        $users = User::query();
 
-        $collect_user = $users->map(function ($query) {
+        if ($request->search) {
+            $users = $users->where('name', 'like', '%' . $request->search . '%')->orWhere('username', 'like', '%' . $request->search . '%');
+        }else if($request->sort){
+            $users = $users->orderBy('id', $request->sort);
+        }
+
+        $result = $users->orderBy('id', 'DESC')->get();
+
+        $result->map(function ($query) {
             $query->role;
             $query->admin;
 
@@ -26,15 +35,23 @@ class UserController extends Controller
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $users
+            $result
         );
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(15);
+        $users = User::query();
 
-        $collect_user = $users->getCollection()->map(function ($query) {
+        if ($request->search) {
+            $users = $users->where('name', 'like', '%' . $request->search . '%')->orWhere('username', 'like', '%' . $request->search . '%');
+        }else if($request->sort){
+            $users = $users->orderBy('id', $request->sort);
+        }
+
+        $result = $users->orderBy('id', 'DESC')->paginate(15);
+
+        $result->getCollection()->map(function ($query) {
             $query->role;
             $query->admin;
 
@@ -44,7 +61,7 @@ class UserController extends Controller
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $users->setCollection($collect_user)
+            $result
         );
     }
 
@@ -53,9 +70,24 @@ class UserController extends Controller
         //
     }
 
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        //
+        $record = User::create([
+            "name" => $request->name,
+            "username" => $request->username,
+            "email" => $request->email,
+            "role_id" => $request->role_id,
+            "devisi_id" => $request->devisi_id,
+            "password" => bcrypt($request->password),
+            "is_active" => 1,
+            "is_new_user" => 0,
+        ]);
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 
     public function show($id)
@@ -84,11 +116,56 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $record = User::where('id', $id)->first();
+
+        if($request->password != null){
+            $record->update([
+                "name" => $request->name,
+                "username" => $request->username,
+                "email" => $request->email,
+                "role_id" => $request->role_id,
+                "devisi_id" => $request->devisi_id,
+                "password" => bcrypt($request->password),
+                "is_active" => $request->is_active
+            ]);
+        }else{
+            $record->update([
+                "name" => $request->name,
+                "username" => $request->username,
+                "email" => $request->email,
+                "role_id" => $request->role_id,
+                "devisi_id" => $request->devisi_id,
+                "is_active" => $request->is_active
+            ]);
+        }
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 
     public function destroy($id)
     {
         //
+    }
+
+    public function usersByRole()
+    {
+        $filter = ['Kepala Cabang', 'Kepala Cabang Senior'];
+
+        $user = User::query();
+        $record = $user->with('roleIm')
+            ->whereHas('roleIm', function ($q) use ($filter) {
+                $q->whereIn('name', $filter);
+            })
+            ->get();
+
+        return self::buildResponse(
+            Constants::HTTP_CODE_200,
+            Constants::HTTP_MESSAGE_200,
+            $record
+        );
     }
 }

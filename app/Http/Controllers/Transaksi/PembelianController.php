@@ -10,10 +10,14 @@ use App\Model\BarangTipe;
 use App\Model\BarangMasuk;
 use App\Model\Admin;
 use App\Model\LogRefund;
+use App\Model\PembelianFile;
 use App\User;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use DB;
 
 use App\Helpers\Constants;
+use App\Model\StokBarang;
 
 class PembelianController extends Controller
 {
@@ -120,7 +124,7 @@ class PembelianController extends Controller
             "ongkir" => $request->ongkir,
             "flag" => 0,
             "keterangan" => $request->keterangan,
-            "user_input" => auth()->user()->admin->username
+            "user_input" => auth()->user()->username
         ]);
 
         return self::buildResponse(
@@ -155,11 +159,13 @@ class PembelianController extends Controller
                     "tanggal" => $request->tanggal,
                     "id_supplier" => $request->id_supplier,
                     "is_dropship" => ($request->kode_cabang) ? true : false, // true/false
+                    "bank" => $request->bank,
+                    "rek_tujuan" => $request->rek_tujuan,
                     "pic" => $request->pic,
                     "ongkir" => $request->ongkir,
                     "flag" => 0,
                     "keterangan" => $request->keterangan,
-                    "user_input" => auth()->user()->admin->username
+                    "user_input" => auth()->user()->username
                 ]);
             } else {
                 $no_invoice = $request->no_invoice;
@@ -209,7 +215,7 @@ class PembelianController extends Controller
             $query['total_pembelian'] = $details->sum('total_harga');
 
             $query['status_flag'] = $this->getCodeFlag($query->flag);
-
+            $query->pembelianFile;
             $pembelianDetail = $query->detail;
             foreach ($pembelianDetail as $key => $detail) {
                 $detail->tipeBarang;
@@ -244,11 +250,13 @@ class PembelianController extends Controller
         $query = Pembelian::where('id', $id)
             ->update([
                 "id_supplier" => $request->id_supplier,
-                "is_dropship" => $request->is_dropship, // true/false
+                //"is_dropship" => $request->is_dropship, // true/false
                 "pic" => $request->pic,
                 "ongkir" => $request->ongkir,
+                "bank" => $request->bank,
+                "rek_tujuan" => $request->rek_tujuan,
                 "keterangan" => $request->keterangan,
-                "user_input" => auth()->user()->admin->username
+                "user_input" => auth()->user()->username
             ]);
 
         return self::buildResponse(
@@ -298,6 +306,7 @@ class PembelianController extends Controller
 
         $id = $request->id;
         $flag = $request->flag;
+        $foto = $request->foto;
 
         $pembelian = Pembelian::where('id', $id)->first();
 
@@ -310,20 +319,29 @@ class PembelianController extends Controller
         } else if ($flag == 3) { //terima barang
             $details = PembelianDetail::where('id_pembelian', $pembelian->id);
             foreach ($details->get() as $key => $detail) {
-                $detail->update(["status" => 1]);  //update barang jadi OK
+                if($detail['status'] != 1){
+                    $detail->update(["status" => 1]);  //update barang jadi OK
 
-                BarangMasuk::create([
-                    "tanggal" => date("Y-m-d"),
-                    "id_tipe" => $detail->id_tipe,
-                    "nomer_barang" => $detail->nomer_barang,
-                    "detail_barang" => $detail->detail_barang,
-                    "imei" => $detail->imei,
-                    "pic" => $pembelian->pic,
-                    "jumlah" => $detail->jumlah,
-                    "satuan" => $detail->satuan,
-                    "total_harga" => $detail->total_harga,
-                    "user_input" => auth()->user()->admin->username
-                ]);
+                    $id_tipe = $detail['id_tipe'];
+                    $jumlah_beli = $detail['jumlah'];
+            
+                    // pluck PIC harusnya 1 jangan array
+                    $stok = StokBarang::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->where('id_tipe' , $id_tipe)->first();
+                    $stok->update(["jumlah_stok" => (int)$stok['jumlah_stok'] + (int)$jumlah_beli ]);
+            
+                    BarangMasuk::create([
+                        "tanggal" => date("Y-m-d"),
+                        "id_tipe" => $detail->id_tipe,
+                        "nomer_barang" => $detail->nomer_barang,
+                        "detail_barang" => $detail->detail_barang,
+                        "imei" => $detail->imei,
+                        "pic" => $pembelian->pic,
+                        "jumlah" => $detail->jumlah,
+                        "satuan" => $detail->satuan,
+                        "total_harga" => $detail->total_harga,
+                        "user_input" => auth()->user()->username
+                    ]);
+                }
             }
         } else if ($flag == 4) { // Approve Void Pembelian
 
@@ -347,6 +365,22 @@ class PembelianController extends Controller
             }
         }
 
+        if (!empty($foto)) {
+                $image_64 = $foto; //your base64 encoded data
+                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
+                $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
+                $image = str_replace($replace, '', $image_64);
+                $image = str_replace(' ', '+', $image);
+                $imageName = Str::random(10) . '.' . $extension;
+                Storage::disk('sftp')->put($imageName, base64_decode(($image), 'r+'));
+
+                PembelianFile::create([
+                    "id_pembelian" => $id,
+                    "path" => $imageName,
+                ]);
+            
+        }
+
         $pembelian->update(["flag" => $flag]);
 
         return self::buildResponse(
@@ -362,6 +396,27 @@ class PembelianController extends Controller
         $status = $request->status;
 
         $query = PembelianDetail::where('id', $id)->update(["status" => $status]);
+        $id_tipe = PembelianDetail::where('id', $id)->first()['id_tipe'];
+        $jumlah_beli = PembelianDetail::where('id', $id)->first()['jumlah'];
+
+        // pluck PIC harusnya 1 jangan array
+        $stok = StokBarang::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->where('id_tipe' , $id_tipe)->first();
+        $stok->update(["jumlah_stok" => (int)$stok['jumlah_stok'] + (int)$jumlah_beli ]);
+
+        $detail = PembelianDetail::where('id', $id)->first();
+
+        BarangMasuk::create([
+            "tanggal" => date("Y-m-d"),
+            "id_tipe" => $detail->id_tipe,
+            "nomer_barang" => $detail->nomer_barang,
+            "detail_barang" => $detail->detail_barang,
+            "imei" => $detail->imei,
+            "pic" => $this->cabangGlobal()->pluck('kode')->first(),
+            "jumlah" => $detail->jumlah,
+            "satuan" => $detail->satuan,
+            "total_harga" => $detail->total_harga,
+            "user_input" => auth()->user()->username
+        ]);
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,

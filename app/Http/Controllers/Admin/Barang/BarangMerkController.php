@@ -27,14 +27,11 @@ class BarangMerkController extends Controller
             return $query;
         });
 
-<<<<<<< HEAD
-=======
         // return response()->json([
         //     'status' => 'success',
         //     'data' => $barang->setCollection($collect)
         // ], 200);
 
->>>>>>> 28cf061 (updated)
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
@@ -53,13 +50,6 @@ class BarangMerkController extends Controller
             $query = BarangMerk::get();
         }
 
-<<<<<<< HEAD
-        return self::buildResponse(
-            Constants::HTTP_CODE_200,
-            Constants::HTTP_MESSAGE_200,
-            $query
-        );
-=======
         if (!empty($query)) {
             // return $this->successResponse($query, 'Success', 200);
 
@@ -77,7 +67,6 @@ class BarangMerkController extends Controller
                 $query
             );
         }
->>>>>>> 28cf061 (updated)
     }
 
 

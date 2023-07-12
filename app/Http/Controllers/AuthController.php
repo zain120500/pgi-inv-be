@@ -50,11 +50,13 @@ class AuthController extends Controller
         $id_top_menu = [];
 
         $credentials = request(['username', 'password']);
+     
         if (!$token = auth()->attempt($credentials)) {
             return $this->errorResponse('Incorrect username or password.', 401);
         } else if (auth()->user()->is_active == 1) {
             $user = auth()->user();
             $access_menu = $user->role->roleMenu;
+            
             $access_menu = $access_menu->map(function ($query) use ($id_top_menu) {
                 $query['menu'] = Menu::select(['id', 'code', 'name', 'parent_id'])->where('id', $query->menu_id)->first();
                 return $query;

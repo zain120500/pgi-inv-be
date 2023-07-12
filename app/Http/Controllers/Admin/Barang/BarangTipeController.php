@@ -15,27 +15,58 @@ class BarangTipeController extends Controller
 
     public function index(Request $request)
     {
+        // $barang = BarangTipe::query();
+      
+        // if(!empty($request->tipe)){
+        //    $query = $barang->with('barangMerk.barangJeniss')
+        //     ->where('tipe', 'like', '%' . $request->tipe . '%')->paginate(15);
+           
+        //  }
+        //  else{
+        //    $query = $barang->paginate(15);
+        //  }
+        $jenis = $request->jenis;
         if (!empty($request->tipe)) {
-            $barang = BarangTipe::where('tipe', 'like', '%' . $request->tipe . '%')->paginate(15);
+            $barang = BarangTipe::with('barangMerk.barangJeniss')->where('tipe', 'like', '%' . $request->tipe . '%')->paginate(15);
         } else if (!empty($request->kode_barang)) {
-            $barang = BarangTipe::where('kode_barang', 'like', '%' . $request->kode_barang . '%')->paginate(15);
-        } else {
-            $barang = BarangTipe::paginate(15);
+            $barang = BarangTipe::with('barangMerk.barangJeniss')->where('kode_barang', 'like', '%' . $request->kode_barang . '%')->paginate(15);
+        } else if(!empty($request->merk)){
+            $barang = BarangTipe::with('barangMerk.barangJeniss')->where('id_merk', $request->merk )->paginate(15);
+        } else if (!empty($jenis)){
+            $barang = BarangTipe::with('barangMerk.barangJeniss')
+            ->whereHas('barangMerk',function ($q) use ($jenis){
+                $q->where('id_jenis',$jenis);
+            })
+            ->paginate(15);
+        }
+        // elseif(!empty($request->merk) && !empty($jenis) ){
+        //     echo 'ada merk jenis';
+        //     $barang = BarangTipe::with('barangMerk.barangJeniss')->where('id_merk', $request->merk)
+        //     ->whereHas('barangMerk',function ($q) use ($jenis){
+        //         $q->where('id_jenis',$jenis);
+        //     })
+        //     ->paginate(15);
+        // }
+         else {
+            $barang = BarangTipe::with('barangMerk.barangJeniss')->paginate(15);
         }
 
-        $collect = $barang->getCollection()->map(function ($query) {
-            $barangMerk = $query->barangMerk;
-            if (!empty($barangMerk)) {
-                $barangMerk->barangJenis;
-            }
+        // $collect = $barang->getCollection()->map(function ($query) use ($request) {
+            
+        //     // $barangMerk = $query->barangMerk;
+        //     // if (!empty($barangMerk)) {
+        //     //     $barangMerk->barangJeniss;
+        //     // }
 
-            return $query;
-        });
+        //     return $query;
+        // });
 
         return self::buildResponse(
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
-            $barang->setCollection($collect)
+            //$barang->setCollection($collect)
+            $barang
+            //$query
         );
     }
 

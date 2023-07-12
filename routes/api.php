@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\Barang\BarangStokController;
 use App\Http\Controllers\Admin\Barang\BarangTipeController;
 use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\Laporan\LaporanController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InternalMemo\InternalMemoController;
 use App\Http\Controllers\InternalMemo\MaintenanceController;
@@ -100,11 +102,11 @@ Route::group([
     Route::group([
         'prefix' => 'role'
     ], function ($router) {
-        Route::get('/', 'RoleController@index');
-        Route::get('/{id}', 'RoleController@show');
-        Route::post('/', 'RoleController@store');
-        Route::post('/{id}', 'RoleController@update');
-        Route::delete('/delete/{id}', 'RoleController@destroy');
+        Route::get('/', [RoleController::class, 'index']);
+        Route::get('/{id}', [RoleController::class, 'show']);
+        Route::post('/', [RoleController::class, 'store']);
+        Route::put('/{id}', [RoleController::class, 'update']);
+        Route::delete('/delete/{id}', [RoleController::class, 'destroy']);
     });
 
     Route::group([
@@ -139,11 +141,14 @@ Route::group([
         'prefix' => 'management-users'
         // 'middleware' => 'guest',
     ], function ($router) {
-
-        Route::get('/', 'UserController@index');
-        Route::get('/all', 'UserController@all');
-        Route::get('/{id}', 'UserController@show');
+        Route::get('/users-role', [UserController::class, 'usersByRole']);
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/all', [UserController::class, 'all']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::post('/create', [UserController::class, 'store']);
+        Route::put('/update/{id}', [UserController::class, 'update']);
     });
+
 
 
     Route::group([
@@ -269,6 +274,8 @@ Route::group([
         Route::get('/pemakaian', [LaporanController::class, 'laporanPemakaian']);
         Route::get('/stokbarang', [LaporanController::class, 'laporanStokBarang']);
         Route::get('/history-barang', [LaporanController::class, 'historyBarang']);
+        Route::get('/barang-masuk', [LaporanController::class, 'barangMasuk']);
+        Route::get('/barang-keluar', [LaporanController::class, 'barangKeluar']);
     });
 });
 
@@ -358,6 +365,7 @@ Route::group([
             Route::get('/all', [StokInventarisController::class, 'all']);
             Route::get('/paginate', [StokInventarisController::class, 'paginate']);
             Route::post('/create', [StokInventarisController::class, 'create']);
+            Route::post('/return', [StokInventarisController::class, 'return']);
 
         });
     });
@@ -406,6 +414,8 @@ Route::group([
             Route::post('/deleteBarangMaintenance', 'MaintenanceController@deleteBarangMaintenance');
             Route::get('/getStockBarangV2', 'MaintenanceController@getStockBarangV2');
             Route::get('/stock-barang-v3', 'MaintenanceController@getStockBarangV3');
+            Route::get('/stock-barang-invent', 'MaintenanceController@getStockBarangInvent');
+            Route::get('/stock-barang-pemakaian', 'MaintenanceController@getStockBarangPemakaian');
             Route::get('/getListMaintenance', 'MaintenanceController@getListMaintenance');
             Route::post('/surat-tugas-maintenance', [MaintenanceController::class, 'newInternalMaintenance']);
             Route::get('/getDetailBarang', 'MaintenanceController@getDetailBarang');
@@ -504,8 +514,14 @@ Route::group([
             Route::post('/{id}', 'DevisiAccessController@update');
             Route::delete('/delete/{id}', 'DevisiAccessController@destroy');
         });
-
     });
 
+    Route::group([
+        'prefix' => 'dashboard'
+    ], function ($router) {
+        Route::get('/pembelianTrack', 'DashboardController@pembelianTrack');
+        Route::get('/stokTersedia', 'DashboardController@stokTersedia');
+        Route::get('/stokHabis', 'DashboardController@stokHabis');
+    });
 
 });
