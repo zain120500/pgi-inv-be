@@ -356,6 +356,7 @@ Route::group([
             Route::get('/paginate', [PemakaianController::class, 'paginate']);
             Route::post('/', [PemakaianController::class, 'store']);
             Route::delete('/{id}', [PemakaianController::class, 'delete']);
+            Route::get('/sync', [PemakaianController::class, 'sync']);
 
         });
 

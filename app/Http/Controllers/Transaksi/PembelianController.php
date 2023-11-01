@@ -18,6 +18,8 @@ use DB;
 
 use App\Helpers\Constants;
 use App\Model\StokBarang;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class PembelianController extends Controller
 {
@@ -319,16 +321,28 @@ class PembelianController extends Controller
         } else if ($flag == 3) { //terima barang
             $details = PembelianDetail::where('id_pembelian', $pembelian->id);
             foreach ($details->get() as $key => $detail) {
+
                 if($detail['status'] != 1){
+                    //echo $detail;
+                    $tipe = BarangTipe::where('id',$detail['id_tipe'])->first();
+                    //return $tipe['tipe_kode'];
+
+                    if ($tipe['tipe_kode']== 1){
+                        $detail->nomer_barang = $this->generateNoBarang();
+                    }
+
                     $detail->update(["status" => 1]);  //update barang jadi OK
 
-                    $id_tipe = $detail['id_tipe'];
-                    $jumlah_beli = $detail['jumlah'];
+                     //$id_tipe = $detail['id_tipe'];
+                    
+                    // $jumlah_beli = $detail['jumlah'];
             
-                    // pluck PIC harusnya 1 jangan array
-                    $stok = StokBarang::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->where('id_tipe' , $id_tipe)->first();
-                    $stok->update(["jumlah_stok" => (int)$stok['jumlah_stok'] + (int)$jumlah_beli ]);
-            
+                    // // pluck PIC harusnya 1 jangan array
+                    // $stok = StokBarang::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->where('id_tipe' , $id_tipe)->first();
+                    // $stok->update(["jumlah_stok" => (int)$stok['jumlah_stok'] + (int)$jumlah_beli ]);
+                    //echo $stok;
+    
+                    echo $this->generateNoBarang();
                     BarangMasuk::create([
                         "tanggal" => date("Y-m-d"),
                         "id_tipe" => $detail->id_tipe,
@@ -494,6 +508,21 @@ class PembelianController extends Controller
         $tahun = $time = date("Y");
 
         $nik = "B" . $tahun . $bulan . $tanggal . sprintf("%04s", $max_nik);
-        return $nik;
+       return $nik;
+    }
+    public function generateNoBarang()
+    {
+        $max_id = StokBarang::whereMonth('last_update','=',Carbon::now()->format('m'))->get();
+        $datetime = Carbon::now();
+        $bulan = $datetime->format('m');
+        $tahun =  $datetime->format('y');
+        $tanggal =  $datetime->format('d');
+        //echo 'year'.$year;
+        //echo $datetime;
+    //     $max_fix = (int) substr($max_id[0]->max_code, 9, 4);
+    //     $max_nik = $max_fix + 1;
+
+         $code = $tahun . $bulan . $tanggal . sprintf("%03s", count($max_id));
+         return $code;
     }
 }

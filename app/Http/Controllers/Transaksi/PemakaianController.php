@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Model\BarangTipe;
 use App\Model\BarangKeluar;
 use App\Model\StokBarang;
+use Faker\Core\Number;
 use Illuminate\Support\Carbon;
 
 class PemakaianController extends Controller
@@ -74,6 +75,12 @@ class PemakaianController extends Controller
 
     public function store(Request $request)
     {
+        
+        $stokBarang = StokBarang::whereIn('pic', $this->cabangGlobal()->pluck('kode'))->where('nomer_barang',$request->nomer_barang)->first();
+        $hargaSatuan = $stokBarang['total_asset'] / $stokBarang['jumlah_stok'];
+        $hargaKeluar = $hargaSatuan * intval($request->jumlah);
+        //echo $stokBarang;
+        
         $pemakaian = Pemakaian::create([
             'tanggal' => $request->tanggal,
             'pic' => $request->pic,
@@ -81,8 +88,8 @@ class PemakaianController extends Controller
             'id_tipe' => $request->id_tipe,
             'jumlah' => $request->jumlah,
             'satuan' => $request->satuan,
-            'harga' => $request->harga,
-            'total_harga' => $request->total_harga,
+            'harga' => (int)$hargaSatuan,
+            'total_harga' => (int)$hargaKeluar,
             'imei' => $request->imei,
             'detail_barang' => $request->detail_barang,
             'keperluan' => $request->keperluan,
@@ -129,16 +136,18 @@ class PemakaianController extends Controller
     {
         try {
             $barangDel = Pemakaian::find($id);
-            //echo $barangDel;
-            $jumlah = StokBarang::where('nomer_barang', $barangDel->nomer_barang)->where('pic' , '0999')->first()->jumlah_stok;
-            // return $jumlah + $barangDel->jumlah;
-             StokBarang::where('nomer_barang', $barangDel->nomer_barang)->where('pic' , '0999')
-            ->update([
-                    "jumlah_stok" => $jumlah + $barangDel->jumlah ,
-                ]);
-            // return $stokBarang;
-            // die;
+            echo $barangDel;
+            // $jumlah = StokBarang::where('nomer_barang', $barangDel->nomer_barang)->where('pic' , '0999')->first()->jumlah_stok;
+            // $jumlah + $barangDel->jumlah;
+            //  StokBarang::where('nomer_barang', $barangDel->nomer_barang)->where('pic' , '0999')
+            // ->update([
+            //         "jumlah_stok" => $jumlah + $barangDel->jumlah,
+            //     ]);
+            // // return $stokBarang;
+            // // die;
+            $barangKeluar = BarangKeluar::where('pic' , '0999')->where('nomer_barang',$barangDel->nomer_barang)->where('tanggal',$barangDel->tanggal)->orderBy('last_update','desc')->first();
             $barangDel->delete();
+            BarangKeluar::find($barangKeluar->id)->delete();
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -147,6 +156,27 @@ class PemakaianController extends Controller
             Constants::HTTP_CODE_200,
             Constants::HTTP_MESSAGE_200,
             $barangDel
-        );
+        ); 
+    }
+    public function sync(){
+        $pemakaian = Pemakaian::where('pic','0999')->where('total_harga' ,'=' ,0)->get();
+        foreach($pemakaian as $p){
+            //echo $p['nomer_barang'];
+            $totalAset = StokBarang::where('pic','0999')->where('nomer_barang',$p['nomer_barang'])->first();
+            //echo $totalAset['total_asset'];
+            echo $p;
+           // echo $totalAset ;
+            if($totalAset != null){
+                $hargaSatuan = $totalAset['total_asset'] / $p['jumlah'];
+                $hargaKeluar = $hargaSatuan * intval($p['jumlah']);
+                Pemakaian::find($p['id'])->update([
+                    'harga' => $hargaSatuan,
+                    'total_harga' => $hargaKeluar
+                ]);
+            }
+           
+        }
+   
+        return $pemakaian;
     }
 }
